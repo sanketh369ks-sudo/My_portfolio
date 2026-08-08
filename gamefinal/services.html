@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - Gaming Website</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #101820;
+            color: #f0f0f0;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            position: relative;
+            color: #00e6e6;
+            animation: titleFadeIn 1.5s ease-in-out;
+        }
+        .service-card {
+            display: inline-block;
+            background: #1e2a38;
+            margin: 15px;
+            padding: 20px;
+            width: 280px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+        .service-card:hover {
+            transform: scale(1.05);
+        }
+        .service-card h3 {
+            color: #00e6e6;
+            margin-bottom: 10px;
+        }
+        .service-card p {
+            font-size: 1rem;
+            opacity: 0;
+            animation: cardFadeIn 2s forwards;
+        }
+        
+        @keyframes titleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Our Services</h1>
+        <div class="service-card">
+            <h3>Game Reviews</h3>
+            <p>Get in-depth reviews of the latest games, helping you make informed choices on your next adventure.</p>
+        </div>
+        <div class="service-card">
+            <h3>Tutorials & Guides</h3>
+            <p>Step-by-step tutorials and gameplay guides to improve your skills and gameplay strategies.</p>
+        </div>
+        <div class="service-card">
+            <h3>Community Events</h3>
+            <p>Join exclusive events and tournaments that bring together gamers from around the world.</p>
+        </div>
+        <div class="service-card">
+            <h3>Live Streams</h3>
+            <p>Watch live streams of popular games and learn from the best players in the industry.</p>
+        </div>
+    </div>
+</body>
+</html>

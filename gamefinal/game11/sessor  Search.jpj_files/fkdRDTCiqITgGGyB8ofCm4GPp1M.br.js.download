@@ -1,0 +1,1 @@
+_w.CSPErrors=[];_w.CSPIgnore=function(n){_w.clarity&&(_w.clarity("set","CSPViolation",n.sample),_w.clarity("event","CSPViolation"));return["chrome-extension"].some(function(t){return n.sourceFile.includes(t)})||["javascript:void(0)","javascript: void(0)"].some(function(t){return n.sample.includes(t)})?!0:_w.CSPErrors.includes(n.sample)?!0:(_w.CSPErrors.push(n.sample),!1)}
