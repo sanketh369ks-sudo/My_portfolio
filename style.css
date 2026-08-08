@@ -1,0 +1,4380 @@
+/* ==========================================================
+   PORTFOLIO WEBSITE
+   STYLE.CSS
+   PART 1A
+   Reset • Variables • Body • Typography • Buttons
+========================================================== */
+
+/* ==========================================================
+   GOOGLE FONT
+========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* ==========================================================
+   CSS VARIABLES
+========================================================== */
+
+:root{
+
+    --bg-color:#0F172A;
+    --primary:#F27D13;
+    --secondary:#E3CFC8;
+    --card:#1E293B;
+
+    --white:#ffffff;
+    --text:#E5E7EB;
+    --text-light:#94A3B8;
+
+    --border:rgba(255,255,255,.08);
+
+    --shadow:
+        0 15px 35px rgba(0,0,0,.35);
+
+    --glow:
+        0 0 15px rgba(242,125,19,.25),
+        0 0 30px rgba(242,125,19,.18);
+
+    --radius:18px;
+
+    --transition:.35s ease;
+
+    --max-width:1200px;
+
+}
+
+/* ==========================================================
+   RESET
+========================================================== */
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    font-family:"Poppins",sans-serif;
+
+    background:var(--bg-color);
+
+    color:var(--text);
+
+    overflow-x:hidden;
+
+    line-height:1.7;
+
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#09101d;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:var(--primary);
+
+    border-radius:50px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#ff983d;
+
+}
+
+/* ==========================================================
+   SELECTION
+========================================================== */
+
+::selection{
+
+    background:var(--primary);
+
+    color:#fff;
+
+}
+
+/* ==========================================================
+   IMAGES
+========================================================== */
+
+img{
+
+    width:100%;
+
+    display:block;
+
+}
+
+/* ==========================================================
+   LINKS
+========================================================== */
+
+a{
+
+    color:inherit;
+
+    text-decoration:none;
+
+    transition:var(--transition);
+
+}
+
+/* ==========================================================
+   LIST
+========================================================== */
+
+ul{
+
+    list-style:none;
+
+}
+
+/* ==========================================================
+   CONTAINER
+========================================================== */
+
+.container{
+
+    width:min(90%,var(--max-width));
+
+    margin:auto;
+
+}
+
+/* ==========================================================
+   SECTION
+========================================================== */
+
+.section{
+
+    padding:100px 8%;
+
+}
+
+/* ==========================================================
+   HEADINGS
+========================================================== */
+
+h1{
+
+    font-size:4rem;
+
+    line-height:1.1;
+
+    color:var(--white);
+
+    font-weight:800;
+
+}
+
+h2{
+
+    font-size:2.8rem;
+
+    color:var(--white);
+
+    font-weight:700;
+
+}
+
+h3{
+
+    font-size:1.5rem;
+
+    color:var(--white);
+
+}
+
+h4{
+
+    font-size:1rem;
+
+    color:var(--white);
+
+}
+
+/* ==========================================================
+   PARAGRAPH
+========================================================== */
+
+p{
+
+    color:var(--text-light);
+
+    font-size:1rem;
+
+}
+
+/* ==========================================================
+   SECTION TITLE
+========================================================== */
+
+.section-title{
+
+    text-align:center;
+
+    margin-bottom:70px;
+
+}
+
+.section-title h2{
+
+    margin-bottom:12px;
+
+}
+
+.section-title p{
+
+    max-width:700px;
+
+    margin:auto;
+
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    padding:15px 34px;
+
+    border-radius:50px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:var(--transition);
+
+    border:none;
+
+}
+
+.primary-btn{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    box-shadow:var(--glow);
+
+}
+
+.primary-btn:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+        0 18px 35px rgba(242,125,19,.35);
+
+}
+
+.secondary-btn{
+
+    background:transparent;
+
+    border:2px solid var(--primary);
+
+    color:var(--white);
+
+}
+
+.secondary-btn:hover{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    transform:translateY(-5px);
+
+}
+
+/* ==========================================================
+   END OF PART 1A
+========================================================== */
+/* ==========================================================
+   PART 1B-1
+   NAVBAR
+   Sticky Navbar • Logo • Navigation • Hamburger
+========================================================== */
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+header{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+
+    z-index:1000;
+
+    backdrop-filter:blur(18px);
+
+    background:rgba(15,23,42,.75);
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+    transition:all .35s ease;
+
+}
+
+/* Navbar when page is scrolled */
+
+header.scrolled{
+
+    background:rgba(15,23,42,.92);
+
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+
+}
+
+/* ==========================================================
+   NAVBAR
+========================================================== */
+
+.navbar{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:18px 30px;
+
+}
+
+/* ==========================================================
+   LOGO
+========================================================== */
+
+.logo a{
+
+    font-size:1.8rem;
+
+    font-weight:800;
+
+    color:var(--white);
+
+    letter-spacing:1px;
+
+    transition:var(--transition);
+
+}
+
+.logo span{
+
+    color:var(--primary);
+
+}
+
+.logo a:hover{
+
+    color:var(--primary);
+
+}
+
+/* ==========================================================
+   NAVIGATION
+========================================================== */
+
+.nav-links{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:35px;
+
+}
+
+.nav-links li{
+
+    position:relative;
+
+}
+
+.nav-links a{
+
+    color:var(--text);
+
+    font-size:1rem;
+
+    font-weight:500;
+
+    transition:var(--transition);
+
+    padding:6px 0;
+
+}
+
+/* Hover */
+
+.nav-links a:hover{
+
+    color:var(--primary);
+
+}
+
+/* Animated underline */
+
+.nav-links a::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-6px;
+
+    width:0;
+
+    height:2px;
+
+    background:var(--primary);
+
+    transition:width .35s ease;
+
+}
+
+.nav-links a:hover::after{
+
+    width:100%;
+
+}
+
+/* Active link */
+
+.nav-links a.active{
+
+    color:var(--primary);
+
+}
+
+.nav-links a.active::after{
+
+    width:100%;
+
+}
+
+/* ==========================================================
+   HAMBURGER
+========================================================== */
+
+.hamburger{
+
+    width:34px;
+
+    height:26px;
+
+    display:none;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    cursor:pointer;
+
+    z-index:1100;
+
+}
+
+.hamburger span{
+
+    width:100%;
+
+    height:3px;
+
+    border-radius:10px;
+
+    background:var(--white);
+
+    transition:all .35s ease;
+
+}
+
+/* Hamburger Animation */
+
+.hamburger.active span:nth-child(1){
+
+    transform:translateY(11px) rotate(45deg);
+
+}
+
+.hamburger.active span:nth-child(2){
+
+    opacity:0;
+
+}
+
+.hamburger.active span:nth-child(3){
+
+    transform:translateY(-11px) rotate(-45deg);
+
+}
+
+/* ==========================================================
+   END OF PART 1B-1
+========================================================== */
+/* ==========================================================
+   PART 1B-2
+   HERO SECTION
+   Hero Layout • Profile • Social • Floating Icons
+========================================================== */
+
+/* ==========================================================
+   HERO SECTION
+========================================================== */
+
+.hero{
+
+    min-height:100vh;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:120px 8% 80px;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.hero-container{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    align-items:center;
+
+    gap:80px;
+
+}
+
+/* ==========================================================
+   HERO LEFT
+========================================================== */
+
+.greeting{
+
+    color:var(--primary);
+
+    font-size:1.2rem;
+
+    font-weight:600;
+
+    margin-bottom:12px;
+
+}
+
+.hero-left h1{
+
+    margin-bottom:12px;
+
+}
+
+.hero-left h2{
+
+    color:var(--secondary);
+
+    font-size:2rem;
+
+    margin-bottom:20px;
+
+}
+
+.hero-description{
+
+    max-width:580px;
+
+    margin-bottom:35px;
+
+}
+
+.hero-buttons{
+
+    display:flex;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:30px;
+
+}
+
+/* ==========================================================
+   SOCIAL ICONS
+========================================================== */
+
+.social-links{
+
+    display:flex;
+
+    gap:18px;
+
+}
+
+.social-links a{
+
+    width:48px;
+
+    height:48px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid var(--border);
+
+    color:var(--white);
+
+    transition:var(--transition);
+
+}
+
+.social-links a:hover{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    transform:translateY(-6px) scale(1.08);
+
+    box-shadow:var(--glow);
+
+}
+
+/* ==========================================================
+   HERO RIGHT
+========================================================== */
+
+.hero-right{
+
+    display:flex;
+
+    justify-content:center;
+
+    position:relative;
+
+}
+
+.profile-wrapper{
+
+    position:relative;
+
+    width:360px;
+
+    height:360px;
+
+}
+
+.profile-image{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+    border:6px solid rgba(255,255,255,.08);
+
+    position:relative;
+
+    z-index:2;
+
+}
+
+.profile-glow{
+
+    position:absolute;
+
+    inset:-12px;
+
+    border-radius:50%;
+
+    background:conic-gradient(
+        var(--primary),
+        #ffb45b,
+        var(--primary)
+    );
+
+    animation:spin 8s linear infinite;
+
+    filter:blur(2px);
+
+}
+
+.profile-glow::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:10px;
+
+    border-radius:50%;
+
+    background:var(--bg-color);
+
+}
+
+/* ==========================================================
+   FLOATING TECHNOLOGY ICONS
+========================================================== */
+
+.floating-icons .icon{
+
+    position:absolute;
+
+    width:58px;
+
+    height:58px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    backdrop-filter:blur(10px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:var(--primary);
+
+    font-size:1.5rem;
+
+    box-shadow:var(--shadow);
+
+    animation:float 4s ease-in-out infinite;
+
+}
+
+.icon.html{top:-10px;left:30px;}
+.icon.css{top:35px;right:-18px;}
+.icon.js{bottom:20px;right:-15px;}
+.icon.react{bottom:-10px;left:40px;}
+.icon.node{top:48%;left:-28px;}
+.icon.github{top:48%;right:-30px;}
+
+/* ==========================================================
+   BACKGROUND FLOATING SHAPES
+========================================================== */
+
+.background .shape{
+
+    position:absolute;
+
+    border-radius:50%;
+
+    filter:blur(80px);
+
+    opacity:.18;
+
+    pointer-events:none;
+
+}
+
+.shape1{
+
+    width:260px;
+    height:260px;
+
+    background:var(--primary);
+
+    top:-100px;
+    left:-80px;
+
+}
+
+.shape2{
+
+    width:220px;
+    height:220px;
+
+    background:#4F46E5;
+
+    right:-80px;
+    top:120px;
+
+}
+
+.shape3{
+
+    width:180px;
+    height:180px;
+
+    background:#06B6D4;
+
+    bottom:80px;
+    left:20%;
+
+}
+
+.shape4{
+
+    width:240px;
+    height:240px;
+
+    background:#9333EA;
+
+    bottom:-120px;
+    right:15%;
+
+}
+
+/* ==========================================================
+   HERO ANIMATIONS
+========================================================== */
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+@keyframes float{
+
+    0%,100%{
+
+        transform:translateY(0);
+
+    }
+
+    50%{
+
+        transform:translateY(-12px);
+
+    }
+
+}
+
+/* ==========================================================
+   END OF PART 1B-2
+========================================================== */
+/* ==========================================================
+   PART 2A-1
+   SKILLS SECTION
+   Layout • Category Containers • Grid
+==========================================================*/
+
+/* ==========================================================
+   SKILLS SECTION
+==========================================================*/
+
+.skills{
+
+    position:relative;
+
+    padding:110px 8%;
+
+    overflow:hidden;
+
+}
+
+/* ==========================================================
+   SKILLS CONTAINER
+==========================================================*/
+
+.skills-container{
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:45px;
+
+}
+
+/* ==========================================================
+   CATEGORY CARD
+==========================================================*/
+
+.skill-category{
+
+    background:rgba(30,41,59,.72);
+
+    backdrop-filter:blur(18px);
+
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    padding:35px;
+
+    box-shadow:0 18px 40px rgba(0,0,0,.28);
+
+    transition:all .35s ease;
+
+}
+
+.skill-category:hover{
+
+    transform:translateY(-8px);
+
+    border-color:rgba(242,125,19,.35);
+
+    box-shadow:
+        0 20px 45px rgba(0,0,0,.35),
+        0 0 20px rgba(242,125,19,.12);
+
+}
+
+/* ==========================================================
+   CATEGORY TITLE
+==========================================================*/
+
+.skill-category h3{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:28px;
+
+    font-size:1.45rem;
+
+    color:var(--white);
+
+    position:relative;
+
+}
+
+.skill-category h3::before{
+
+    content:"";
+
+    width:6px;
+
+    height:30px;
+
+    border-radius:10px;
+
+    background:var(--primary);
+
+}
+
+.skill-category h3::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    margin-left:12px;
+
+    background:linear-gradient(
+        to right,
+        rgba(242,125,19,.45),
+        transparent
+    );
+
+}
+
+/* ==========================================================
+   SKILL GRID
+==========================================================*/
+
+.skill-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(150px,1fr));
+
+    gap:22px;
+
+    align-items:stretch;
+
+}
+
+/* ==========================================================
+   GRID SPACING
+==========================================================*/
+
+.skill-grid > *{
+
+    min-height:130px;
+
+}
+
+/* ==========================================================
+   SECTION DECORATION
+==========================================================*/
+
+.skills::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:320px;
+
+    height:320px;
+
+    top:-120px;
+
+    right:-120px;
+
+    border-radius:50%;
+
+    background:rgba(242,125,19,.06);
+
+    filter:blur(70px);
+
+    pointer-events:none;
+
+}
+
+.skills::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:260px;
+
+    height:260px;
+
+    bottom:-100px;
+
+    left:-90px;
+
+    border-radius:50%;
+
+    background:rgba(79,70,229,.08);
+
+    filter:blur(70px);
+
+    pointer-events:none;
+
+}
+
+/* ==========================================================
+   END OF PART 2A-1
+==========================================================*/
+/* ==========================================================
+   PART 2A-2
+   SKILL CARDS • ICONS • HOVER EFFECTS • GLOW
+========================================================== */
+
+/* ==========================================================
+   SKILL CARD
+========================================================== */
+
+.skill-card{
+
+    position:relative;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    min-height:130px;
+
+    padding:25px 18px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease,
+        border-color .35s ease,
+        background .35s ease;
+
+}
+
+/* ==========================================================
+   GLOW BACKGROUND
+========================================================== */
+
+.skill-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-60%;
+
+    background:
+        radial-gradient(circle,
+        rgba(242,125,19,.22),
+        transparent 70%);
+
+    opacity:0;
+
+    transition:opacity .35s ease;
+
+    pointer-events:none;
+
+}
+
+.skill-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    border-radius:18px;
+
+    border:1px solid transparent;
+
+    transition:border-color .35s ease;
+
+}
+
+/* ==========================================================
+   ICON
+========================================================== */
+
+.skill-card i{
+
+    font-size:2.6rem;
+
+    color:var(--primary);
+
+    margin-bottom:18px;
+
+    transition:
+        transform .35s ease,
+        color .35s ease;
+
+}
+
+/* ==========================================================
+   TITLE
+========================================================== */
+
+.skill-card h4{
+
+    color:var(--white);
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    transition:color .35s ease;
+
+}
+
+/* ==========================================================
+   HOVER
+========================================================== */
+
+.skill-card:hover{
+
+    transform:
+        translateY(-10px)
+        scale(1.04);
+
+    background:rgba(255,255,255,.06);
+
+    border-color:rgba(242,125,19,.45);
+
+    box-shadow:
+        0 18px 35px rgba(0,0,0,.35),
+        0 0 22px rgba(242,125,19,.18);
+
+}
+
+.skill-card:hover::before{
+
+    opacity:1;
+
+}
+
+.skill-card:hover::after{
+
+    border-color:rgba(242,125,19,.35);
+
+}
+
+.skill-card:hover i{
+
+    transform:
+        scale(1.18)
+        rotate(8deg);
+
+    color:#FFB15A;
+
+}
+
+.skill-card:hover h4{
+
+    color:#ffffff;
+
+}
+
+/* ==========================================================
+   ACTIVE CLICK EFFECT
+========================================================== */
+
+.skill-card:active{
+
+    transform:
+        scale(.97);
+
+}
+
+/* ==========================================================
+   ICON FLOAT ANIMATION
+========================================================== */
+
+.skill-card i{
+
+    animation:skillFloat 4s ease-in-out infinite;
+
+}
+
+.skill-card:nth-child(even) i{
+
+    animation-delay:.8s;
+
+}
+
+.skill-card:nth-child(3n) i{
+
+    animation-delay:1.5s;
+
+}
+
+@keyframes skillFloat{
+
+    0%,100%{
+
+        transform:translateY(0);
+
+    }
+
+    50%{
+
+        transform:translateY(-6px);
+
+    }
+
+}
+
+/* ==========================================================
+   OPTIONAL GLOW PULSE
+========================================================== */
+
+@keyframes glowPulse{
+
+    0%{
+
+        box-shadow:
+        0 0 0 rgba(242,125,19,0);
+
+    }
+
+    50%{
+
+        box-shadow:
+        0 0 24px rgba(242,125,19,.20);
+
+    }
+
+    100%{
+
+        box-shadow:
+        0 0 0 rgba(242,125,19,0);
+
+    }
+
+}
+
+.skill-card:hover{
+
+    animation:glowPulse 1.6s ease-in-out infinite;
+
+}
+
+/* ==========================================================
+   END OF PART 2A-2
+========================================================== */
+/* ==========================================================
+   PART 2B-1
+   SCROLL REVEAL • UTILITY ANIMATIONS • TRANSITIONS
+========================================================== */
+
+/* ==========================================================
+   REVEAL (INITIAL STATE)
+========================================================== */
+
+.reveal{
+
+    opacity:0;
+
+    transform:translateY(70px);
+
+    transition:
+        opacity .8s ease,
+        transform .8s ease;
+
+    will-change:opacity,transform;
+
+}
+
+/* Visible */
+
+.reveal.active{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+/* ==========================================================
+   DIRECTIONAL REVEALS
+========================================================== */
+
+.reveal-left{
+
+    opacity:0;
+
+    transform:translateX(-80px);
+
+    transition:all .8s ease;
+
+}
+
+.reveal-left.active{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}
+
+.reveal-right{
+
+    opacity:0;
+
+    transform:translateX(80px);
+
+    transition:all .8s ease;
+
+}
+
+.reveal-right.active{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}
+
+.reveal-up{
+
+    opacity:0;
+
+    transform:translateY(80px);
+
+    transition:all .8s ease;
+
+}
+
+.reveal-up.active{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+.reveal-scale{
+
+    opacity:0;
+
+    transform:scale(.9);
+
+    transition:all .8s ease;
+
+}
+
+.reveal-scale.active{
+
+    opacity:1;
+
+    transform:scale(1);
+
+}
+
+/* ==========================================================
+   ANIMATION DELAYS
+========================================================== */
+
+.delay-1{
+
+    transition-delay:.1s;
+
+}
+
+.delay-2{
+
+    transition-delay:.2s;
+
+}
+
+.delay-3{
+
+    transition-delay:.3s;
+
+}
+
+.delay-4{
+
+    transition-delay:.4s;
+
+}
+
+.delay-5{
+
+    transition-delay:.5s;
+
+}
+
+/* ==========================================================
+   FADE UTILITIES
+========================================================== */
+
+.fade-in{
+
+    animation:fadeIn .8s ease forwards;
+
+}
+
+.fade-up{
+
+    animation:fadeUp .8s ease forwards;
+
+}
+
+.fade-down{
+
+    animation:fadeDown .8s ease forwards;
+
+}
+
+.zoom-in{
+
+    animation:zoomIn .8s ease forwards;
+
+}
+
+/* ==========================================================
+   TRANSITION HELPERS
+========================================================== */
+
+.transition{
+
+    transition:all .35s ease;
+
+}
+
+.transition-fast{
+
+    transition:all .2s ease;
+
+}
+
+.transition-slow{
+
+    transition:all .6s ease;
+
+}
+
+/* ==========================================================
+   HOVER LIFT
+========================================================== */
+
+.hover-lift{
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease;
+
+}
+
+.hover-lift:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 16px 30px rgba(0,0,0,.25);
+
+}
+
+/* ==========================================================
+   KEYFRAMES
+========================================================== */
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+@keyframes fadeDown{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+@keyframes zoomIn{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.9);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* ==========================================================
+   END OF PART 2B-1
+========================================================== */
+/* ==========================================================
+   PART 2B-2
+   CARD GLOW • FLOATING EFFECTS • KEYFRAMES • UTILITIES
+========================================================== */
+
+/* ==========================================================
+   CARD GLOW UTILITIES
+========================================================== */
+
+.glow-card{
+    position:relative;
+    overflow:hidden;
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease,
+        border-color .35s ease;
+}
+
+.glow-card::before{
+    content:"";
+    position:absolute;
+    inset:-120%;
+    background:
+        radial-gradient(circle,
+        rgba(242,125,19,.22),
+        transparent 65%);
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+}
+
+.glow-card:hover{
+    transform:translateY(-8px);
+    box-shadow:
+        0 18px 35px rgba(0,0,0,.30),
+        0 0 28px rgba(242,125,19,.20);
+}
+
+.glow-card:hover::before{
+    opacity:1;
+}
+
+/* ==========================================================
+   FLOATING ANIMATION UTILITIES
+========================================================== */
+
+.float{
+    animation:floatY 4s ease-in-out infinite;
+}
+
+.float-slow{
+    animation:floatY 7s ease-in-out infinite;
+}
+
+.float-fast{
+    animation:floatY 2.8s ease-in-out infinite;
+}
+
+/* Animation delay helpers */
+
+.anim-delay-1{ animation-delay:.2s; }
+.anim-delay-2{ animation-delay:.4s; }
+.anim-delay-3{ animation-delay:.6s; }
+.anim-delay-4{ animation-delay:.8s; }
+.anim-delay-5{ animation-delay:1s; }
+
+/* ==========================================================
+   PULSE & ROTATION
+========================================================== */
+
+.pulse{
+    animation:pulseGlow 2.5s ease-in-out infinite;
+}
+
+.rotate-slow{
+    animation:rotate360 16s linear infinite;
+}
+
+/* ==========================================================
+   KEYFRAMES
+========================================================== */
+
+@keyframes floatY{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-12px);
+    }
+
+}
+
+@keyframes pulseGlow{
+
+    0%,100%{
+        box-shadow:0 0 0 rgba(242,125,19,0);
+    }
+
+    50%{
+        box-shadow:0 0 24px rgba(242,125,19,.25);
+    }
+
+}
+
+@keyframes rotate360{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+/* ==========================================================
+   PERFORMANCE HELPERS
+========================================================== */
+
+.will-animate{
+    will-change:transform, opacity;
+    transform:translateZ(0);
+    backface-visibility:hidden;
+}
+
+/* ==========================================================
+   END OF PART 2B-2
+========================================================== */
+/* ==========================================================
+   PART 3A-1
+   ACHIEVEMENTS SECTION
+   Layout • Grid • Achievement Card Container
+========================================================== */
+
+/* ==========================================================
+   ACHIEVEMENTS SECTION
+========================================================== */
+
+.achievements{
+
+    position:relative;
+
+    padding:110px 8%;
+
+    overflow:hidden;
+
+}
+
+/* Decorative Background */
+
+.achievements::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:340px;
+
+    height:340px;
+
+    top:-120px;
+
+    left:-120px;
+
+    border-radius:50%;
+
+    background:rgba(242,125,19,.06);
+
+    filter:blur(80px);
+
+    pointer-events:none;
+
+}
+
+.achievements::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:260px;
+
+    height:260px;
+
+    right:-100px;
+
+    bottom:-100px;
+
+    border-radius:50%;
+
+    background:rgba(99,102,241,.08);
+
+    filter:blur(80px);
+
+    pointer-events:none;
+
+}
+
+/* ==========================================================
+   ACHIEVEMENT GRID
+========================================================== */
+
+.achievement-grid{
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(330px,1fr));
+
+    gap:32px;
+
+    align-items:stretch;
+
+}
+
+/* ==========================================================
+   ACHIEVEMENT CARD
+========================================================== */
+
+.achievement-card{
+
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:rgba(30,41,59,.72);
+
+    backdrop-filter:blur(18px);
+
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+
+        0 18px 40px rgba(0,0,0,.30);
+
+    transition:
+
+        transform .4s ease,
+
+        box-shadow .4s ease,
+
+        border-color .4s ease;
+
+}
+
+/* Card Hover */
+
+.achievement-card:hover{
+
+    transform:
+
+        translateY(-10px);
+
+    border-color:
+
+        rgba(242,125,19,.35);
+
+    box-shadow:
+
+        0 22px 45px rgba(0,0,0,.35),
+
+        0 0 24px rgba(242,125,19,.15);
+
+}
+
+/* ==========================================================
+   CARD CONTENT WRAPPER
+========================================================== */
+
+.achievement-content{
+
+    padding:28px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+
+    flex:1;
+
+}
+
+/* ==========================================================
+   TITLE
+========================================================== */
+
+.achievement-content h3{
+
+    color:var(--white);
+
+    font-size:1.35rem;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   DESCRIPTION
+========================================================== */
+
+.achievement-content p{
+
+    color:var(--text-light);
+
+    line-height:1.7;
+
+    font-size:.98rem;
+
+}
+
+/* ==========================================================
+   DATE
+========================================================== */
+
+.achievement-content span{
+
+    margin-top:auto;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:var(--primary);
+
+    font-size:.9rem;
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   END OF PART 3A-1
+========================================================== */
+/* ==========================================================
+   PART 3A-2A
+   ACHIEVEMENT IMAGES
+   Image Container • Hover Zoom • Overlay
+========================================================== */
+
+/* ==========================================================
+   IMAGE CONTAINER
+========================================================== */
+
+.achievement-image{
+
+    position:relative;
+
+    width:100%;
+
+    height:240px;
+
+    overflow:hidden;
+
+    border-radius:20px 20px 0 0;
+
+    background:var(--card);
+
+    cursor:pointer;
+
+}
+
+/* ==========================================================
+   IMAGE
+========================================================== */
+
+.achievement-image img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+
+    transition:
+        transform .6s ease,
+        filter .4s ease;
+
+}
+
+/* ==========================================================
+   DARK OVERLAY
+========================================================== */
+
+.achievement-image::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(15,23,42,.65),
+            rgba(15,23,42,.08)
+        );
+
+    opacity:0;
+
+    transition:opacity .4s ease;
+
+    z-index:1;
+
+}
+
+/* ==========================================================
+   HOVER ICON
+========================================================== */
+
+.achievement-image::after{
+
+    content:"\f00e";
+
+    font-family:"Font Awesome 6 Free";
+
+    font-weight:900;
+
+    position:absolute;
+
+    top:50%;
+
+    left:50%;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.7);
+
+    width:70px;
+
+    height:70px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:rgba(242,125,19,.92);
+
+    color:#fff;
+
+    font-size:1.5rem;
+
+    opacity:0;
+
+    z-index:2;
+
+    transition:all .35s ease;
+
+}
+
+/* ==========================================================
+   IMAGE HOVER
+========================================================== */
+
+.achievement-card:hover .achievement-image img{
+
+    transform:scale(1.12);
+
+    filter:brightness(.85);
+
+}
+
+.achievement-card:hover .achievement-image::before{
+
+    opacity:1;
+
+}
+
+.achievement-card:hover .achievement-image::after{
+
+    opacity:1;
+
+    transform:
+        translate(-50%,-50%)
+        scale(1);
+
+}
+
+/* ==========================================================
+   END OF PART 3A-2A
+========================================================== */
+/* ==========================================================
+   PART 3A-2B
+   ACHIEVEMENT CARD ANIMATIONS
+   Staggered Delays • Entrance • Lightbox Ready
+========================================================== */
+
+/* ==========================================================
+   ENTRANCE ANIMATION
+========================================================== */
+
+.achievement-card{
+
+    opacity:0;
+
+    transform:translateY(50px);
+
+    animation:achievementReveal .8s ease forwards;
+
+}
+
+/* ==========================================================
+   STAGGERED DELAYS
+========================================================== */
+
+.achievement-card:nth-child(1){
+
+    animation-delay:.1s;
+
+}
+
+.achievement-card:nth-child(2){
+
+    animation-delay:.25s;
+
+}
+
+.achievement-card:nth-child(3){
+
+    animation-delay:.4s;
+
+}
+
+.achievement-card:nth-child(4){
+
+    animation-delay:.55s;
+
+}
+
+.achievement-card:nth-child(5){
+
+    animation-delay:.7s;
+
+}
+
+.achievement-card:nth-child(6){
+
+    animation-delay:.85s;
+
+}
+
+/* ==========================================================
+   REVEAL KEYFRAMES
+========================================================== */
+
+@keyframes achievementReveal{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateY(50px)
+            scale(.96);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+/* ==========================================================
+   LIGHTBOX READY STATES
+========================================================== */
+
+.achievement-image{
+
+    user-select:none;
+
+    -webkit-user-select:none;
+
+}
+
+.achievement-image img{
+
+    pointer-events:none;
+
+}
+
+.achievement-image:hover{
+
+    cursor:zoom-in;
+
+}
+
+.achievement-card.lightbox-active{
+
+    z-index:5;
+
+}
+
+/* ==========================================================
+   ACCESSIBILITY
+========================================================== */
+
+.achievement-card:focus-within{
+
+    outline:2px solid var(--primary);
+
+    outline-offset:4px;
+
+}
+
+/* ==========================================================
+   END OF PART 3A-2B
+========================================================== */
+/* ==========================================================
+   PART 3B-1
+   CERTIFICATE SECTION
+   Grid • Cards • Image Hover • View Button
+========================================================== */
+
+/* ==========================================================
+   CERTIFICATES SECTION
+========================================================== */
+
+.certificates{
+
+    position:relative;
+
+    padding:110px 8%;
+
+    overflow:hidden;
+
+}
+
+/* ==========================================================
+   CERTIFICATE GRID
+========================================================== */
+
+.certificate-grid{
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(320px,1fr));
+
+    gap:30px;
+
+}
+
+/* ==========================================================
+   CERTIFICATE CARD
+========================================================== */
+
+.certificate-card{
+
+    background:rgba(30,41,59,.75);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    transition:all .4s ease;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.30);
+
+}
+
+.certificate-card:hover{
+
+    transform:translateY(-10px);
+
+    border-color:rgba(242,125,19,.35);
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,.35),
+        0 0 20px rgba(242,125,19,.15);
+
+}
+
+/* ==========================================================
+   CERTIFICATE IMAGE
+========================================================== */
+
+.certificate-card img{
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+    cursor:pointer;
+
+    transition:
+        transform .6s ease,
+        filter .4s ease;
+
+}
+
+.certificate-card:hover img{
+
+    transform:scale(1.08);
+
+    filter:brightness(.9);
+
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.certificate-content{
+
+    padding:24px;
+
+}
+
+.certificate-content h3{
+
+    color:var(--white);
+
+    margin-bottom:10px;
+
+}
+
+.certificate-content p{
+
+    color:var(--text-light);
+
+    margin-bottom:10px;
+
+}
+
+.certificate-content span{
+
+    display:block;
+
+    color:var(--primary);
+
+    font-size:.9rem;
+
+    margin-bottom:20px;
+
+}
+
+/* ==========================================================
+   VIEW BUTTON
+========================================================== */
+
+.view-btn{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:all .35s ease;
+
+}
+
+.view-btn:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 25px rgba(242,125,19,.35);
+
+}
+/* ==========================================================
+   PART 3B-2
+   LIGHTBOX • CERTIFICATE MODAL • RESPONSIVE
+========================================================== */
+
+/* ==========================================================
+   LIGHTBOX & MODAL BASE
+========================================================== */
+
+.lightbox,
+.certificate-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:rgba(0,0,0,.92);
+
+    backdrop-filter:blur(8px);
+
+    -webkit-backdrop-filter:blur(8px);
+
+    visibility:hidden;
+
+    opacity:0;
+
+    z-index:9999;
+
+    transition:
+        opacity .35s ease,
+        visibility .35s ease;
+
+}
+
+/* Active State */
+
+.lightbox.active,
+.certificate-modal.active{
+
+    visibility:visible;
+
+    opacity:1;
+
+}
+
+/* ==========================================================
+   MODAL IMAGE
+========================================================== */
+
+.lightbox-image,
+.modal-image{
+
+    max-width:90%;
+
+    max-height:90vh;
+
+    object-fit:contain;
+
+    border-radius:18px;
+
+    border:2px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.5),
+        0 0 30px rgba(242,125,19,.18);
+
+    animation:modalZoom .35s ease;
+
+    user-select:none;
+
+}
+
+/* ==========================================================
+   CLOSE BUTTON
+========================================================== */
+
+.close-lightbox,
+.close-modal{
+
+    position:absolute;
+
+    top:28px;
+
+    right:36px;
+
+    width:52px;
+
+    height:52px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#fff;
+
+    font-size:2rem;
+
+    cursor:pointer;
+
+    transition:all .3s ease;
+
+}
+
+.close-lightbox:hover,
+.close-modal:hover{
+
+    background:var(--primary);
+
+    transform:rotate(90deg) scale(1.08);
+
+}
+
+/* ==========================================================
+   MODAL ANIMATION
+========================================================== */
+
+@keyframes modalZoom{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.85);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .lightbox-image,
+    .modal-image{
+
+        max-width:95%;
+
+        max-height:80vh;
+
+    }
+
+    .close-lightbox,
+    .close-modal{
+
+        top:18px;
+
+        right:18px;
+
+        width:46px;
+
+        height:46px;
+
+        font-size:1.6rem;
+
+    }
+
+}
+
+/* ==========================================================
+   END OF PART 3B-2
+========================================================== */
+/* ==========================================================
+   PART 4A-1
+   CONTACT SECTION
+   Contact Container • Contact Info • Social Icons
+========================================================== */
+
+/* ==========================================================
+   CONTACT SECTION
+========================================================== */
+
+.contact{
+
+    position:relative;
+
+    padding:110px 8%;
+
+    background:var(--bg-color);
+
+    overflow:hidden;
+
+}
+
+/* Background Glow */
+
+.contact::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:300px;
+
+    height:300px;
+
+    top:-120px;
+
+    right:-100px;
+
+    border-radius:50%;
+
+    background:rgba(242,125,19,.08);
+
+    filter:blur(80px);
+
+    pointer-events:none;
+
+}
+
+/* ==========================================================
+   CONTACT CONTAINER
+========================================================== */
+
+.contact-container{
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:50px;
+
+    align-items:center;
+
+}
+
+/* ==========================================================
+   CONTACT INFORMATION
+========================================================== */
+
+.contact-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:22px;
+
+}
+
+.contact-info p{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:18px 22px;
+
+    background:rgba(30,41,59,.72);
+
+    backdrop-filter:blur(15px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    color:var(--text);
+
+    transition:all .35s ease;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.20);
+
+}
+
+.contact-info p:hover{
+
+    transform:translateX(10px);
+
+    border-color:rgba(242,125,19,.35);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.28),
+        0 0 20px rgba(242,125,19,.12);
+
+}
+
+.contact-info i{
+
+    width:46px;
+
+    height:46px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    font-size:1.2rem;
+
+    flex-shrink:0;
+
+}
+
+/* ==========================================================
+   CONTACT TEXT
+========================================================== */
+
+.contact-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:30px;
+
+}
+
+.contact-text p{
+
+    font-size:1.05rem;
+
+    color:var(--text-light);
+
+    line-height:1.9;
+
+}
+
+/* ==========================================================
+   SOCIAL ICONS
+========================================================== */
+
+.contact-social{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:18px;
+
+}
+
+.contact-social a{
+
+    width:54px;
+
+    height:54px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:var(--white);
+
+    font-size:1.3rem;
+
+    transition:all .35s ease;
+
+}
+
+.contact-social a:hover{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    transform:translateY(-6px) scale(1.08);
+
+    box-shadow:
+        0 12px 25px rgba(242,125,19,.30);
+
+}
+
+/* ==========================================================
+   END OF PART 4A-1
+========================================================== */
+/* ==========================================================
+   PART 4A-2
+   FOOTER
+   Footer • Profile • Links • Copyright
+========================================================== */
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+footer{
+
+    position:relative;
+
+    background:#0B1220;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    padding:70px 8% 35px;
+
+    text-align:center;
+
+    overflow:hidden;
+
+}
+
+/* Decorative Glow */
+
+footer::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:280px;
+
+    height:280px;
+
+    left:50%;
+
+    top:-180px;
+
+    transform:translateX(-50%);
+
+    background:rgba(242,125,19,.08);
+
+    border-radius:50%;
+
+    filter:blur(80px);
+
+    pointer-events:none;
+
+}
+
+/* ==========================================================
+   FOOTER PROFILE
+========================================================== */
+
+.footer-profile{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:35px;
+
+}
+
+.footer-profile img{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+    border:4px solid var(--primary);
+
+    box-shadow:
+        0 0 25px rgba(242,125,19,.25);
+
+    margin-bottom:18px;
+
+    transition:all .35s ease;
+
+}
+
+.footer-profile img:hover{
+
+    transform:scale(1.08) rotate(3deg);
+
+    box-shadow:
+        0 0 35px rgba(242,125,19,.40);
+
+}
+
+.footer-profile h3{
+
+    color:var(--white);
+
+    font-size:1.5rem;
+
+    margin-bottom:8px;
+
+}
+
+.footer-profile p{
+
+    color:var(--text-light);
+
+}
+
+/* ==========================================================
+   FOOTER LINKS
+========================================================== */
+
+.footer-links{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:26px;
+
+    margin:35px 0;
+
+}
+
+.footer-links a{
+
+    color:var(--text-light);
+
+    font-weight:500;
+
+    position:relative;
+
+    transition:all .3s ease;
+
+}
+
+.footer-links a:hover{
+
+    color:var(--primary);
+
+}
+
+.footer-links a::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-5px;
+
+    width:0;
+
+    height:2px;
+
+    background:var(--primary);
+
+    transition:width .3s ease;
+
+}
+
+.footer-links a:hover::after{
+
+    width:100%;
+
+}
+
+/* ==========================================================
+   COPYRIGHT
+========================================================== */
+
+.copyright{
+
+    color:var(--text-light);
+
+    font-size:.95rem;
+
+    margin-bottom:12px;
+
+}
+
+.designer{
+
+    color:var(--text-light);
+
+    font-size:.95rem;
+
+}
+
+.designer strong{
+
+    color:var(--primary);
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   FOOTER HOVER EFFECT
+========================================================== */
+
+footer:hover::before{
+
+    opacity:1;
+
+    transition:opacity .4s ease;
+
+}
+
+/* ==========================================================
+   END OF PART 4A-2
+========================================================== */
+/* ==========================================================
+   PART 4A-2
+   FOOTER
+   Footer • Profile • Links • Copyright
+========================================================== */
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+footer{
+
+    position:relative;
+
+    background:#0B1220;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    padding:70px 8% 35px;
+
+    text-align:center;
+
+    overflow:hidden;
+
+}
+
+/* Decorative Glow */
+
+footer::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:280px;
+
+    height:280px;
+
+    left:50%;
+
+    top:-180px;
+
+    transform:translateX(-50%);
+
+    background:rgba(242,125,19,.08);
+
+    border-radius:50%;
+
+    filter:blur(80px);
+
+    pointer-events:none;
+
+}
+
+/* ==========================================================
+   FOOTER PROFILE
+========================================================== */
+
+.footer-profile{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:35px;
+
+}
+
+.footer-profile img{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+    border:4px solid var(--primary);
+
+    box-shadow:
+        0 0 25px rgba(242,125,19,.25);
+
+    margin-bottom:18px;
+
+    transition:all .35s ease;
+
+}
+
+.footer-profile img:hover{
+
+    transform:scale(1.08) rotate(3deg);
+
+    box-shadow:
+        0 0 35px rgba(242,125,19,.40);
+
+}
+
+.footer-profile h3{
+
+    color:var(--white);
+
+    font-size:1.5rem;
+
+    margin-bottom:8px;
+
+}
+
+.footer-profile p{
+
+    color:var(--text-light);
+
+}
+
+/* ==========================================================
+   FOOTER LINKS
+========================================================== */
+
+.footer-links{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:26px;
+
+    margin:35px 0;
+
+}
+
+.footer-links a{
+
+    color:var(--text-light);
+
+    font-weight:500;
+
+    position:relative;
+
+    transition:all .3s ease;
+
+}
+
+.footer-links a:hover{
+
+    color:var(--primary);
+
+}
+
+.footer-links a::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-5px;
+
+    width:0;
+
+    height:2px;
+
+    background:var(--primary);
+
+    transition:width .3s ease;
+
+}
+
+.footer-links a:hover::after{
+
+    width:100%;
+
+}
+
+/* ==========================================================
+   COPYRIGHT
+========================================================== */
+
+.copyright{
+
+    color:var(--text-light);
+
+    font-size:.95rem;
+
+    margin-bottom:12px;
+
+}
+
+.designer{
+
+    color:var(--text-light);
+
+    font-size:.95rem;
+
+}
+
+.designer strong{
+
+    color:var(--primary);
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   FOOTER HOVER EFFECT
+========================================================== */
+
+footer:hover::before{
+
+    opacity:1;
+
+    transition:opacity .4s ease;
+
+}
+
+/* ==========================================================
+   END OF PART 4A-2
+========================================================== */
+/* ==========================================================
+   PART 4B-2
+   MOBILE MEDIA QUERIES
+   Responsive Utility Classes
+========================================================== */
+
+/* ==========================================================
+   MOBILE
+   576px and below
+========================================================== */
+
+@media (max-width:576px){
+
+    section{
+
+        padding:80px 20px;
+
+    }
+
+    .hero{
+
+        min-height:auto;
+
+        padding-top:120px;
+
+    }
+
+    .hero h1{
+
+        font-size:2.3rem;
+
+        line-height:1.2;
+
+    }
+
+    .hero h2{
+
+        font-size:1.25rem;
+
+    }
+
+    .hero-description{
+
+        font-size:.95rem;
+
+    }
+
+    .hero-buttons{
+
+        flex-direction:column;
+
+        align-items:center;
+
+        gap:15px;
+
+    }
+
+    .hero-buttons .btn{
+
+        width:100%;
+
+        max-width:280px;
+
+    }
+
+    .profile-image{
+
+        width:220px;
+
+        height:220px;
+
+    }
+
+    .section-title{
+
+        font-size:2rem;
+
+    }
+
+    .section-subtitle{
+
+        font-size:.95rem;
+
+    }
+
+    .skill-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .achievement-grid,
+    .certificate-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .footer-links{
+
+        flex-direction:column;
+
+        gap:15px;
+
+    }
+
+    .contact-social{
+
+        justify-content:center;
+
+    }
+
+}
+
+/* ==========================================================
+   EXTRA SMALL DEVICES
+========================================================== */
+
+@media (max-width:400px){
+
+    .hero h1{
+
+        font-size:2rem;
+
+    }
+
+    .profile-image{
+
+        width:180px;
+
+        height:180px;
+
+    }
+
+    .skill-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .contact-info p{
+
+        padding:15px;
+
+        font-size:.9rem;
+
+    }
+
+}
+
+/* ==========================================================
+   RESPONSIVE UTILITIES
+========================================================== */
+
+.w-100{ width:100%; }
+
+.text-center{ text-align:center; }
+
+.mx-auto{
+
+    margin-left:auto;
+
+    margin-right:auto;
+
+}
+
+.hide-mobile{
+
+    display:block;
+
+}
+
+.show-mobile{
+
+    display:none;
+
+}
+
+@media (max-width:768px){
+
+    .hide-mobile{
+
+        display:none !important;
+
+    }
+
+    .show-mobile{
+
+        display:block !important;
+
+    }
+
+    .flex-mobile{
+
+        display:flex;
+
+        flex-direction:column;
+
+    }
+
+    .gap-mobile{
+
+        gap:20px;
+
+    }
+
+}
+
+/* ==========================================================
+   RESPONSIVE IMAGE
+========================================================== */
+
+.img-responsive{
+
+    max-width:100%;
+
+    height:auto;
+
+    display:block;
+
+}
+
+/* ==========================================================
+   END OF PART 4B-2
+========================================================== */
+/* ==========================================================
+   PART 5A (FINAL 1)
+   FLOATING SHAPES • PARTICLES • DECORATIVE BLOBS
+   ANIMATED GRADIENTS
+========================================================== */
+
+/* ==========================================================
+   FLOATING BACKGROUND WRAPPER
+========================================================== */
+
+.bg-effects{
+
+    position:fixed;
+
+    inset:0;
+
+    width:100%;
+
+    height:100%;
+
+    overflow:hidden;
+
+    pointer-events:none;
+
+    z-index:-1;
+
+}
+
+/* ==========================================================
+   FLOATING SHAPES
+========================================================== */
+
+.shape{
+
+    position:absolute;
+
+    border-radius:50%;
+
+    filter:blur(8px);
+
+    opacity:.22;
+
+    animation:floatShape linear infinite;
+
+}
+
+.shape-1{
+
+    width:180px;
+
+    height:180px;
+
+    top:10%;
+
+    left:6%;
+
+    background:rgba(242,125,19,.18);
+
+    animation-duration:18s;
+
+}
+
+.shape-2{
+
+    width:260px;
+
+    height:260px;
+
+    top:55%;
+
+    right:8%;
+
+    background:rgba(99,102,241,.16);
+
+    animation-duration:24s;
+
+}
+
+.shape-3{
+
+    width:130px;
+
+    height:130px;
+
+    bottom:10%;
+
+    left:20%;
+
+    background:rgba(255,255,255,.08);
+
+    animation-duration:15s;
+
+}
+
+.shape-4{
+
+    width:220px;
+
+    height:220px;
+
+    top:28%;
+
+    right:32%;
+
+    background:rgba(242,125,19,.10);
+
+    animation-duration:20s;
+
+}
+
+/* ==========================================================
+   PARTICLES
+========================================================== */
+
+.particle{
+
+    position:absolute;
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.45);
+
+    box-shadow:0 0 12px rgba(255,255,255,.35);
+
+    animation:particleFloat linear infinite;
+
+}
+
+.particle.orange{
+
+    background:var(--primary);
+
+    box-shadow:0 0 14px rgba(242,125,19,.45);
+
+}
+
+.particle.small{
+
+    width:5px;
+
+    height:5px;
+
+}
+
+.particle.large{
+
+    width:12px;
+
+    height:12px;
+
+}
+
+/* ==========================================================
+   DECORATIVE BLOBS
+========================================================== */
+
+.blob{
+
+    position:absolute;
+
+    border-radius:50%;
+
+    filter:blur(90px);
+
+    opacity:.16;
+
+    animation:blobMove 18s ease-in-out infinite;
+
+}
+
+.blob-1{
+
+    width:320px;
+
+    height:320px;
+
+    top:-120px;
+
+    left:-120px;
+
+    background:rgba(242,125,19,.22);
+
+}
+
+.blob-2{
+
+    width:280px;
+
+    height:280px;
+
+    bottom:-100px;
+
+    right:-80px;
+
+    background:rgba(99,102,241,.20);
+
+    animation-delay:5s;
+
+}
+
+/* ==========================================================
+   ANIMATED GRADIENT
+========================================================== */
+
+.gradient-bg{
+
+    background:linear-gradient(
+        -45deg,
+        #0F172A,
+        #18243F,
+        #1E293B,
+        #0F172A
+    );
+
+    background-size:400% 400%;
+
+    animation:gradientFlow 18s ease infinite;
+
+}
+
+/* ==========================================================
+   KEYFRAMES
+========================================================== */
+
+@keyframes floatShape{
+
+    0%{
+
+        transform:
+            translateY(0)
+            rotate(0deg);
+
+    }
+
+    50%{
+
+        transform:
+            translateY(-40px)
+            rotate(180deg);
+
+    }
+
+    100%{
+
+        transform:
+            translateY(0)
+            rotate(360deg);
+
+    }
+
+}
+
+@keyframes particleFloat{
+
+    from{
+
+        transform:translateY(100vh);
+
+        opacity:0;
+
+    }
+
+    15%{
+
+        opacity:1;
+
+    }
+
+    85%{
+
+        opacity:1;
+
+    }
+
+    to{
+
+        transform:translateY(-120px);
+
+        opacity:0;
+
+    }
+
+}
+
+@keyframes blobMove{
+
+    0%,100%{
+
+        transform:
+            translate(0,0)
+            scale(1);
+
+    }
+
+    50%{
+
+        transform:
+            translate(40px,-35px)
+            scale(1.15);
+
+    }
+
+}
+
+@keyframes gradientFlow{
+
+    0%{
+
+        background-position:0% 50%;
+
+    }
+
+    50%{
+
+        background-position:100% 50%;
+
+    }
+
+    100%{
+
+        background-position:0% 50%;
+
+    }
+
+}
+
+/* ==========================================================
+   END OF PART 5A
+========================================================== */
+/* ==========================================================
+   PART 5B (FINAL 2)
+   ADVANCED UTILITY CLASSES
+   Spacing • Flex • Grid • Display • Shadows
+   Glassmorphism • Border Radius • Z-Index
+========================================================== */
+
+/* ==========================================================
+   DISPLAY UTILITIES
+========================================================== */
+
+.d-none{display:none !important;}
+.d-block{display:block !important;}
+.d-inline{display:inline !important;}
+.d-inline-block{display:inline-block !important;}
+.d-flex{display:flex !important;}
+.d-grid{display:grid !important;}
+
+/* ==========================================================
+   FLEX UTILITIES
+========================================================== */
+
+.flex-row{flex-direction:row;}
+.flex-column{flex-direction:column;}
+
+.justify-start{justify-content:flex-start;}
+.justify-center{justify-content:center;}
+.justify-between{justify-content:space-between;}
+.justify-around{justify-content:space-around;}
+.justify-evenly{justify-content:space-evenly;}
+
+.align-start{align-items:flex-start;}
+.align-center{align-items:center;}
+.align-end{align-items:flex-end;}
+.align-stretch{align-items:stretch;}
+
+.flex-wrap{flex-wrap:wrap;}
+.flex-nowrap{flex-wrap:nowrap;}
+
+.flex-1{flex:1;}
+.flex-auto{flex:auto;}
+
+/* ==========================================================
+   GRID UTILITIES
+========================================================== */
+
+.grid-2{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:24px;
+
+}
+
+.grid-3{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:24px;
+
+}
+
+.grid-auto{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(250px,1fr));
+
+    gap:24px;
+
+}
+
+/* ==========================================================
+   SPACING UTILITIES
+========================================================== */
+
+.m-0{margin:0 !important;}
+.mt-1{margin-top:10px;}
+.mt-2{margin-top:20px;}
+.mt-3{margin-top:30px;}
+.mt-4{margin-top:40px;}
+
+.mb-1{margin-bottom:10px;}
+.mb-2{margin-bottom:20px;}
+.mb-3{margin-bottom:30px;}
+.mb-4{margin-bottom:40px;}
+
+.p-1{padding:10px;}
+.p-2{padding:20px;}
+.p-3{padding:30px;}
+.p-4{padding:40px;}
+
+.py-2{
+
+    padding-top:20px;
+    padding-bottom:20px;
+
+}
+
+.px-2{
+
+    padding-left:20px;
+    padding-right:20px;
+
+}
+
+/* ==========================================================
+   BORDER RADIUS
+========================================================== */
+
+.rounded-sm{border-radius:10px;}
+.rounded{border-radius:16px;}
+.rounded-lg{border-radius:20px;}
+.rounded-xl{border-radius:28px;}
+.rounded-full{border-radius:999px;}
+
+/* ==========================================================
+   SHADOWS
+========================================================== */
+
+.shadow-sm{
+
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+
+}
+
+.shadow{
+
+    box-shadow:0 15px 35px rgba(0,0,0,.28);
+
+}
+
+.shadow-lg{
+
+    box-shadow:0 25px 55px rgba(0,0,0,.40);
+
+}
+
+.shadow-glow{
+
+    box-shadow:
+        0 0 24px rgba(242,125,19,.22);
+
+}
+
+/* ==========================================================
+   GLASSMORPHISM
+========================================================== */
+
+.glass{
+
+    background:rgba(255,255,255,.06);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(18px);
+
+    -webkit-backdrop-filter:blur(18px);
+
+}
+
+.glass-dark{
+
+    background:rgba(30,41,59,.72);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(18px);
+
+    -webkit-backdrop-filter:blur(18px);
+
+}
+
+/* ==========================================================
+   OVERFLOW
+========================================================== */
+
+.overflow-hidden{overflow:hidden;}
+.overflow-auto{overflow:auto;}
+.overflow-visible{overflow:visible;}
+
+/* ==========================================================
+   POSITION
+========================================================== */
+
+.relative{position:relative;}
+.absolute{position:absolute;}
+.fixed{position:fixed;}
+.sticky{position:sticky;}
+
+/* ==========================================================
+   Z-INDEX
+========================================================== */
+
+.z-0{z-index:0;}
+.z-1{z-index:1;}
+.z-10{z-index:10;}
+.z-50{z-index:50;}
+.z-100{z-index:100;}
+.z-max{z-index:9999;}
+
+/* ==========================================================
+   WIDTH / HEIGHT
+========================================================== */
+
+.w-100{width:100%;}
+.h-100{height:100%;}
+.min-vh-100{min-height:100vh;}
+
+/* ==========================================================
+   TEXT HELPERS
+========================================================== */
+
+.text-left{text-align:left;}
+.text-center{text-align:center;}
+.text-right{text-align:right;}
+
+.text-white{color:#fff;}
+.text-primary{color:var(--primary);}
+.text-muted{color:var(--text-light);}
+
+/* ==========================================================
+   END OF PART 5B
+========================================================== */
+/* ==========================================================
+   PART 5C (FINAL 3)
+   PERFORMANCE • ACCESSIBILITY • SCROLLBAR
+   SELECTION • PRINT • END OF STYLESHEET
+========================================================== */
+
+/* ==========================================================
+   GPU ACCELERATION
+========================================================== */
+
+.gpu,
+.animate,
+.skill-card,
+.achievement-card,
+.certificate-card,
+.profile-image,
+.btn{
+
+    transform:translateZ(0);
+
+    backface-visibility:hidden;
+
+    will-change:transform, opacity;
+
+}
+
+/* ==========================================================
+   PERFORMANCE CONTAINMENT
+========================================================== */
+
+.section,
+.card,
+.skill-card,
+.achievement-card,
+.certificate-card{
+
+    contain:layout style paint;
+
+}
+
+/* ==========================================================
+   ACCESSIBILITY
+========================================================== */
+
+/* Keyboard Focus */
+
+:focus-visible{
+
+    outline:3px solid var(--primary);
+
+    outline-offset:4px;
+
+    border-radius:8px;
+
+}
+
+/* Better Tap Highlight */
+
+a,
+button{
+
+    -webkit-tap-highlight-color:transparent;
+
+}
+
+/* ==========================================================
+   REDUCED MOTION
+========================================================== */
+
+@media (prefers-reduced-motion:reduce){
+
+    *{
+
+        animation:none !important;
+
+        transition:none !important;
+
+        scroll-behavior:auto !important;
+
+    }
+
+    html{
+
+        scroll-behavior:auto;
+
+    }
+
+}
+
+/* ==========================================================
+   TEXT SELECTION
+========================================================== */
+
+::selection{
+
+    background:var(--primary);
+
+    color:#ffffff;
+
+}
+
+::-moz-selection{
+
+    background:var(--primary);
+
+    color:#ffffff;
+
+}
+
+/* ==========================================================
+   CUSTOM SCROLLBAR
+========================================================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#0B1220;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:linear-gradient(
+        180deg,
+        var(--primary),
+        #ff9d3b
+    );
+
+    border-radius:100px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#ff9d3b;
+
+}
+
+/* Firefox */
+
+html{
+
+    scrollbar-width:thin;
+
+    scrollbar-color:var(--primary) #0B1220;
+
+}
+
+/* ==========================================================
+   IMAGE OPTIMIZATION
+========================================================== */
+
+img{
+
+    max-width:100%;
+
+    height:auto;
+
+    display:block;
+
+    user-select:none;
+
+    -webkit-user-drag:none;
+
+}
+
+/* ==========================================================
+   PRINT STYLES
+========================================================== */
+
+@media print{
+
+    *{
+
+        background:#ffffff !important;
+
+        color:#000000 !important;
+
+        box-shadow:none !important;
+
+        text-shadow:none !important;
+
+    }
+
+    .navbar,
+    .hero-buttons,
+    .hero-social,
+    .contact-social,
+    .floating-icons,
+    .bg-effects,
+    .lightbox,
+    .certificate-modal,
+    footer{
+
+        display:none !important;
+
+    }
+
+    body{
+
+        margin:0;
+
+        padding:20px;
+
+    }
+
+    section{
+
+        page-break-inside:avoid;
+
+        break-inside:avoid;
+
+    }
+
+    a{
+
+        text-decoration:none;
+
+        color:#000 !important;
+
+    }
+
+}
+
+/* ==========================================================
+   END OF STYLE.CSS
+   Premium Portfolio Theme
+   HTML • CSS • Vanilla JavaScript
+========================================================== */
