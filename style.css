@@ -5027,6 +5027,58 @@ img{
     }
 }
 
+/* View Button Helper */
+.view-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .35s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    text-decoration: none;
+    margin-top: auto;
+}
+
+.view-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(242,125,19,.35);
+    color: #fff;
+}
+
+/* Card Equal Height Flex Helpers */
+.achievement-card,
+.certificate-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.achievement-content,
+.certificate-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Skill Card Helper */
+.skill-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+}
+
 /* ==========================================================
    COMPREHENSIVE MOBILE & TABLET RESPONSIVE OVERRIDES
    (Supports all devices 320px - 992px)
@@ -5037,6 +5089,18 @@ html, body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden !important;
+}
+
+/* Mobile Menu Backdrop Overlay */
+body.menu-open::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    transition: opacity 0.35s ease;
 }
 
 /* Certificate image sizing helper */
@@ -5227,22 +5291,22 @@ html, body {
     }
 
     .profile-wrapper {
-        width: 210px;
-        height: 210px;
+        width: 200px;
+        height: 200px;
     }
 
     .floating-icons .icon {
-        width: 36px;
-        height: 36px;
-        font-size: 0.95rem;
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
     }
 
-    .icon.html { top: -10px; left: 5px; }
-    .icon.css { top: 10px; right: -10px; }
-    .icon.js { bottom: 5px; right: -10px; }
-    .icon.react { bottom: -10px; left: 10px; }
-    .icon.node { top: 48%; left: -12px; }
-    .icon.github { top: 48%; right: -12px; }
+    .icon.html { top: -8px; left: 0px; }
+    .icon.css { top: 8px; right: -5px; }
+    .icon.js { bottom: 5px; right: -5px; }
+    .icon.react { bottom: -8px; left: 5px; }
+    .icon.node { top: 48%; left: -10px; }
+    .icon.github { top: 48%; right: -10px; }
 }
 
 /* 3. Section Titles & Spacing */
@@ -5256,7 +5320,7 @@ html, body {
     }
 
     .section-title {
-        margin-bottom: 40px;
+        margin-bottom: 35px;
     }
 
     .section-title h2 {
@@ -5266,6 +5330,14 @@ html, body {
     .section-title p {
         font-size: 0.92rem;
         padding: 0 10px;
+    }
+
+    .skill-category h3 {
+        justify-content: center;
+    }
+
+    .skill-category h3::after {
+        display: none;
     }
 }
 
