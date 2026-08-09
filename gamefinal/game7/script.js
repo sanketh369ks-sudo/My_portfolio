@@ -1,7 +1,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-let bird = { x: 50, y: 150, width: 24, height: 24, gravity: 0.45, lift: -8, velocity: 0 };
+// Game parameters tuned for smooth, comfortable speed
+let bird = { x: 50, y: 150, width: 24, height: 24, gravity: 0.25, lift: -5.5, velocity: 0 };
 let pipes = [];
 let frame = 0;
 let score = 0;
@@ -9,7 +10,13 @@ let gameOver = false;
 let gameStarted = false;
 
 const pipeWidth = 44;
-const pipeGap = 120;
+const pipeGap = 130;
+const pipeSpeed = 1.6;
+
+// FPS Throttling variables (prevents hyper-speed on 120Hz/144Hz monitors)
+let lastTime = 0;
+const fps = 60;
+const frameInterval = 1000 / fps;
 
 function setup() {
     // Keyboard listener for Space or ArrowUp
@@ -48,7 +55,18 @@ function handleJump() {
     }
 }
 
-function gameLoop() {
+function gameLoop(currentTime) {
+    requestAnimationFrame(gameLoop);
+
+    // Limit execution to 60 FPS max
+    if (!lastTime) lastTime = currentTime;
+    const elapsed = currentTime - lastTime;
+
+    if (elapsed < frameInterval) {
+        return;
+    }
+    lastTime = currentTime - (elapsed % frameInterval);
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (gameStarted && !gameOver) {
@@ -58,8 +76,8 @@ function gameLoop() {
         bird.velocity += bird.gravity;
         bird.y += bird.velocity;
 
-        // Pipe generation
-        if (frame % 90 === 0) {
+        // Pipe generation (every ~2 seconds at 60 FPS)
+        if (frame % 110 === 0) {
             const minPipeHeight = 40;
             const maxPipeHeight = canvas.height - pipeGap - minPipeHeight;
             const pipeHeight = Math.floor(Math.random() * (maxPipeHeight - minPipeHeight + 1)) + minPipeHeight;
@@ -83,7 +101,7 @@ function gameLoop() {
         // Update pipes and check collisions
         for (let i = 0; i < pipes.length; i++) {
             let pipe = pipes[i];
-            pipe.x -= 2.5;
+            pipe.x -= pipeSpeed;
 
             // Collision detection
             if (
@@ -236,8 +254,6 @@ function gameLoop() {
         ctx.strokeText('Press SPACE or Click to Restart', canvas.width / 2, canvas.height / 2 + 45);
         ctx.fillText('Press SPACE or Click to Restart', canvas.width / 2, canvas.height / 2 + 45);
     }
-
-    requestAnimationFrame(gameLoop);
 }
 
 function resetGame() {
