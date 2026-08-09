@@ -15,6 +15,7 @@ const btnLeft = document.getElementById('btnLeft');
 const btnRight = document.getElementById('btnRight');
 const btnPause = document.getElementById('btnPause');
 const canvasWrapper = document.querySelector('.canvas-wrapper');
+const gameContainer = document.querySelector('.game-container');
 
 const GRID_SIZE = 20;
 const TILE_COUNT_X = canvas.width / GRID_SIZE;
@@ -197,7 +198,10 @@ function gameOver() {
 }
 
 function togglePause() {
-    if (!gameStarted) return;
+    if (!gameStarted) {
+        startGame();
+        return;
+    }
     if (isPaused) {
         gameInterval = setInterval(gameLoop, 100);
         isPaused = false;
@@ -208,13 +212,14 @@ function togglePause() {
     }
 }
 
-// Direction change handler used by all input methods
+// Direction change handler - checks against nextDirection so rapid mobile taps are never lost!
 function changeDirection(dir) {
     if (!gameStarted) startGame();
-    if (dir === 'UP' && direction.y === 0) nextDirection = { x: 0, y: -1 };
-    if (dir === 'DOWN' && direction.y === 0) nextDirection = { x: 0, y: 1 };
-    if (dir === 'LEFT' && direction.x === 0) nextDirection = { x: -1, y: 0 };
-    if (dir === 'RIGHT' && direction.x === 0) nextDirection = { x: 1, y: 0 };
+
+    if (dir === 'UP' && nextDirection.y !== 1) nextDirection = { x: 0, y: -1 };
+    if (dir === 'DOWN' && nextDirection.y !== -1) nextDirection = { x: 0, y: 1 };
+    if (dir === 'LEFT' && nextDirection.x !== 1) nextDirection = { x: -1, y: 0 };
+    if (dir === 'RIGHT' && nextDirection.x !== -1) nextDirection = { x: 1, y: 0 };
 }
 
 // Keyboard input handling
@@ -251,30 +256,20 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Helper for unified touch/pointer event listening
-function attachTouchHandler(element, callback) {
+// Fast, reliable touch event binder
+function bindTouch(element, callback) {
     if (!element) return;
     let handled = false;
 
-    element.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        handled = true;
-        if (navigator.vibrate) navigator.vibrate(15);
-        callback();
-        setTimeout(() => { handled = false; }, 300);
-    });
-
     element.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (!handled) {
-            handled = true;
-            if (navigator.vibrate) navigator.vibrate(15);
-            callback();
-            setTimeout(() => { handled = false; }, 300);
-        }
+        if (e.cancelable) e.preventDefault();
+        handled = true;
+        if (navigator.vibrate) navigator.vibrate(10);
+        callback();
+        setTimeout(() => { handled = false; }, 250);
     }, { passive: false });
 
-    element.addEventListener('click', (e) => {
+    element.addEventListener('mousedown', (e) => {
         e.preventDefault();
         if (!handled) {
             callback();
@@ -282,46 +277,47 @@ function attachTouchHandler(element, callback) {
     });
 }
 
-// Touch D-Pad button listeners
-attachTouchHandler(btnUp, () => changeDirection('UP'));
-attachTouchHandler(btnDown, () => changeDirection('DOWN'));
-attachTouchHandler(btnLeft, () => changeDirection('LEFT'));
-attachTouchHandler(btnRight, () => changeDirection('RIGHT'));
-attachTouchHandler(btnPause, () => {
-    if (!gameStarted) startGame();
-    else togglePause();
-});
+// Attach Touch D-Pad Controls
+bindTouch(btnUp, () => changeDirection('UP'));
+bindTouch(btnDown, () => changeDirection('DOWN'));
+bindTouch(btnLeft, () => changeDirection('LEFT'));
+bindTouch(btnRight, () => changeDirection('RIGHT'));
+bindTouch(btnPause, togglePause);
 
-attachTouchHandler(startBtn, startGame);
-attachTouchHandler(restartBtn, () => {
+bindTouch(startBtn, startGame);
+bindTouch(restartBtn, () => {
     init();
     startGame();
 });
 
-// Touch Swipe Detection on Canvas Wrapper
-if (canvasWrapper) {
-    canvasWrapper.addEventListener('touchstart', (e) => {
+// Tap anywhere on overlays to start/restart
+if (startOverlay) bindTouch(startOverlay, startGame);
+if (gameOverOverlay) bindTouch(gameOverOverlay, () => { init(); startGame(); });
+
+// Full-screen / Canvas Swipe Detection for Mobile
+const swipeTarget = canvasWrapper || gameContainer;
+if (swipeTarget) {
+    swipeTarget.addEventListener('touchstart', (e) => {
         if (e.touches && e.touches.length > 0) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         }
         if (!gameStarted) startGame();
+    }, { passive: true });
+
+    swipeTarget.addEventListener('touchmove', (e) => {
+        if (e.cancelable) e.preventDefault();
     }, { passive: false });
 
-    canvasWrapper.addEventListener('touchmove', (e) => {
-        e.preventDefault(); // Prevents mobile page scrolling while swiping
-    }, { passive: false });
-
-    canvasWrapper.addEventListener('touchend', (e) => {
+    swipeTarget.addEventListener('touchend', (e) => {
         if (!touchStartX || !touchStartY) return;
 
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndY = e.changedTouches[0].clientY;
+        const touchEndX = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0].clientX : touchStartX;
+        const touchEndY = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0].clientY : touchStartY;
 
         const diffX = touchEndX - touchStartX;
         const diffY = touchEndY - touchStartY;
 
-        // Minimum swipe distance threshold (15px)
         if (Math.abs(diffX) > Math.abs(diffY)) {
             if (Math.abs(diffX) > 15) {
                 if (diffX > 0) changeDirection('RIGHT');
