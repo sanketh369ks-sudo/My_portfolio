@@ -424,7 +424,7 @@ const closeLightbox =
     document.querySelector(".close-lightbox");
 
 const achievementImages =
-    document.querySelectorAll(".achievement-image img");
+    document.querySelectorAll(".achievement-image img, .achievement-image");
 
 const certificateModal =
     document.querySelector(".certificate-modal");
@@ -459,11 +459,15 @@ function openLightbox(src, alt = "") {
 
 }
 
-achievementImages.forEach((image) => {
+achievementImages.forEach((element) => {
 
-    image.addEventListener("click", () => {
+    element.addEventListener("click", (e) => {
 
-        openLightbox(image.src, image.alt);
+        const img = element.tagName === "IMG" ? element : element.querySelector("img");
+
+        if (!img) return;
+
+        openLightbox(img.src, img.alt);
 
     });
 

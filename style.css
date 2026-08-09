@@ -2803,7 +2803,7 @@ body.menu-open{
 
 .achievement-image img{
 
-    pointer-events:none;
+    pointer-events:auto;
 
 }
 
