@@ -52,7 +52,13 @@ function startGame() {
             setTileCandy(tile, randomCandy());
 
             // 1. TAP-TO-SWAP (Mobile & Desktop friendly)
-            tile.addEventListener("click", () => handleTileClick(tile));
+            tile.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (Date.now() - lastTouchTimestamp < 500) {
+                    return; // Ignore synthesized click after touch
+                }
+                handleTileClick(tile);
+            });
 
             // 2. HTML5 DRAG & DROP (Desktop)
             tile.addEventListener("dragstart", dragStart);
@@ -74,24 +80,26 @@ function startGame() {
     }
 }
 
-// TAP TO SWAP LOGIC
+let lastTouchTimestamp = 0;
+
 function handleTileClick(tile) {
+    if (!tile) return;
+
     if (!currTile) {
         // Select first tile
         currTile = tile;
         tile.classList.add("selected");
-        if (navigator.vibrate) navigator.vibrate(10);
+        if (navigator.vibrate) navigator.vibrate(12);
     } else if (currTile === tile) {
         // Deselect tile
         currTile.classList.remove("selected");
         currTile = null;
     } else {
         // Select second tile and attempt swap
-        otherTile = tile;
+        let firstTile = currTile;
         currTile.classList.remove("selected");
-        executeSwap(currTile, otherTile);
         currTile = null;
-        otherTile = null;
+        executeSwap(firstTile, tile);
     }
 }
 
@@ -164,7 +172,8 @@ function dragEnd() {
 
 // TOUCH SWIPE HANDLERS (MOBILE)
 function touchStart(e, tile) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
+    lastTouchTimestamp = Date.now();
     if (e.touches && e.touches.length > 0) {
         touchStartTile = tile;
         touchStartX = e.touches[0].clientX;
@@ -173,14 +182,21 @@ function touchStart(e, tile) {
 }
 
 function touchMove(e) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
 }
 
 function touchEnd(e) {
+    if (e.cancelable) e.preventDefault();
+    lastTouchTimestamp = Date.now();
     if (!touchStartTile || !touchStartX || !touchStartY) return;
 
-    let touchEndX = e.changedTouches[0].clientX;
-    let touchEndY = e.changedTouches[0].clientY;
+    let touchEndX = touchStartX;
+    let touchEndY = touchStartY;
+
+    if (e.changedTouches && e.changedTouches.length > 0) {
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
+    }
 
     let diffX = touchEndX - touchStartX;
     let diffY = touchEndY - touchStartY;
@@ -201,6 +217,10 @@ function touchEnd(e) {
 
         if (targetR >= 0 && targetR < rows && targetC >= 0 && targetC < columns) {
             let targetTile = board[targetR][targetC];
+            if (currTile) {
+                currTile.classList.remove("selected");
+                currTile = null;
+            }
             executeSwap(touchStartTile, targetTile);
         }
     }
