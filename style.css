@@ -761,6 +761,16 @@ header.scrolled{
 
     height:360px;
 
+    margin:0 auto;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
 }
 
 .profile-image{
@@ -773,11 +783,13 @@ header.scrolled{
 
     border-radius:50%;
 
-    border:6px solid rgba(255,255,255,.08);
+    border:5px solid rgba(255,255,255,.15);
 
     position:relative;
 
     z-index:2;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
 
 }
 
@@ -785,33 +797,49 @@ header.scrolled{
 
     position:absolute;
 
-    inset:-12px;
+    top:50%;
+
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:calc(100% + 24px);
+
+    height:calc(100% + 24px);
 
     border-radius:50%;
 
     background:conic-gradient(
         var(--primary),
         #ffb45b,
+        #f27d13,
+        #ffb45b,
         var(--primary)
     );
 
-    animation:spin 8s linear infinite;
+    animation:spinGlow 8s linear infinite;
 
-    filter:blur(2px);
+    filter:blur(5px);
+
+    z-index:1;
+
+    pointer-events:none;
 
 }
 
-.profile-glow::after{
+@keyframes spinGlow{
 
-    content:"";
+    0%{
 
-    position:absolute;
+        transform:translate(-50%,-50%) rotate(0deg);
 
-    inset:10px;
+    }
 
-    border-radius:50%;
+    100%{
 
-    background:var(--bg-color);
+        transform:translate(-50%,-50%) rotate(360deg);
+
+    }
 
 }
 
