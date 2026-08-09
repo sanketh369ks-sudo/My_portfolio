@@ -4934,6 +4934,100 @@ img{
 }
 
 /* ==========================================================
+   INTERACTIVE UTILITIES (Progress, Back to Top, Particles)
+========================================================== */
+
+/* Scroll Progress Bar */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), #ff9d3b);
+    z-index: 10001;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 10px 25px rgba(242, 125, 19, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.35s ease;
+    z-index: 999;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background: #ff9d3b;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(242, 125, 19, 0.6);
+}
+
+/* Background Effects & Particles */
+.bg-effects {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    bottom: -20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    animation: particleFloat linear forwards;
+    pointer-events: none;
+}
+
+.particle.orange {
+    background: rgba(242, 125, 19, 0.25);
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-105vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ==========================================================
    END OF STYLE.CSS
    Premium Portfolio Theme
    HTML • CSS • Vanilla JavaScript
