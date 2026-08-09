@@ -22,7 +22,7 @@
             
             <div id="startOverlay" class="overlay">
                 <h2>Ready to Play?</h2>
-                <p>Use Arrow Keys or WASD to Move<br>Space to Pause/Start</p>
+                <p>Use Arrow Keys, WASD, Swipe, or Touch Controls to Move<br>Space to Pause/Start</p>
                 <button id="startBtn">Start Game</button>
             </div>
 
@@ -32,13 +32,24 @@
                 <button id="restartBtn">Play Again</button>
             </div>
         </div>
+
+        <!-- Touch / On-Screen D-Pad for Mobile Devices -->
+        <div class="d-pad">
+            <button id="btnUp" class="d-pad-btn up" aria-label="Up">▲</button>
+            <div class="d-pad-middle">
+                <button id="btnLeft" class="d-pad-btn left" aria-label="Left">◀</button>
+                <button id="btnRight" class="d-pad-btn right" aria-label="Right">▶</button>
+            </div>
+            <button id="btnDown" class="d-pad-btn down" aria-label="Down">▼</button>
+        </div>
         
         <div class="controls-hint">
-            <span><strong>Arrow Keys / WASD</strong>: Move</span>
-            <span><strong>Space</strong>: Pause</span>
+            <span><strong>Desktop</strong>: Arrow Keys / WASD / Space</span>
+            <span><strong>Mobile</strong>: Swipe / On-Screen D-Pad</span>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
 </html>
+
 

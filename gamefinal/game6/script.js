@@ -8,6 +8,13 @@ const finalScoreDisplay = document.getElementById('finalScore');
 const restartBtn = document.getElementById('restartBtn');
 const startBtn = document.getElementById('startBtn');
 
+// Touch D-Pad elements
+const btnUp = document.getElementById('btnUp');
+const btnDown = document.getElementById('btnDown');
+const btnLeft = document.getElementById('btnLeft');
+const btnRight = document.getElementById('btnRight');
+const canvasWrapper = document.querySelector('.canvas-wrapper');
+
 const GRID_SIZE = 20;
 const TILE_COUNT_X = canvas.width / GRID_SIZE;
 const TILE_COUNT_Y = canvas.height / GRID_SIZE;
@@ -21,6 +28,10 @@ let highScore = parseInt(localStorage.getItem('snake_high_score')) || 0;
 let gameInterval = null;
 let isPaused = false;
 let gameStarted = false;
+
+// Touch tracking
+let touchStartX = 0;
+let touchStartY = 0;
 
 // Initialize game state
 function init() {
@@ -196,32 +207,37 @@ function togglePause() {
     }
 }
 
-// Input handling
+// Direction change handler used by all input methods
+function changeDirection(dir) {
+    if (!gameStarted) startGame();
+    if (dir === 'UP' && direction.y === 0) nextDirection = { x: 0, y: -1 };
+    if (dir === 'DOWN' && direction.y === 0) nextDirection = { x: 0, y: 1 };
+    if (dir === 'LEFT' && direction.x === 0) nextDirection = { x: -1, y: 0 };
+    if (dir === 'RIGHT' && direction.x === 0) nextDirection = { x: 1, y: 0 };
+}
+
+// Keyboard input handling
 document.addEventListener('keydown', (event) => {
     switch (event.code) {
         case 'ArrowUp':
         case 'KeyW':
-            if (direction.y === 0) nextDirection = { x: 0, y: -1 };
+            changeDirection('UP');
             event.preventDefault();
-            if (!gameStarted) startGame();
             break;
         case 'ArrowDown':
         case 'KeyS':
-            if (direction.y === 0) nextDirection = { x: 0, y: 1 };
+            changeDirection('DOWN');
             event.preventDefault();
-            if (!gameStarted) startGame();
             break;
         case 'ArrowLeft':
         case 'KeyA':
-            if (direction.x === 0) nextDirection = { x: -1, y: 0 };
+            changeDirection('LEFT');
             event.preventDefault();
-            if (!gameStarted) startGame();
             break;
         case 'ArrowRight':
         case 'KeyD':
-            if (direction.x === 0) nextDirection = { x: 1, y: 0 };
+            changeDirection('RIGHT');
             event.preventDefault();
-            if (!gameStarted) startGame();
             break;
         case 'Space':
             event.preventDefault();
@@ -233,6 +249,58 @@ document.addEventListener('keydown', (event) => {
             break;
     }
 });
+
+// Touch D-Pad button listeners
+if (btnUp) {
+    btnUp.addEventListener('click', () => changeDirection('UP'));
+    btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('UP'); });
+}
+if (btnDown) {
+    btnDown.addEventListener('click', () => changeDirection('DOWN'));
+    btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('DOWN'); });
+}
+if (btnLeft) {
+    btnLeft.addEventListener('click', () => changeDirection('LEFT'));
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('LEFT'); });
+}
+if (btnRight) {
+    btnRight.addEventListener('click', () => changeDirection('RIGHT'));
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('RIGHT'); });
+}
+
+// Touch Swipe Detection on Canvas Wrapper
+if (canvasWrapper) {
+    canvasWrapper.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    canvasWrapper.addEventListener('touchend', (e) => {
+        if (!touchStartX || !touchStartY) return;
+
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+
+        const diffX = touchEndX - touchStartX;
+        const diffY = touchEndY - touchStartY;
+
+        // Minimum swipe distance threshold (25px)
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (Math.abs(diffX) > 25) {
+                if (diffX > 0) changeDirection('RIGHT');
+                else changeDirection('LEFT');
+            }
+        } else {
+            if (Math.abs(diffY) > 25) {
+                if (diffY > 0) changeDirection('DOWN');
+                else changeDirection('UP');
+            }
+        }
+
+        touchStartX = 0;
+        touchStartY = 0;
+    }, { passive: true });
+}
 
 // UI Event Listeners
 if (startBtn) {
@@ -248,4 +316,5 @@ if (restartBtn) {
 
 // Initialize game on script load
 init();
+
 
