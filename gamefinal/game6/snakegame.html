@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Snake Game</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,10 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>🐍 Snake Game</h1>
+        <div class="game-header">
+            <a href="../../index.html" class="back-btn">← Portfolio</a>
+            <h1>🐍 Snake Game</h1>
+        </div>
         <div class="scoreboard">
             <div id="score">Score: 0</div>
             <div id="highScore">High Score: 0</div>
@@ -22,7 +25,7 @@
             
             <div id="startOverlay" class="overlay">
                 <h2>Ready to Play?</h2>
-                <p>Use Arrow Keys, WASD, Swipe, or Touch Controls to Move<br>Space to Pause/Start</p>
+                <p>Tap Start or Swipe on screen to move!<br>Controls: D-Pad or Swipe</p>
                 <button id="startBtn">Start Game</button>
             </div>
 
@@ -38,6 +41,7 @@
             <button id="btnUp" class="d-pad-btn up" aria-label="Up">▲</button>
             <div class="d-pad-middle">
                 <button id="btnLeft" class="d-pad-btn left" aria-label="Left">◀</button>
+                <button id="btnPause" class="d-pad-btn center" aria-label="Pause/Play">⏯</button>
                 <button id="btnRight" class="d-pad-btn right" aria-label="Right">▶</button>
             </div>
             <button id="btnDown" class="d-pad-btn down" aria-label="Down">▼</button>

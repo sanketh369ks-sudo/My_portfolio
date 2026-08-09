@@ -30,9 +30,32 @@ body {
     text-align: center;
 }
 
-h1 {
-    font-size: 2rem;
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     margin-bottom: 12px;
+}
+
+.back-btn {
+    color: #7bed9f;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+    background: rgba(46, 213, 115, 0.2);
+}
+
+h1 {
+    font-size: 1.8rem;
     font-weight: 700;
     background: linear-gradient(45deg, #2ed573, #7bed9f);
     -webkit-background-clip: text;
@@ -128,6 +151,7 @@ button {
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
     transition: all 0.2s ease;
+    touch-action: manipulation;
 }
 
 button:hover {
@@ -145,37 +169,47 @@ button:active {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     user-select: none;
     -webkit-user-select: none;
+    touch-action: none;
 }
 
 .d-pad-middle {
     display: flex;
-    gap: 36px;
+    gap: 12px;
+    align-items: center;
 }
 
 .d-pad-btn {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
     padding: 0;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
     color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
-    touch-action: manipulation;
+    touch-action: none;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.d-pad-btn.center {
+    font-size: 1.1rem;
+    background: rgba(46, 213, 115, 0.2);
+    border-color: rgba(46, 213, 115, 0.4);
 }
 
 .d-pad-btn:active {
-    background: rgba(46, 213, 115, 0.7);
+    background: rgba(46, 213, 115, 0.8) !important;
     transform: scale(0.92);
+    box-shadow: 0 0 15px rgba(46, 213, 115, 0.6);
 }
 
 .controls-hint {

@@ -2,22 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=alt, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Store</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .img{
-            width: 20vw;
-            height: 30vh;
-            padding: 10px;
+        .img {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
         }
-        .img-main{
+        .img:hover {
+            transform: scale(1.05);
+        }
+        .img-main {
             display: flex;
-            padding-left: 10px;
-            padding-top: 10px;
+            padding: 20px 10px;
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
+            gap: 15px;
         }
     </style>
 </head>

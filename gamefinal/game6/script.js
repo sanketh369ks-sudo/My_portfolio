@@ -13,6 +13,7 @@ const btnUp = document.getElementById('btnUp');
 const btnDown = document.getElementById('btnDown');
 const btnLeft = document.getElementById('btnLeft');
 const btnRight = document.getElementById('btnRight');
+const btnPause = document.getElementById('btnPause');
 const canvasWrapper = document.querySelector('.canvas-wrapper');
 
 const GRID_SIZE = 20;
@@ -250,30 +251,66 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Helper for unified touch/pointer event listening
+function attachTouchHandler(element, callback) {
+    if (!element) return;
+    let handled = false;
+
+    element.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        handled = true;
+        if (navigator.vibrate) navigator.vibrate(15);
+        callback();
+        setTimeout(() => { handled = false; }, 300);
+    });
+
+    element.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!handled) {
+            handled = true;
+            if (navigator.vibrate) navigator.vibrate(15);
+            callback();
+            setTimeout(() => { handled = false; }, 300);
+        }
+    }, { passive: false });
+
+    element.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!handled) {
+            callback();
+        }
+    });
+}
+
 // Touch D-Pad button listeners
-if (btnUp) {
-    btnUp.addEventListener('click', () => changeDirection('UP'));
-    btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('UP'); });
-}
-if (btnDown) {
-    btnDown.addEventListener('click', () => changeDirection('DOWN'));
-    btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('DOWN'); });
-}
-if (btnLeft) {
-    btnLeft.addEventListener('click', () => changeDirection('LEFT'));
-    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('LEFT'); });
-}
-if (btnRight) {
-    btnRight.addEventListener('click', () => changeDirection('RIGHT'));
-    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); changeDirection('RIGHT'); });
-}
+attachTouchHandler(btnUp, () => changeDirection('UP'));
+attachTouchHandler(btnDown, () => changeDirection('DOWN'));
+attachTouchHandler(btnLeft, () => changeDirection('LEFT'));
+attachTouchHandler(btnRight, () => changeDirection('RIGHT'));
+attachTouchHandler(btnPause, () => {
+    if (!gameStarted) startGame();
+    else togglePause();
+});
+
+attachTouchHandler(startBtn, startGame);
+attachTouchHandler(restartBtn, () => {
+    init();
+    startGame();
+});
 
 // Touch Swipe Detection on Canvas Wrapper
 if (canvasWrapper) {
     canvasWrapper.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+        if (e.touches && e.touches.length > 0) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }
+        if (!gameStarted) startGame();
+    }, { passive: false });
+
+    canvasWrapper.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Prevents mobile page scrolling while swiping
+    }, { passive: false });
 
     canvasWrapper.addEventListener('touchend', (e) => {
         if (!touchStartX || !touchStartY) return;
@@ -284,14 +321,14 @@ if (canvasWrapper) {
         const diffX = touchEndX - touchStartX;
         const diffY = touchEndY - touchStartY;
 
-        // Minimum swipe distance threshold (25px)
+        // Minimum swipe distance threshold (15px)
         if (Math.abs(diffX) > Math.abs(diffY)) {
-            if (Math.abs(diffX) > 25) {
+            if (Math.abs(diffX) > 15) {
                 if (diffX > 0) changeDirection('RIGHT');
                 else changeDirection('LEFT');
             }
         } else {
-            if (Math.abs(diffY) > 25) {
+            if (Math.abs(diffY) > 15) {
                 if (diffY > 0) changeDirection('DOWN');
                 else changeDirection('UP');
             }
@@ -299,19 +336,7 @@ if (canvasWrapper) {
 
         touchStartX = 0;
         touchStartY = 0;
-    }, { passive: true });
-}
-
-// UI Event Listeners
-if (startBtn) {
-    startBtn.addEventListener('click', startGame);
-}
-
-if (restartBtn) {
-    restartBtn.addEventListener('click', () => {
-        init();
-        startGame();
-    });
+    }, { passive: false });
 }
 
 // Initialize game on script load
