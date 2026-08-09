@@ -4,12 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Snake Game</h1>
-    <div id="score">Score: 0</div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="game-container">
+        <h1>🐍 Snake Game</h1>
+        <div class="scoreboard">
+            <div id="score">Score: 0</div>
+            <div id="highScore">High Score: 0</div>
+        </div>
+        
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            
+            <div id="startOverlay" class="overlay">
+                <h2>Ready to Play?</h2>
+                <p>Use Arrow Keys or WASD to Move<br>Space to Pause/Start</p>
+                <button id="startBtn">Start Game</button>
+            </div>
+
+            <div id="gameOverOverlay" class="overlay hidden">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="finalScore">0</span></p>
+                <button id="restartBtn">Play Again</button>
+            </div>
+        </div>
+        
+        <div class="controls-hint">
+            <span><strong>Arrow Keys / WASD</strong>: Move</span>
+            <span><strong>Space</strong>: Pause</span>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
+
