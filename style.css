@@ -781,6 +781,8 @@ header.scrolled{
 
     object-fit:cover;
 
+    object-position:center top;
+
     border-radius:50%;
 
     border:5px solid rgba(255,255,255,.15);
