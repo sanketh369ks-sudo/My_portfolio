@@ -348,30 +348,55 @@ canvas {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Mobile On-Screen Controls */
-.mobile-controls {
-    display: none;
+/* On-Screen Action Controls (Visible on Laptop & Mobile) */
+.action-controls {
+    display: flex;
     width: 100%;
-    margin-top: 10px;
-    justify-content: space-between;
+    margin-top: 12px;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .touch-btn {
-    background: rgba(255, 30, 67, 0.25);
+    background: linear-gradient(135deg, rgba(255, 30, 67, 0.25) 0%, rgba(15, 23, 42, 0.8) 100%);
     border: 1px solid var(--spidey-red);
     color: #fff;
-    padding: 15px 25px;
-    border-radius: 16px;
-    font-weight: bold;
-    font-size: 1.1rem;
+    padding: 10px 18px;
+    border-radius: 14px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
     touch-action: manipulation;
+    user-select: none;
+    box-shadow: 0 4px 15px rgba(255, 30, 67, 0.2);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.touch-btn:hover {
+    background: linear-gradient(135deg, var(--spidey-red) 0%, var(--spidey-dark-red) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 30, 67, 0.5);
+}
+
+.touch-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.btn-hint {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: monospace;
 }
 
 @media (max-width: 768px) {
-    .mobile-controls {
-        display: flex;
-    }
-
     .controls-info {
         display: none;
     }

@@ -27,10 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const bestScore = document.getElementById('bestScore');
     const gameOverTitle = document.getElementById('gameOverTitle');
 
-    // Mobile buttons
+    // Action buttons (Laptop & Mobile)
     const mobileSwingBtn = document.getElementById('mobileSwingBtn');
     const mobileBlastBtn = document.getElementById('mobileBlastBtn');
     const mobileJumpBtn = document.getElementById('mobileJumpBtn');
+    const mobileShieldBtn = document.getElementById('mobileShieldBtn');
+    const mobileEmpBtn = document.getElementById('mobileEmpBtn');
 
     // Boss HUD, Power & Combo Elements
     const bossHudBar = document.getElementById('bossHudBar');
@@ -249,6 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     canvas.addEventListener('mousemove', updateMousePos);
     canvas.addEventListener('pointermove', updateMousePos);
+    window.addEventListener('mousemove', updateMousePos);
+    window.addEventListener('pointermove', updateMousePos);
 
     canvas.addEventListener('mousedown', (e) => {
         getAudioContext();
@@ -404,6 +408,20 @@ document.addEventListener('DOMContentLoaded', () => {
             spideyJump();
         };
         mobileJumpBtn.addEventListener('click', handleJump);
+    }
+    if (mobileShieldBtn) {
+        mobileShieldBtn.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            triggerWebShield();
+        });
+    }
+    if (mobileEmpBtn) {
+        mobileEmpBtn.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            triggerElectricShockwave();
+        });
     }
 
     // --- Player (Spider-Man) ---
