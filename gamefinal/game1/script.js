@@ -1323,6 +1323,123 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    function drawGliderVillain(ctx, b) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+
+        // Hover tilt angle
+        const tilt = Math.sin(b.pulse) * 0.15;
+        ctx.rotate(tilt);
+
+        // Villain Red/Purple Aura
+        ctx.shadowColor = '#a855f7';
+        ctx.shadowBlur = 12;
+
+        // 1. JET GLIDER VEHICLE
+        // Thruster Jet Flame
+        ctx.fillStyle = '#ff6600';
+        ctx.beginPath();
+        ctx.moveTo(-10, 14);
+        ctx.lineTo(0, 24 + Math.sin(b.pulse * 4) * 4);
+        ctx.lineTo(10, 14);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath();
+        ctx.moveTo(-5, 14);
+        ctx.lineTo(0, 19);
+        ctx.lineTo(5, 14);
+        ctx.closePath();
+        ctx.fill();
+
+        // Metallic Glider Wings
+        ctx.fillStyle = '#4c1d95'; // Dark purple glider
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 4);
+        ctx.lineTo(-28, 14);
+        ctx.lineTo(-14, 18);
+        ctx.lineTo(0, 12);
+        ctx.lineTo(14, 18);
+        ctx.lineTo(28, 14);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 2. HUMANOID VILLAIN FIGURE (GREEN GOBLIN SUIT)
+        ctx.shadowBlur = 0;
+        ctx.lineCap = 'round';
+
+        // Legs Standing on Glider
+        ctx.strokeStyle = '#15803d'; // Green suit
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-6, 2); ctx.lineTo(-10, 12);
+        ctx.moveTo(6, 2); ctx.lineTo(10, 12);
+        ctx.stroke();
+
+        // Muscular Torso & Purple Pauldrons
+        ctx.fillStyle = '#16a34a';
+        ctx.fillRect(-7, -12, 14, 14);
+
+        // Purple Armor Chestplate
+        ctx.fillStyle = '#7e22ce';
+        ctx.beginPath();
+        ctx.moveTo(-7, -12); ctx.lineTo(0, -4); ctx.lineTo(7, -12);
+        ctx.closePath();
+        ctx.fill();
+
+        // Flexed Arms Holding Pumpkin Bomb
+        ctx.strokeStyle = '#16a34a';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(-7, -10); ctx.lineTo(-14, -2); ctx.lineTo(-6, 2);
+        ctx.moveTo(7, -10); ctx.lineTo(14, -2); ctx.lineTo(6, 2);
+        ctx.stroke();
+
+        // Glowing Pumpkin Bomb in Hand
+        ctx.fillStyle = '#ff6600';
+        ctx.shadowColor = '#ff3300';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. VILLAIN HELMET & GLOWING YELLOW EYES
+        ctx.shadowBlur = 0;
+        // Neck
+        ctx.fillStyle = '#15803d';
+        ctx.fillRect(-3, -16, 6, 4);
+
+        // Helmet Head
+        ctx.fillStyle = '#16a34a';
+        ctx.beginPath();
+        ctx.ellipse(0, -22, 6.5, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Goblin Horns / Ears
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath();
+        ctx.moveTo(-6, -24); ctx.lineTo(-12, -28); ctx.lineTo(-5, -20);
+        ctx.moveTo(6, -24); ctx.lineTo(12, -28); ctx.lineTo(5, -20);
+        ctx.fill();
+
+        // Glowing Angry Yellow Visor Eyes
+        ctx.fillStyle = '#fef08a';
+        ctx.shadowColor = '#fef08a';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(-1, -23); ctx.lineTo(-6, -25); ctx.lineTo(-4, -20); ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(1, -23); ctx.lineTo(6, -25); ctx.lineTo(4, -20); ctx.closePath(); ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    }
+
     // --- Canvas Rendering ---
     function render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1415,22 +1532,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.shadowBlur = 0;
         }
 
-        // 7. Draw Pumpkin Bombs
+        // 7. Draw Humanoid Glider Supervillain Enemies
         pumpkinBombs.forEach(b => {
-            ctx.fillStyle = '#ff6600';
-            ctx.shadowColor = '#ff3300';
-            ctx.shadowBlur = 15 + Math.sin(b.pulse) * 5;
-            ctx.beginPath();
-            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Bomb Jack-o-lantern face
-            ctx.fillStyle = '#000000';
-            ctx.beginPath();
-            ctx.arc(b.x - 5, b.y - 3, 3, 0, Math.PI * 2);
-            ctx.arc(b.x + 5, b.y - 3, 3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
+            drawGliderVillain(ctx, b);
         });
 
         // 8. Draw Collectibles
