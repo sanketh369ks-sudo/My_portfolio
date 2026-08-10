@@ -47,11 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx = null;
 
     function getAudioContext() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
+        try {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        } catch (e) {
+            console.log('Audio Context initialization deferred:', e);
         }
         return audioCtx;
     }
@@ -224,12 +228,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     canvas.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
-        mousePos.x = e.clientX - rect.left;
-        mousePos.y = e.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        mousePos.x = (e.clientX - rect.left) * scaleX;
+        mousePos.y = (e.clientY - rect.top) * scaleY;
     });
 
     canvas.addEventListener('mousedown', (e) => {
         getAudioContext();
+        if (gameState === 'start' || gameState === 'gameover') {
+            startGame();
+            return;
+        }
         if (e.button === 0) { // Left click: Swing
             isSwingingInput = true;
         } else if (e.button === 2) { // Right click: Blast
@@ -249,6 +259,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keyboard Listeners
     window.addEventListener('keydown', (e) => {
         getAudioContext();
+        if (gameState === 'start' && (e.code === 'Space' || e.code === 'Enter')) {
+            startGame();
+            return;
+        }
+        if (gameState === 'gameover' && (e.code === 'Space' || e.code === 'Enter')) {
+            startGame();
+            return;
+        }
         if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
             keys.space = true;
             isSwingingInput = true;
@@ -1408,12 +1426,13 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverOverlay.classList.add('active');
     }
 
-    // Button Click Listeners
-    startBtn.addEventListener('click', startGame);
-    resumeBtn.addEventListener('click', togglePause);
-    pauseBtn.addEventListener('click', togglePause);
-    restartBtn.addEventListener('click', startGame);
-    restartPauseBtn.addEventListener('click', startGame);
+    // Button Click & Overlay Listeners
+    startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+    startOverlay.addEventListener('click', startGame);
+    resumeBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePause(); });
+    pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePause(); });
+    restartBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+    restartPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
 
     // Initial Setup
     generateWorld();
