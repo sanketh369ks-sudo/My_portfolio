@@ -287,6 +287,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
             triggerSpiderSense();
         }
+        if (e.code === 'KeyK') {
+            if (boss.active) {
+                boss.hp = 0;
+                spawnExplosion(boss.x, boss.y, '#ff1e43', 50);
+                spawnExplosion(boss.x, boss.y, '#ffcb05', 30);
+                spawnExplosion(boss.x, boss.y, '#ffffff', 20);
+                playSFX('explosion');
+                score += 2500;
+                webFluid = 100;
+                boss.dismiss();
+                nextBossDistance = distance + 400;
+            }
+        }
         if (e.code === 'KeyP') {
             togglePause();
         }
