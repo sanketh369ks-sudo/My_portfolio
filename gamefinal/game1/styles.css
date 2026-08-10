@@ -438,57 +438,127 @@ canvas {
 
 @media (max-width: 768px) {
     body {
-        padding: 5px;
+        padding: 4px;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
     }
 
     .game-container {
         width: 100%;
+        height: 100%;
+        justify-content: space-between;
     }
 
     .controls-info {
         display: none;
     }
 
+    /* Ultra-compact header taking minimal height on mobile */
     .top-bar {
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 8px 12px;
-        justify-content: center;
+        flex-wrap: nowrap;
+        gap: 6px;
+        padding: 6px 10px;
+        margin-bottom: 4px;
+        border-radius: 12px;
+        justify-content: space-between;
+    }
+
+    .title-box svg,
+    .hero-profile-card,
+    #powerCard,
+    #comboCard {
+        display: none !important;
+    }
+
+    .game-title {
+        font-size: 1rem;
+        letter-spacing: 1px;
     }
 
     .hud-stats {
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .stat-label {
+        font-size: 0.55rem;
     }
 
     .stat-value {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
     }
 
     .fluid-container {
-        width: 80px;
+        width: 55px;
     }
 
+    .fluid-bar-bg {
+        height: 6px;
+    }
+
+    .nav-buttons {
+        gap: 4px;
+    }
+
+    .btn-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+    }
+
+    .btn-icon svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    /* HUGE MAX GAMEPLAY CANVAS ON MOBILE */
+    .canvas-wrapper {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+        border-radius: 14px;
+    }
+
+    .modal-card {
+        padding: 18px 22px;
+        max-width: 92%;
+    }
+
+    .modal-title {
+        font-size: 1.6rem;
+    }
+
+    .score-summary {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .summary-item span {
+        font-size: 1.4rem;
+    }
+
+    /* Compact 1-row action buttons */
     .action-controls {
-        gap: 6px;
+        gap: 4px;
+        margin-top: 4px;
+        flex-wrap: nowrap;
     }
 
     .touch-btn {
-        padding: 10px 10px;
-        font-size: 0.85rem;
-        flex: 1 1 calc(33.33% - 6px);
+        padding: 8px 4px;
+        font-size: 0.75rem;
+        border-radius: 10px;
+        flex: 1;
         justify-content: center;
+        gap: 2px;
     }
 
     .btn-hint {
         display: none;
-    }
-
-    .canvas-wrapper {
-        aspect-ratio: 16 / 9;
-        height: auto;
-        border-radius: 12px;
     }
 }
 
