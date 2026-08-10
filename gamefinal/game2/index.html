@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>T20 Cricket Championship | Ultimate Realistic Cricket Game</title>
-  <meta name="description" content="An authentic interactive HTML5 T20 Cricket web game featuring full stadium canvas, shot timing meter, bowling target marker, ball physics, coin toss, commentary, and sound effects.">
+  <title>T20 Cricket Championship | 3D Stadium Cricket Game</title>
+  <meta name="description" content="An immersive 3D HTML5 T20 Cricket web game featuring 3D WebGL stadium graphics, 3D player models, shot timing meter, coin toss, commentary, and sound effects.">
   <link rel="stylesheet" href="style.css">
+  <!-- THREE.JS 3D ENGINE -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
   <div id="app">
@@ -13,7 +15,7 @@
     <header class="header-nav">
       <div class="brand-title">
         <span class="brand-icon">🏏</span>
-        <span>T20 CRICKET CHAMPIONSHIP</span>
+        <span>T20 CRICKET 3D CHAMPIONSHIP</span>
       </div>
       <div class="nav-controls">
         <button id="btn-sound-toggle" class="btn btn-outline btn-icon-only" title="Toggle Sound">
@@ -31,22 +33,22 @@
     <!-- 🟢 SCREEN 1: HOME SCREEN -->
     <section id="screen-home" class="screen active">
       <div class="home-hero">
-        <span class="home-title-badge">PRO LEAGUE SIMULATOR</span>
-        <h1 class="home-heading">T20 Cricket Master</h1>
-        <p class="home-subheading">Experience authentic T20 cricket with real interactive timing meters, bowling spot targeting, field placement tactics, 2D stadium canvas physics, commentary, and full scorecards!</p>
+        <span class="home-title-badge">3D WEBGL ENGINE</span>
+        <h1 class="home-heading">T20 Cricket 3D</h1>
+        <p class="home-subheading">Experience full 3D broadcast cricket with realistic 3D pitch view, 3D stadium floodlights, 3D player models, shot timing meter, commentary, and full scorecards!</p>
         
         <div class="home-menu-grid">
           <div class="home-card" id="card-play-match">
             <span class="home-card-icon">🏆</span>
             <h3 class="home-card-title">Play Match</h3>
-            <p class="home-card-desc">Select teams, choose XI, toss coin, control shots & bowling target.</p>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 8px;">Start Match</button>
+            <p class="home-card-desc">Select teams, choose XI, toss coin, control 3D shots & bowling.</p>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 8px;">Start 3D Match</button>
           </div>
           
           <div class="home-card" id="card-practice">
             <span class="home-card-icon">🎯</span>
             <h3 class="home-card-title">Practice Nets</h3>
-            <p class="home-card-desc">Master your shot timing bar & ball placement target in the nets.</p>
+            <p class="home-card-desc">Master your 3D shot timing & ball placement target in the nets.</p>
             <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;">Nets Mode</button>
           </div>
 
@@ -71,7 +73,7 @@
     <section id="screen-team-select" class="screen">
       <div class="section-title-box">
         <h2 class="section-title">Team Selection</h2>
-        <p class="section-subtitle">Select your franchise and your rival for the match</p>
+        <p class="section-subtitle">Select your franchise and rival team for the 3D match</p>
       </div>
 
       <div class="team-select-grid">
@@ -202,7 +204,7 @@
       </div>
     </section>
 
-    <!-- 🟢 SCREEN 5: MATCH PLAYING VIEW -->
+    <!-- 🟢 SCREEN 5: MATCH PLAYING VIEW (FULL 3D STADIUM) -->
     <section id="screen-match" class="screen">
       <!-- TOP LIVE SCOREBOARD -->
       <div class="scoreboard-top">
@@ -251,15 +253,15 @@
         </div>
       </div>
 
-      <!-- 🏏 HTML5 CANVAS STADIUM & PITCH GRAPHICS -->
+      <!-- 🏟️ 3D WEBGL STADIUM CONTAINER -->
       <div class="stadium-stage" id="stadium-pitch">
-        <canvas id="cricket-canvas" width="800" height="320"></canvas>
+        <div id="stadium-3d-container" style="width: 100%; height: 100%;"></div>
+        <canvas id="cricket-canvas" width="800" height="340" style="display: none;"></canvas>
         <div class="event-overlay" id="event-overlay-text">6️⃣ SIX!</div>
       </div>
 
-      <!-- INTERACTIVE SHOT TIMING METER / BOWLING TARGET AREA -->
+      <!-- INTERACTIVE SHOT TIMING METER -->
       <div class="interactive-mechanics-box" id="mechanics-container">
-        <!-- BATTING TIMING METER -->
         <div id="batting-timing-meter-box">
           <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
             <span>⏱️ SHOT TIMING METER</span>
@@ -370,7 +372,7 @@
       <div class="commentary-box" id="commentary-container">
         <div class="commentary-item">
           <span class="commentary-ball">0.0</span>
-          <span class="commentary-text">Match ready! Fielders take positions, batsmen take guard.</span>
+          <span class="commentary-text">3D Stadium camera initialized! Ready for action.</span>
         </div>
       </div>
     </section>
@@ -517,10 +519,10 @@
         <button id="btn-close-rules" class="btn btn-outline btn-icon-only">✕</button>
       </div>
       <div style="line-height: 1.6; color: var(--text-muted);">
-        <p style="margin-bottom: 12px;"><strong style="color: white;">1. Shot Timing Bar:</strong> When batting, watch the timing marker slide back and forth. Pick your shot button when the pointer aligns with the GREEN zone for maximum power!</p>
-        <p style="margin-bottom: 12px;"><strong style="color: white;">2. Interactive Field Canvas:</strong> Watch real 2D fielders, bowler runup animation, ball physics trajectory, and boundary flashes live on the pitch canvas.</p>
-        <p style="margin-bottom: 12px;"><strong style="color: white;">3. Bowling Variation:</strong> Choose pace, yorker, bouncer, spin, or slower ball to trick the computer batsman.</p>
-        <p style="margin-bottom: 12px;"><strong style="color: white;">4. Victory Goal:</strong> Chase down the target in 2nd innings or restrict the opponent before 20 overs run out!</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">1. 3D Stadium Camera:</strong> Watch real 3D WebGL pitch perspectives, 3D stadium lights, 3D stumps, and 3D player models.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">2. Shot Timing Bar:</strong> When batting, time your shot buttons with the GREEN zone for maximum 6s and 4s.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">3. Bowling Variations:</strong> Pick Yorker, Pace, Bouncer, Spin, or Slower ball variations.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">4. Match Goal:</strong> Outscore the target in 2nd innings or bowl out the opponent!</p>
       </div>
     </div>
   </div>

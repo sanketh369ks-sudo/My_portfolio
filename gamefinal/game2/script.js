@@ -1,4 +1,4 @@
-/* T20 CRICKET CHAMPIONSHIP - COMPLETE REALISTIC GAME ENGINE WITH REAL HUMAN PLAYER GRAPHICS */
+/* T20 CRICKET CHAMPIONSHIP - 3D WEBGL ENGINE & COMPLETE GAME LOGIC */
 
 // ==========================================
 // 1. AUDIO SYNTHESIZER ENGINE (Web Audio API)
@@ -153,315 +153,259 @@ class SoundEngine {
 const sounds = new SoundEngine();
 
 // ==========================================
-// 2. HTML5 CANVAS STADIUM & HUMAN PLAYER RENDERER
+// 2. THREE.JS 3D WEBGL STADIUM ENGINE
 // ==========================================
-class StadiumRenderer {
-  constructor(canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    this.ctx = this.canvas.getContext("2d");
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+class Cricket3DEngine {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
+    this.width = this.container.clientWidth || 800;
+    this.height = this.container.clientHeight || 340;
     
-    this.ball = { x: 270, y: 160, rotation: 0, visible: false };
-    this.batsmanSwingAngle = 0;
-    this.bailsFlying = false;
-    this.bailOffset = 0;
-    this.bowlerRunX = 220;
-    
-    this.fielders = [
-      { x: 580, y: 110, role: "Slip" },
-      { x: 620, y: 70, role: "Gully" },
-      { x: 450, y: 60, role: "Cover" },
-      { x: 320, y: 80, role: "Mid-Off" },
-      { x: 320, y: 240, role: "Mid-On" },
-      { x: 450, y: 260, role: "Mid-Wicket" },
-      { x: 580, y: 220, role: "Square Leg" },
-      { x: 680, y: 160, role: "Third Man" },
-      { x: 720, y: 80, role: "Deep Cover" }
-    ];
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.ballMesh = null;
+    this.batsmanMesh = null;
+    this.batMesh = null;
+    this.bailsGroup = null;
+    this.stumpsGroup = null;
+
+    this.isThreeLoaded = typeof THREE !== "undefined";
+
+    if (this.isThreeLoaded) {
+      this.init3D();
+    }
   }
 
-  draw() {
-    const ctx = this.ctx;
-    const w = this.width;
-    const h = this.height;
+  init3D() {
+    // 3D Scene
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x080c14);
+    this.scene.fog = new THREE.FogExp2(0x080c14, 0.005);
 
-    // Grass Stadium Field
-    ctx.fillStyle = "#092918";
-    ctx.fillRect(0, 0, w, h);
+    // 3D Camera (Behind Bowler Broadcast Angle)
+    this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 1000);
+    this.camera.position.set(0, 12, -35);
+    this.camera.lookAt(0, 2, 20);
 
-    // Grass Stripes
-    ctx.fillStyle = "#0c3620";
-    for (let i = 0; i < w; i += 60) {
-      ctx.fillRect(i, 0, 30, h);
-    }
+    // 3D Renderer
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setSize(this.width, this.height);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.container.appendChild(this.renderer.domElement);
 
-    // Boundary Rope
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.ellipse(w / 2, h / 2, w / 2 - 20, h / 2 - 20, 0, 0, Math.PI * 2);
-    ctx.stroke();
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    this.scene.add(ambientLight);
 
-    // 30-Yard Inner Circle
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([8, 8]);
-    ctx.beginPath();
-    ctx.ellipse(w / 2, h / 2, 180, 100, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    mainLight.position.set(20, 40, -20);
+    mainLight.castShadow = true;
+    this.scene.add(mainLight);
 
-    // Pitch Rect
-    ctx.fillStyle = "#d4b886";
-    ctx.fillRect(250, h / 2 - 22, 300, 44);
-    ctx.strokeStyle = "rgba(255,255,255,0.7)";
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(250, h / 2 - 22, 300, 44);
+    // 3D Ground (Grass Field)
+    const groundGeo = new THREE.CylinderGeometry(60, 60, 0.2, 64);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a2e1c, roughness: 0.8 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.position.y = -0.1;
+    ground.receiveShadow = true;
+    this.scene.add(ground);
 
-    // Crease Lines
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(270, h / 2 - 20, 4, 40);
-    ctx.fillRect(530, h / 2 - 20, 4, 40);
+    // 3D Pitch Strip
+    const pitchGeo = new THREE.BoxGeometry(4, 0.22, 22);
+    const pitchMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c, roughness: 0.6 });
+    const pitch = new THREE.Mesh(pitchGeo, pitchMat);
+    pitch.position.set(0, 0.01, 0);
+    pitch.receiveShadow = true;
+    this.scene.add(pitch);
 
-    // Draw Stumps & Bails
-    this.drawStumps(ctx, 265, h / 2 - 12, false);
-    this.drawStumps(ctx, 535, h / 2 - 12, this.bailsFlying);
+    // 3D Boundary Line Ring
+    const ringGeo = new THREE.RingGeometry(55, 55.5, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.05;
+    this.scene.add(ring);
 
-    // Draw Fielders (Human Sprites with Caps & Kits)
-    const batKitColor = (GameState.match && GameState.match.innings1) ? GameState.match.innings1.battingTeam.color : "#0066cc";
-    const bowlKitColor = (GameState.match && GameState.match.innings1) ? GameState.match.innings1.bowlingTeam.color : "#ffcc00";
+    // 3D Stadium Light Towers
+    this.createStadiumTower(-45, 45);
+    this.createStadiumTower(45, 45);
+    this.createStadiumTower(-45, -45);
+    this.createStadiumTower(45, -45);
 
-    this.fielders.forEach(f => {
-      this.drawHumanSprite(ctx, f.x, f.y, bowlKitColor, "fielder", 0);
+    // 3D Stumps & Bails at Batsman end (Z = 10)
+    this.stumpsGroup = this.createStumps(0, 0, 10);
+    this.scene.add(this.stumpsGroup);
+
+    // 3D Batsman Model with Bat
+    this.create3DBatsman(0.5, 0, 10);
+
+    // 3D Red Leather Ball
+    const ballGeo = new THREE.SphereGeometry(0.3, 16, 16);
+    const ballMat = new THREE.MeshStandardMaterial({ color: 0xd62828, roughness: 0.3 });
+    this.ballMesh = new THREE.Mesh(ballGeo, ballMat);
+    this.ballMesh.position.set(0, 1, -10);
+    this.ballMesh.visible = false;
+    this.scene.add(this.ballMesh);
+
+    // Start 60fps Animation Loop
+    this.animateLoop();
+
+    // Window Resize Handler
+    window.addEventListener("resize", () => {
+      if (this.container && this.renderer) {
+        this.width = this.container.clientWidth;
+        this.height = this.container.clientHeight;
+        this.camera.aspect = this.width / this.height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(this.width, this.height);
+      }
     });
+  }
 
-    // Draw Bowler
-    this.drawHumanSprite(ctx, this.bowlerRunX, h / 2 - 2, bowlKitColor, "bowler", 0);
+  createStadiumTower(x, z) {
+    const poleGeo = new THREE.CylinderGeometry(0.4, 0.6, 25, 8);
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+    const pole = new THREE.Mesh(poleGeo, poleMat);
+    pole.position.set(x, 12.5, z);
+    this.scene.add(pole);
 
-    // Draw Wicketkeeper
-    this.drawHumanSprite(ctx, 560, h / 2 - 2, bowlKitColor, "keeper", 0);
+    const lightGeo = new THREE.BoxGeometry(4, 2, 1);
+    const lightMat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
+    const lightHead = new THREE.Mesh(lightGeo, lightMat);
+    lightHead.position.set(x, 25, z);
+    this.scene.add(lightHead);
+  }
 
-    // Draw Non-Striker Batsman
-    this.drawHumanSprite(ctx, 275, h / 2 - 28, batKitColor, "batsman", 0);
+  createStumps(x, y, z) {
+    const group = new THREE.Group();
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
 
-    // Draw Striker Batsman with Real Cricket Bat
-    this.drawHumanBatsmanWithBat(ctx, 525, h / 2 - 2, batKitColor, this.batsmanSwingAngle);
-
-    // Draw Leather Cricket Ball with Seam
-    if (this.ball.visible) {
-      this.drawLeatherBall(ctx, this.ball.x, this.ball.y, this.ball.rotation);
+    for (let i = -1; i <= 1; i++) {
+      const sGeo = new THREE.CylinderGeometry(0.08, 0.08, 1.4, 8);
+      const stump = new THREE.Mesh(sGeo, woodMat);
+      stump.position.set(x + i * 0.25, y + 0.7, z);
+      group.add(stump);
     }
-  }
-
-  // Draw Human Sprite Body (Head, Torso, Legs, Arms)
-  drawHumanSprite(ctx, x, y, jerseyColor, type, frame) {
-    ctx.save();
-    ctx.translate(x, y);
-
-    // Shadow
-    ctx.fillStyle = "rgba(0,0,0,0.3)";
-    ctx.beginPath();
-    ctx.ellipse(0, 10, 8, 4, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Legs (White Cricket Pants / Socks)
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(-4, 0, 3, 10);
-    ctx.fillRect(1, 0, 3, 10);
-
-    // Torso (Jersey Color)
-    ctx.fillStyle = jerseyColor;
-    ctx.fillRect(-5, -10, 10, 10);
-
-    // Head & Cap / Helmet
-    ctx.fillStyle = "#ffd59e"; // Skin tone
-    ctx.beginPath();
-    ctx.arc(0, -14, 4, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Cap / Helmet visor
-    ctx.fillStyle = type === "batsman" ? "#0f172a" : jerseyColor;
-    ctx.beginPath();
-    ctx.arc(0, -15, 4.5, Math.PI, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  // Draw Batsman holding Real Cricket Bat & Swing Arc
-  drawHumanBatsmanWithBat(ctx, x, y, jerseyColor, swingAngle) {
-    ctx.save();
-    ctx.translate(x, y);
-
-    // Shadow
-    ctx.fillStyle = "rgba(0,0,0,0.3)";
-    ctx.beginPath();
-    ctx.ellipse(0, 10, 10, 4, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Leg Pads (White Cricket Pads)
-    ctx.fillStyle = "#f8fafc";
-    ctx.fillRect(-6, -2, 5, 12);
-    ctx.fillRect(1, -2, 5, 12);
-
-    // Torso (Jersey Color)
-    ctx.fillStyle = jerseyColor;
-    ctx.fillRect(-6, -12, 12, 10);
-
-    // Helmet (Dark with visor)
-    ctx.fillStyle = "#ffd59e";
-    ctx.beginPath();
-    ctx.arc(0, -16, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = "#0f172a";
-    ctx.beginPath();
-    ctx.arc(0, -17, 5.5, Math.PI, Math.PI * 2);
-    ctx.fill();
-    // Visor line
-    ctx.strokeStyle = "#94a3b8";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-4, -15);
-    ctx.lineTo(4, -15);
-    ctx.stroke();
-
-    // Arms & Real Wooden Cricket Bat
-    ctx.save();
-    ctx.rotate(swingAngle * Math.PI / 180);
-
-    // Gloves
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.arc(-8, -4, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Cricket Bat Handle (Black rubber grip)
-    ctx.fillStyle = "#1e293b";
-    ctx.fillRect(-12, -6, 8, 3);
-
-    // Cricket Bat Blade (Willow Wood Texture)
-    ctx.fillStyle = "#e2b87f";
-    ctx.fillRect(-22, -8, 12, 6);
-    ctx.strokeStyle = "#8d5b28";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-22, -8, 12, 6);
-
-    ctx.restore();
-    ctx.restore();
-  }
-
-  // Draw Stumps & Bails
-  drawStumps(ctx, x, y, bailsFlying) {
-    ctx.save();
-    ctx.fillStyle = "#facc15"; // Wooden yellow stumps
-
-    // 3 Stumps
-    ctx.fillRect(x - 4, y, 2.5, 16);
-    ctx.fillRect(x, y, 2.5, 16);
-    ctx.fillRect(x + 4, y, 2.5, 16);
 
     // Bails
-    if (!bailsFlying) {
-      ctx.fillStyle = "#eab308";
-      ctx.fillRect(x - 5, y - 2, 11, 2);
-    } else {
-      // Exploding bails flying in air!
-      ctx.save();
-      ctx.translate(x, y - 10 - this.bailOffset);
-      ctx.rotate(this.bailOffset * 0.1);
-      ctx.fillStyle = "#ff3366";
-      ctx.fillRect(-5, 0, 11, 3);
-      ctx.restore();
+    const bGeo = new THREE.BoxGeometry(0.7, 0.06, 0.08);
+    const bMat = new THREE.MeshStandardMaterial({ color: 0xeab308 });
+    const bails = new THREE.Mesh(bGeo, bMat);
+    bails.position.set(x, y + 1.43, z);
+    group.add(bails);
+
+    return group;
+  }
+
+  create3DBatsman(x, y, z) {
+    const group = new THREE.Group();
+
+    // Body Jersey
+    const jerseyColor = (GameState.match && GameState.match.innings1) ? GameState.match.innings1.battingTeam.color : 0x0066cc;
+    const bodyMat = new THREE.MeshStandardMaterial({ color: jerseyColor });
+    const bodyGeo = new THREE.CylinderGeometry(0.4, 0.4, 1.4, 8);
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.position.y = 1.3;
+    group.add(body);
+
+    // Head / Helmet
+    const headGeo = new THREE.SphereGeometry(0.3, 12, 12);
+    const headMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.y = 2.2;
+    group.add(head);
+
+    // Legs (White Pads)
+    const padMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc });
+    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.2, 8), padMat);
+    leg1.position.set(-0.2, 0.6, 0);
+    group.add(leg1);
+
+    const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.2, 8), padMat);
+    leg2.position.set(0.2, 0.6, 0);
+    group.add(leg2);
+
+    // 3D Wooden Cricket Bat
+    const batGeo = new THREE.BoxGeometry(0.15, 1.2, 0.35);
+    const batMat = new THREE.MeshStandardMaterial({ color: 0xe2b87f, roughness: 0.3 });
+    this.batMesh = new THREE.Mesh(batGeo, batMat);
+    this.batMesh.position.set(-0.5, 1.1, -0.3);
+    this.batMesh.rotation.z = Math.PI / 6;
+    group.add(this.batMesh);
+
+    group.position.set(x, y, z);
+    this.batsmanMesh = group;
+    this.scene.add(group);
+  }
+
+  animateLoop() {
+    const loop = () => {
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.render(this.scene, this.camera);
+      }
+      requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
+  animate3DDelivery(outcome, callback) {
+    if (!this.isThreeLoaded || !this.ballMesh) {
+      if (callback) callback();
+      return;
     }
 
-    ctx.restore();
-  }
+    this.ballMesh.visible = true;
+    this.ballMesh.position.set(0, 1.2, -10);
 
-  // Draw Leather Cricket Ball with Seam
-  drawLeatherBall(ctx, x, y, rotation) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-
-    // Red Leather Ball Body
-    ctx.fillStyle = "#dc2626";
-    ctx.beginPath();
-    ctx.arc(0, 0, 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // White Seam Stitch Arc
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, 5, -Math.PI / 3, Math.PI / 3);
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  animateDelivery(outcome, callback) {
-    this.ball.visible = true;
-    this.ball.x = 270;
-    this.ball.y = this.height / 2;
-    this.bailsFlying = false;
-    this.bailOffset = 0;
-    this.batsmanSwingAngle = 0;
-
-    let targetX = 530;
-    let targetY = this.height / 2;
+    let targetX = 0, targetY = 1.0, targetZ = 10;
 
     if (outcome === 4) {
-      targetX = 760;
-      targetY = 40 + Math.random() * (this.height - 80);
+      targetX = 25; targetY = 0.3; targetZ = 45;
     } else if (outcome === 6) {
-      targetX = 780;
-      targetY = Math.random() > 0.5 ? 20 : this.height - 20;
+      targetX = 35; targetY = 15; targetZ = 50;
     } else if (outcome === "W") {
-      targetX = 535;
-      targetY = this.height / 2;
-      this.bailsFlying = true;
+      targetX = 0; targetY = 0.8; targetZ = 10;
     } else if (typeof outcome === "number" && outcome > 0) {
-      targetX = 580 + outcome * 30;
-      targetY = this.height / 2 + (Math.random() > 0.5 ? 60 : -60);
+      targetX = (Math.random() > 0.5 ? 1 : -1) * (10 + outcome * 4);
+      targetY = 0.5;
+      targetZ = 20 + outcome * 5;
     }
 
-    const steps = 30;
+    const startPos = { x: 0, y: 1.2, z: -10 };
+    const steps = 40;
     let currentStep = 0;
-    const dx = (targetX - this.ball.x) / steps;
-    const dy = (targetY - this.ball.y) / steps;
 
-    const interval = setInterval(() => {
-      this.ball.x += dx;
-      this.ball.y += dy;
-      this.ball.rotation += 0.4;
-
-      if (currentStep > 15) {
-        this.batsmanSwingAngle = -45; // Swing bat
-      }
-      if (this.bailsFlying) {
-        this.bailOffset += 2;
-      }
-
-      this.draw();
-
+    const animInterval = setInterval(() => {
       currentStep++;
+      const t = currentStep / steps;
+
+      // Parabolic Arc Y
+      const heightArc = Math.sin(t * Math.PI) * (outcome === 6 ? 12 : 3);
+
+      this.ballMesh.position.x = startPos.x + (targetX - startPos.x) * t;
+      this.ballMesh.position.y = startPos.y + (targetY - startPos.y) * t + heightArc;
+      this.ballMesh.position.z = startPos.z + (targetZ - startPos.z) * t;
+
+      // Bat swing animation at impact (t = 0.5)
+      if (t >= 0.45 && this.batMesh) {
+        this.batMesh.rotation.y = Math.PI / 3;
+      }
+
       if (currentStep >= steps) {
-        clearInterval(interval);
+        clearInterval(animInterval);
         setTimeout(() => {
-          this.ball.visible = false;
-          this.batsmanSwingAngle = 0;
-          this.bailsFlying = false;
-          this.draw();
+          this.ballMesh.visible = false;
+          if (this.batMesh) this.batMesh.rotation.y = 0;
           if (callback) callback();
-        }, 350);
+        }, 300);
       }
     }, 20);
   }
 }
 
-let stadiumCanvas;
+let stadium3D;
 
 // ==========================================
 // 3. INTERACTIVE SHOT TIMING METER
@@ -536,16 +480,13 @@ const GameState = {
   match: null
 };
 
-// Initialize App on DOM Load
 document.addEventListener("DOMContentLoaded", () => {
   initTeamSelection();
   bindEvents();
-  stadiumCanvas = new StadiumRenderer("cricket-canvas");
-  stadiumCanvas.draw();
+  stadium3D = new Cricket3DEngine("stadium-3d-container");
   timingMeter = new TimingMeter();
 });
 
-// Navigation Screen Switcher
 function showScreen(screenId) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const target = document.getElementById(screenId);
@@ -830,7 +771,6 @@ function setupMatchObject() {
   };
 
   updateMatchUI();
-  stadiumCanvas.draw();
 }
 
 function createInningsObject(battingTeam, bowlingTeam, battingXI, bowlingXI, isUserBatting) {
@@ -909,7 +849,8 @@ function playBall(shotChoice, deliveryChoice) {
 
   sounds.playBatHit();
 
-  stadiumCanvas.animateDelivery(outcome, () => {
+  // 3D Delivery Animation
+  stadium3D.animate3DDelivery(outcome, () => {
     let runValue = 0;
 
     if (outcome === "W") {
@@ -952,7 +893,7 @@ function playBall(shotChoice, deliveryChoice) {
       sounds.playFour();
       showEventOverlay("4️⃣ FOUR!", "event-four");
       inn.overHistory.push("4");
-      addCommentary(inn, `FOUR! ${striker.name} cracks a gorgeous shot through fielders for 4 runs (${speedKm} km/h). [Timing: ${timingQuality.toUpperCase()}]`);
+      addCommentary(inn, `FOUR! ${striker.name} hits a gorgeous boundary! (${speedKm} km/h). [Timing: ${timingQuality.toUpperCase()}]`);
 
     } else if (outcome === 6) {
       runValue = 6;
@@ -969,7 +910,7 @@ function playBall(shotChoice, deliveryChoice) {
       sounds.playSix();
       showEventOverlay("6️⃣ SIX!", "event-six");
       inn.overHistory.push("6");
-      addCommentary(inn, `SIX! HUGE HIT! ${striker.name} dispatches ${bowler.name} out of the stadium! (${speedKm} km/h) [Timing: ${timingQuality.toUpperCase()}]`);
+      addCommentary(inn, `SIX! HUGE 3D HIT! ${striker.name} launches it into the stadium stands! (${speedKm} km/h) [Timing: ${timingQuality.toUpperCase()}]`);
 
     } else {
       runValue = parseInt(outcome, 10) || 0;
@@ -1134,7 +1075,6 @@ function startSecondInnings() {
 
   showScreen("screen-match");
   updateMatchUI();
-  stadiumCanvas.draw();
 }
 
 function endMatch() {
