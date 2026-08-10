@@ -899,7 +899,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             ctx.closePath();
             ctx.stroke();
-             ctx.restore();
+        });
+
+        ctx.restore();
     }
 
     function drawSpikyBoss(ctx, x, y, radius, spikes, pulse) {
