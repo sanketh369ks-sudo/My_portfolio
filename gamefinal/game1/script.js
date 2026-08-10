@@ -875,6 +875,19 @@ document.addEventListener('DOMContentLoaded', () => {
             player.y += player.vy;
         }
 
+        // Top Screen Height Boundary Constraint (Keep Spider-Man strictly inside top screen height)
+        const minTopY = player.radius + 15;
+        if (player.y < minTopY) {
+            player.y = minTopY;
+            if (player.vy < 0) {
+                player.vy = 0; // Stop upward movement
+            }
+            if (player.isSwinging) {
+                player.isSwinging = false;
+                player.webAnchor = null;
+            }
+        }
+
         // Building Ground Collision & Landing
         player.onGround = false;
         for (let b of buildings) {
