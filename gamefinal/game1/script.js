@@ -391,9 +391,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let targetX = mousePos.x + cameraX;
         let targetY = mousePos.y;
 
-        // Smart Magnetic Target Lock-On to nearest Glider Villain ahead
+        // Smart Magnetic Target Lock-On to Boss Man or nearest Glider Villain ahead
         let bestTarget = null;
-        let minDist = 320;
+        let minDist = 480;
+
+        if (boss.active) {
+            const dBoss = Math.hypot(boss.x - targetX, boss.y - targetY);
+            if (dBoss < minDist) {
+                minDist = dBoss;
+                bestTarget = boss;
+            }
+        }
+
         for (let b of pumpkinBombs) {
             if (b.x > player.x - 20) {
                 const d = Math.hypot(b.x - targetX, b.y - targetY);
@@ -509,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let bossProjectiles = [];
     let nextBossDistance = 250;
 
-    // --- Red Spiky Boss Entity ---
+    // --- Muscular Symbiote Boss Man Entity ---
     const boss = {
         active: false,
         x: 0,
@@ -518,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         vy: 0,
         hp: 100,
         maxHp: 100,
-        radius: 38,
+        radius: 65, // Fits giant Muscular Boss Man torso, shoulders, claws & head
         spikes: 12,
         phaseTimer: 0,
         attackTimer: 0,
@@ -800,10 +809,10 @@ document.addEventListener('DOMContentLoaded', () => {
             b.y += b.vy;
             b.life--;
 
-            // Check collision with Red Spiky Boss
+            // Check collision with Muscular Symbiote Boss Man
             if (boss.active) {
                 const distBoss = Math.hypot(b.x - boss.x, b.y - boss.y);
-                if (distBoss < b.radius + boss.radius) {
+                if (distBoss < b.radius + boss.radius + 15) {
                     const dmg = b.isSuper ? 35 : 15;
                     boss.hp -= dmg;
                     playSFX('boss_hit');
