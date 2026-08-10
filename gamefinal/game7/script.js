@@ -1,22 +1,72 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Ensure roundRect compatibility
+if (!ctx.roundRect) {
+    ctx.roundRect = function(x, y, w, h, r) {
+        let radius = typeof r === 'number' ? r : (r[0] || 0);
+        this.beginPath();
+        this.moveTo(x + radius, y);
+        this.lineTo(x + w - radius, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + radius);
+        this.lineTo(x + w, y + h - radius);
+        this.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        this.lineTo(x + radius, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - radius);
+        this.lineTo(x, y + radius);
+        this.quadraticCurveTo(x, y, x + radius, y);
+        this.closePath();
+    };
+}
+
 // Game parameters tuned for smooth, comfortable speed
-let bird = { x: 50, y: 150, width: 24, height: 24, gravity: 0.25, lift: -5.5, velocity: 0 };
+let bird = { x: 50, y: 150, width: 24, height: 24, gravity: 0.25, lift: -5.5, velocity: 0, wingAngle: 0 };
 let pipes = [];
 let frame = 0;
 let score = 0;
+let highScore = parseInt(localStorage.getItem('flappy_nature_highscore')) || 0;
 let gameOver = false;
 let gameStarted = false;
 
 const pipeWidth = 44;
 const pipeGap = 130;
 const pipeSpeed = 1.6;
+const groundHeight = 36;
+const groundY = canvas.height - groundHeight;
 
 // FPS Throttling variables (prevents hyper-speed on 120Hz/144Hz monitors)
 let lastTime = 0;
 const fps = 60;
 const frameInterval = 1000 / fps;
+
+// Parallax nature background scroll positions
+let bgOffsetFar = 0;
+let bgOffsetMid = 0;
+let bgOffsetNear = 0;
+
+// Nature elements: Clouds & Drifting Leaves
+let clouds = [
+    { x: 20, y: 45, scale: 0.8, speed: 0.15 },
+    { x: 140, y: 75, scale: 1.1, speed: 0.2 },
+    { x: 260, y: 30, scale: 0.7, speed: 0.12 }
+];
+
+let particles = [];
+function initParticles() {
+    particles = [];
+    for (let i = 0; i < 14; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * (groundY - 20),
+            size: Math.random() * 3 + 2,
+            speedX: Math.random() * 0.4 + 0.3,
+            speedY: Math.random() * 0.3 + 0.1,
+            oscillation: Math.random() * Math.PI * 2,
+            oscSpeed: Math.random() * 0.03 + 0.01,
+            color: Math.random() > 0.4 ? '#8dc63f' : (Math.random() > 0.5 ? '#ffb7c5' : '#7cb342')
+        });
+    }
+}
 
 function setup() {
     // Keyboard listener for Space or ArrowUp
@@ -38,6 +88,7 @@ function setup() {
         handleJump();
     }, { passive: false });
 
+    initParticles();
     resetGame();
     requestAnimationFrame(gameLoop);
 }
@@ -72,14 +123,20 @@ function gameLoop(currentTime) {
     if (gameStarted && !gameOver) {
         frame++;
 
+        // Update Parallax Offsets
+        bgOffsetFar = (bgOffsetFar + 0.2) % canvas.width;
+        bgOffsetMid = (bgOffsetMid + 0.6) % canvas.width;
+        bgOffsetNear = (bgOffsetNear + pipeSpeed) % canvas.width;
+
         // Bird physics
         bird.velocity += bird.gravity;
         bird.y += bird.velocity;
+        bird.wingAngle += 0.25;
 
         // Pipe generation (every ~2 seconds at 60 FPS)
         if (frame % 110 === 0) {
             const minPipeHeight = 40;
-            const maxPipeHeight = canvas.height - pipeGap - minPipeHeight;
+            const maxPipeHeight = groundY - pipeGap - minPipeHeight;
             const pipeHeight = Math.floor(Math.random() * (maxPipeHeight - minPipeHeight + 1)) + minPipeHeight;
 
             pipes.push({
@@ -92,7 +149,7 @@ function gameLoop(currentTime) {
             pipes.push({
                 x: canvas.width,
                 y: pipeHeight + pipeGap,
-                height: canvas.height - (pipeHeight + pipeGap),
+                height: groundY - (pipeHeight + pipeGap),
                 scored: false,
                 isTop: false
             });
@@ -103,162 +160,622 @@ function gameLoop(currentTime) {
             let pipe = pipes[i];
             pipe.x -= pipeSpeed;
 
-            // Collision detection
+            // Collision detection (with slight hit box leniency for smoother feel)
+            const padding = 2;
             if (
-                bird.x < pipe.x + pipeWidth &&
-                bird.x + bird.width > pipe.x &&
-                bird.y < pipe.y + pipe.height &&
-                bird.y + bird.height > pipe.y
+                bird.x + padding < pipe.x + pipeWidth &&
+                bird.x + bird.width - padding > pipe.x &&
+                bird.y + padding < pipe.y + pipe.height &&
+                bird.y + bird.height - padding > pipe.y
             ) {
-                gameOver = true;
+                triggerGameOver();
             }
 
             // Score counting (only count top pipe once per pipe pair)
             if (pipe.isTop && pipe.x + pipeWidth < bird.x && !pipe.scored) {
                 score++;
                 pipe.scored = true;
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('flappy_nature_highscore', highScore);
+                }
             }
         }
 
         // Remove off-screen pipes
         pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
 
-        // Canvas boundary collision
-        if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
-            gameOver = true;
+        // Ground and ceiling collision
+        if (bird.y + bird.height >= groundY || bird.y <= 0) {
+            triggerGameOver();
         }
+    } else {
+        // Gentle wing idle animation on start/over screens
+        bird.wingAngle += 0.1;
+        // Slow ambient background drift on menu
+        bgOffsetFar = (bgOffsetFar + 0.08) % canvas.width;
+        bgOffsetMid = (bgOffsetMid + 0.2) % canvas.width;
     }
 
-    // --- DRAWING ---
+    // Update nature particles
+    particles.forEach(p => {
+        p.x -= p.speedX;
+        p.y += p.speedY + Math.sin(p.oscillation) * 0.3;
+        p.oscillation += p.oscSpeed;
 
-    // Draw background gradient (sky to horizon)
-    let bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    bgGrad.addColorStop(0, '#70c5ce');
-    bgGrad.addColorStop(1, '#b4e4eb');
-    ctx.fillStyle = bgGrad;
+        if (p.x < -10) p.x = canvas.width + 10;
+        if (p.y > groundY) p.y = -5;
+    });
+
+    // Update clouds
+    clouds.forEach(c => {
+        c.x -= c.speed;
+        if (c.x < -70) c.x = canvas.width + 50;
+    });
+
+    // --- DRAWING NATURE SCENE LAYERS ---
+    drawSkyAndSun();
+    drawClouds();
+    drawDistantMountains();
+    drawMidgroundHills();
+    drawPipes();
+    drawNatureParticles();
+    drawGround();
+    drawBird();
+    drawUI();
+}
+
+function triggerGameOver() {
+    gameOver = true;
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('flappy_nature_highscore', highScore);
+    }
+}
+
+// --- NATURE GRAPHICS RENDERING FUNCTIONS ---
+
+function drawSkyAndSun() {
+    // Atmosphere Sky Gradient
+    let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    skyGrad.addColorStop(0, '#4a90e2');   // Deep serene blue
+    skyGrad.addColorStop(0.45, '#7bc0ed'); // Warm sky blue
+    skyGrad.addColorStop(0.75, '#bfe3f7'); // Horizon glow
+    skyGrad.addColorStop(1.0, '#eaf7e3');  // Golden nature tint near horizon
+    ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw pipes
+    // Glowing Sun
+    const sunX = 250;
+    const sunY = 70;
+    
+    // Sun Outer Aura / Rays
+    let auraGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 55);
+    auraGrad.addColorStop(0, 'rgba(255, 245, 200, 0.8)');
+    auraGrad.addColorStop(0.5, 'rgba(255, 220, 130, 0.35)');
+    auraGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = auraGrad;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 55, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sun Disk
+    let sunGrad = ctx.createRadialGradient(sunX - 4, sunY - 4, 2, sunX, sunY, 18);
+    sunGrad.addColorStop(0, '#ffffff');
+    sunGrad.addColorStop(0.3, '#fff3a8');
+    sunGrad.addColorStop(1, '#ffc845');
+    ctx.fillStyle = sunGrad;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 18, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawClouds() {
+    clouds.forEach(c => {
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+        let x = c.x;
+        let y = c.y;
+        let s = c.scale;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 16 * s, Math.PI * 0.5, Math.PI * 1.5);
+        ctx.arc(x + 16 * s, y - 12 * s, 18 * s, Math.PI * 1.0, Math.PI * 1.85);
+        ctx.arc(x + 36 * s, y - 10 * s, 15 * s, Math.PI * 1.3, Math.PI * 1.9);
+        ctx.arc(x + 48 * s, y, 14 * s, Math.PI * 1.5, Math.PI * 0.5);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cloud subtle soft shadow underneath
+        ctx.fillStyle = 'rgba(180, 210, 230, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(x + 24 * s, y + 4 * s, 26 * s, 6 * s, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    });
+}
+
+function drawDistantMountains() {
+    // Parallax Layer 1: Distant Silhouetted Blue-Purple Peaks
+    ctx.fillStyle = '#6589a6';
+    ctx.beginPath();
+
+    const mountainPoints = [
+        [0, 290], [40, 240], [90, 310], [140, 220], [190, 285],
+        [240, 210], [300, 300], [360, 230], [410, 295], [460, 250]
+    ];
+
+    let shift = bgOffsetFar;
+    ctx.moveTo(-50, groundY);
+
+    for (let i = 0; i < 3; i++) {
+        let offsetX = i * 360 - shift;
+        mountainPoints.forEach((pt, idx) => {
+            let px = pt[0] + offsetX;
+            let py = pt[1];
+            ctx.lineTo(px, py);
+        });
+    }
+
+    ctx.lineTo(canvas.width + 100, groundY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Mountain Snow Caps
+    ctx.fillStyle = 'rgba(245, 250, 255, 0.7)';
+    for (let i = 0; i < 3; i++) {
+        let offsetX = i * 360 - shift;
+        // Peak 1: (140, 220)
+        let p1x = 140 + offsetX;
+        ctx.beginPath();
+        ctx.moveTo(p1x, 220);
+        ctx.lineTo(p1x - 14, 245);
+        ctx.lineTo(p1x + 14, 245);
+        ctx.closePath();
+        ctx.fill();
+
+        // Peak 2: (240, 210)
+        let p2x = 240 + offsetX;
+        ctx.beginPath();
+        ctx.moveTo(p2x, 210);
+        ctx.lineTo(p2x - 16, 238);
+        ctx.lineTo(p2x + 16, 238);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+function drawMidgroundHills() {
+    // Parallax Layer 2: Lush Rolling Green Hills & Trees
+    let shift = bgOffsetMid;
+
+    // Back Hill Layer
+    ctx.fillStyle = '#56a347';
+    ctx.beginPath();
+    ctx.moveTo(-20, groundY);
+
+    for (let x = -50; x <= canvas.width + 100; x += 10) {
+        let realX = x + shift;
+        let hillY = groundY - 70 + Math.sin(realX * 0.015) * 22 + Math.cos(realX * 0.03) * 10;
+        ctx.lineTo(x, hillY);
+    }
+    ctx.lineTo(canvas.width + 20, groundY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Front Hill Layer with Trees
+    ctx.fillStyle = '#428e34';
+    ctx.beginPath();
+    ctx.moveTo(-20, groundY);
+
+    for (let x = -50; x <= canvas.width + 100; x += 10) {
+        let realX = x + shift * 1.5;
+        let hillY = groundY - 42 + Math.sin(realX * 0.025 + 1.2) * 16;
+        ctx.lineTo(x, hillY);
+    }
+    ctx.lineTo(canvas.width + 20, groundY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Pine Trees along the hill ridge
+    ctx.fillStyle = '#2d6823';
+    for (let i = -1; i < 6; i++) {
+        let treeX = (i * 85 - (shift * 1.5) % 85 + 85) % (canvas.width + 80) - 20;
+        let treeBaseY = groundY - 42 + Math.sin((treeX + shift * 1.5) * 0.025 + 1.2) * 16;
+
+        // Tree trunk
+        ctx.fillStyle = '#4a3319';
+        ctx.fillRect(treeX - 2, treeBaseY - 6, 4, 8);
+
+        // Pine Foliage Triangles
+        ctx.fillStyle = '#255e1c';
+        ctx.beginPath();
+        ctx.moveTo(treeX, treeBaseY - 24);
+        ctx.lineTo(treeX - 9, treeBaseY - 12);
+        ctx.lineTo(treeX + 9, treeBaseY - 12);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(treeX, treeBaseY - 18);
+        ctx.lineTo(treeX - 12, treeBaseY - 5);
+        ctx.lineTo(treeX + 12, treeBaseY - 5);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+function drawPipes() {
     pipes.forEach(pipe => {
-        // Main pipe body
+        // Pipe Gradient with Mossy Nature Vibe
         let pipeGrad = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipeWidth, 0);
-        pipeGrad.addColorStop(0, '#73bf2e');
-        pipeGrad.addColorStop(0.5, '#9ce659');
-        pipeGrad.addColorStop(1, '#558022');
+        pipeGrad.addColorStop(0, '#4e8c25');
+        pipeGrad.addColorStop(0.3, '#7bc437');
+        pipeGrad.addColorStop(0.7, '#64aa2b');
+        pipeGrad.addColorStop(1, '#3b6e1b');
 
         ctx.fillStyle = pipeGrad;
         ctx.fillRect(pipe.x, pipe.y, pipeWidth, pipe.height);
 
-        ctx.strokeStyle = '#2d470f';
+        // Dark outline
+        ctx.strokeStyle = '#244710';
         ctx.lineWidth = 2;
         ctx.strokeRect(pipe.x, pipe.y, pipeWidth, pipe.height);
 
-        // Pipe rim/cap
-        ctx.fillStyle = '#83d338';
+        // Bark / Wood grain details on pipes
+        ctx.strokeStyle = 'rgba(30, 60, 12, 0.25)';
+        ctx.lineWidth = 1.5;
+        for (let strokeY = pipe.y + 15; strokeY < pipe.y + pipe.height - 10; strokeY += 22) {
+            ctx.beginPath();
+            ctx.moveTo(pipe.x + 8, strokeY);
+            ctx.lineTo(pipe.x + pipeWidth - 8, strokeY + 4);
+            ctx.stroke();
+        }
+
+        // Pipe Rim / Cap with Nature Wood Finish
+        let capHeight = 16;
+        let capX = pipe.x - 3;
+        let capW = pipeWidth + 6;
+        let capY = pipe.isTop ? pipe.height - capHeight : pipe.y;
+
+        let capGrad = ctx.createLinearGradient(capX, 0, capX + capW, 0);
+        capGrad.addColorStop(0, '#65aa2d');
+        capGrad.addColorStop(0.5, '#95dc48');
+        capGrad.addColorStop(1, '#4e8a20');
+
+        ctx.fillStyle = capGrad;
+        ctx.fillRect(capX, capY, capW, capHeight);
+        ctx.strokeStyle = '#244710';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(capX, capY, capW, capHeight);
+
+        // Cute Vine / Leaf decoration hanging on the pipe cap
+        ctx.fillStyle = '#8bc34a';
         if (pipe.isTop) {
-            ctx.fillRect(pipe.x - 3, pipe.height - 14, pipeWidth + 6, 14);
-            ctx.strokeRect(pipe.x - 3, pipe.height - 14, pipeWidth + 6, 14);
+            // Leaf hanging down
+            ctx.beginPath();
+            ctx.ellipse(capX + 10, capY + capHeight + 4, 5, 8, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
         } else {
-            ctx.fillRect(pipe.x - 3, pipe.y, pipeWidth + 6, 14);
-            ctx.strokeRect(pipe.x - 3, pipe.y, pipeWidth + 6, 14);
+            // Leaf sticking up
+            ctx.beginPath();
+            ctx.ellipse(capX + capW - 10, capY - 4, 5, 8, -0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
         }
     });
+}
 
-    // Draw bird with rotation animation
+function drawGround() {
+    // Parallax Earth / Soil Base
+    let soilGrad = ctx.createLinearGradient(0, groundY, 0, canvas.height);
+    soilGrad.addColorStop(0, '#8c5e38');
+    soilGrad.addColorStop(0.3, '#6e4526');
+    soilGrad.addColorStop(1, '#4a2c15');
+    ctx.fillStyle = soilGrad;
+    ctx.fillRect(0, groundY, canvas.width, groundHeight);
+
+    // Darker soil separator line
+    ctx.fillStyle = '#3a200d';
+    ctx.fillRect(0, groundY, canvas.width, 2);
+
+    // Soil pebbles/texture
+    ctx.fillStyle = 'rgba(60, 35, 15, 0.4)';
+    for (let i = 0; i < canvas.width; i += 24) {
+        let px = (i - bgOffsetNear % 24 + canvas.width) % canvas.width;
+        ctx.fillRect(px, groundY + 14, 5, 3);
+        ctx.fillRect(px + 10, groundY + 24, 4, 4);
+    }
+
+    // Top Moving Grass Strip
+    let grassGrad = ctx.createLinearGradient(0, groundY - 6, 0, groundY + 6);
+    grassGrad.addColorStop(0, '#8ed433');
+    grassGrad.addColorStop(1, '#539e1b');
+    ctx.fillStyle = grassGrad;
+    ctx.fillRect(0, groundY - 6, canvas.width, 8);
+
+    // Animated Grass Blades Edge
+    ctx.fillStyle = '#8ed433';
+    ctx.strokeStyle = '#3d7811';
+    ctx.lineWidth = 1;
+
+    const bladeWidth = 8;
+    for (let x = -bladeWidth; x < canvas.width + bladeWidth; x += bladeWidth) {
+        let realX = x - (bgOffsetNear % bladeWidth);
+        ctx.beginPath();
+        ctx.moveTo(realX, groundY - 5);
+        ctx.lineTo(realX + 4, groundY - 11);
+        ctx.lineTo(realX + 8, groundY - 5);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Cute Tiny Wildflowers along ground edge
+    for (let i = 0; i < canvas.width; i += 75) {
+        let flowerX = (i - bgOffsetNear % 75 + canvas.width) % canvas.width;
+        let flowerY = groundY - 8;
+
+        // Stem
+        ctx.strokeStyle = '#4e8c25';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(flowerX, groundY);
+        ctx.lineTo(flowerX, flowerY);
+        ctx.stroke();
+
+        // Flower Petals
+        ctx.fillStyle = (i % 150 === 0) ? '#ffea00' : '#ffffff';
+        ctx.beginPath();
+        ctx.arc(flowerX - 2, flowerY, 2, 0, Math.PI * 2);
+        ctx.arc(flowerX + 2, flowerY, 2, 0, Math.PI * 2);
+        ctx.arc(flowerX, flowerY - 2, 2, 0, Math.PI * 2);
+        ctx.arc(flowerX, flowerY + 2, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flower Center
+        ctx.fillStyle = '#ff9800';
+        ctx.beginPath();
+        ctx.arc(flowerX, flowerY, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawNatureParticles() {
+    particles.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.oscillation);
+
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    });
+}
+
+function drawBird() {
     ctx.save();
     ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+
+    // Rotation angle based on velocity
     let angle = Math.min(Math.max(bird.velocity * 4, -25), 70) * (Math.PI / 180);
     ctx.rotate(angle);
 
-    // Bird body
-    ctx.fillStyle = '#ffeb3b';
+    // Bird Tail Feather
+    ctx.fillStyle = '#f57c00';
+    ctx.beginPath();
+    ctx.moveTo(-10, -2);
+    ctx.lineTo(-17, -7);
+    ctx.lineTo(-14, 2);
+    ctx.lineTo(-17, 7);
+    ctx.closePath();
+    ctx.fill();
+
+    // Bird Body (Golden Nature Bird)
+    let birdGrad = ctx.createRadialGradient(-2, -2, 2, 0, 0, bird.width / 2);
+    birdGrad.addColorStop(0, '#fff176');
+    birdGrad.addColorStop(0.7, '#fbc02d');
+    birdGrad.addColorStop(1, '#f57f17');
+    ctx.fillStyle = birdGrad;
     ctx.beginPath();
     ctx.arc(0, 0, bird.width / 2, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#d7a100';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#b78103';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Bird wing
-    ctx.fillStyle = '#fbc02d';
+    // Animated Flapping Wing
+    ctx.save();
+    let flapOffset = Math.sin(bird.wingAngle) * 5;
+    ctx.fillStyle = '#fff59d';
     ctx.beginPath();
-    ctx.ellipse(-4, 2, 6, 4, 0.3, 0, Math.PI * 2);
+    ctx.ellipse(-3, 2 + flapOffset * 0.4, 7, 4.5, 0.2 + flapOffset * 0.1, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = '#f57f17';
+    ctx.lineWidth = 1;
     ctx.stroke();
+    ctx.restore();
 
-    // Bird eye
+    // Bird Eye & Highlight
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(4, -4, 4.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = '#212121';
     ctx.beginPath();
-    ctx.arc(5.5, -4, 2, 0, Math.PI * 2);
+    ctx.arc(5.5, -4, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    // Catchlight dot
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(6.2, -5, 0.8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Bird beak
-    ctx.fillStyle = '#ff5722';
+    // Bird Beak
+    let beakGrad = ctx.createLinearGradient(7, 0, 14, 0);
+    beakGrad.addColorStop(0, '#ff7043');
+    beakGrad.addColorStop(1, '#d84315');
+    ctx.fillStyle = beakGrad;
     ctx.beginPath();
-    ctx.moveTo(8, -1);
-    ctx.lineTo(14, 2);
+    ctx.moveTo(8, -2);
+    ctx.lineTo(15, 1);
     ctx.lineTo(8, 5);
     ctx.closePath();
     ctx.fill();
 
     ctx.restore();
+}
 
-    // Draw Score
+function drawUI() {
+    // --- HUD Score Banner ---
+    ctx.save();
+    
+    // Wooden / Glassmorphic Score Plate
+    let plateX = canvas.width / 2 - 50;
+    let plateY = 12;
+    let plateW = 100;
+    let plateH = 34;
+
+    ctx.fillStyle = 'rgba(30, 45, 20, 0.55)';
+    ctx.beginPath();
+    ctx.roundRect(plateX, plateY, plateW, plateH, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
     ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 4;
-    ctx.font = 'bold 24px Arial, sans-serif';
+    ctx.font = 'bold 18px "Segoe UI", Arial, sans-serif';
     ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${score}`, canvas.width / 2, plateY + 23);
+    ctx.restore();
 
-    ctx.strokeText(`Score: ${score}`, canvas.width / 2, 38);
-    ctx.fillText(`Score: ${score}`, canvas.width / 2, 38);
-
-    // Overlay screens
+    // --- Overlay Screens ---
     if (!gameStarted) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.save();
+        ctx.fillStyle = 'rgba(15, 30, 20, 0.45)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = '#000000';
+        // Start Card Window
+        let cardW = 240;
+        let cardH = 160;
+        let cardX = (canvas.width - cardW) / 2;
+        let cardY = (canvas.height - cardH) / 2 - 10;
+
+        let cardGrad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
+        cardGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        cardGrad.addColorStop(1, 'rgba(240, 248, 235, 0.92)');
+        ctx.fillStyle = cardGrad;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, 16);
+        ctx.fill();
+        ctx.strokeStyle = '#8bc34a';
         ctx.lineWidth = 3;
+        ctx.stroke();
 
-        ctx.font = 'bold 20px Arial, sans-serif';
-        ctx.strokeText('Press SPACE or Click', canvas.width / 2, canvas.height / 2 - 10);
-        ctx.fillText('Press SPACE or Click', canvas.width / 2, canvas.height / 2 - 10);
+        // Title text
+        ctx.fillStyle = '#2e7d32';
+        ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Flappy Nature', canvas.width / 2, cardY + 38);
 
-        ctx.font = '16px Arial, sans-serif';
-        ctx.strokeText('to Jump & Start', canvas.width / 2, canvas.height / 2 + 20);
-        ctx.fillText('to Jump & Start', canvas.width / 2, canvas.height / 2 + 20);
+        // Subtitle instructions
+        ctx.fillStyle = '#424242';
+        ctx.font = '14px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Press SPACE or Click to Jump', canvas.width / 2, cardY + 70);
+
+        // Play Button Visual Badge
+        let btnW = 120;
+        let btnH = 34;
+        let btnX = canvas.width / 2 - btnW / 2;
+        let btnY = cardY + 98;
+
+        let btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
+        btnGrad.addColorStop(0, '#7cb342');
+        btnGrad.addColorStop(1, '#558b2f');
+        ctx.fillStyle = btnGrad;
+        ctx.beginPath();
+        ctx.roundRect(btnX, btnY, btnW, btnH, 17);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('TAP TO PLAY', canvas.width / 2, btnY + 22);
+
+        if (highScore > 0) {
+            ctx.fillStyle = '#558b2f';
+            ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+            ctx.fillText(`Best Score: ${highScore}`, canvas.width / 2, cardY + cardH + 25);
+        }
+
+        ctx.restore();
+
     } else if (gameOver) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.save();
+        ctx.fillStyle = 'rgba(20, 15, 10, 0.55)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#ff5252';
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 4;
-        ctx.font = 'bold 28px Arial, sans-serif';
-        ctx.strokeText('GAME OVER', canvas.width / 2, canvas.height / 2 - 30);
-        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 30);
+        // Game Over Card Window
+        let cardW = 240;
+        let cardH = 180;
+        let cardX = (canvas.width - cardW) / 2;
+        let cardY = (canvas.height - cardH) / 2 - 10;
+
+        let cardGrad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
+        cardGrad.addColorStop(0, 'rgba(255, 255, 255, 0.96)');
+        cardGrad.addColorStop(1, 'rgba(255, 245, 235, 0.94)');
+        ctx.fillStyle = cardGrad;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, 16);
+        ctx.fill();
+        ctx.strokeStyle = '#ff7043';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = '#d84315';
+        ctx.font = 'bold 22px "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, cardY + 40);
+
+        // Scores summary
+        ctx.fillStyle = '#37474f';
+        ctx.font = 'bold 15px "Segoe UI", Arial, sans-serif';
+        ctx.fillText(`Score: ${score}`, canvas.width / 2, cardY + 75);
+        ctx.fillStyle = '#689f38';
+        ctx.fillText(`High Score: ${highScore}`, canvas.width / 2, cardY + 98);
+
+        // Restart Button Visual Badge
+        let btnW = 130;
+        let btnH = 34;
+        let btnX = canvas.width / 2 - btnW / 2;
+        let btnY = cardY + 124;
+
+        let btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
+        btnGrad.addColorStop(0, '#ff7043');
+        btnGrad.addColorStop(1, '#d84315');
+        ctx.fillStyle = btnGrad;
+        ctx.beginPath();
+        ctx.roundRect(btnX, btnY, btnW, btnH, 17);
+        ctx.fill();
 
         ctx.fillStyle = '#ffffff';
-        ctx.lineWidth = 3;
-        ctx.font = 'bold 18px Arial, sans-serif';
-        ctx.strokeText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
-        ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
+        ctx.font = 'bold 13px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('PLAY AGAIN', canvas.width / 2, btnY + 22);
 
-        ctx.font = '14px Arial, sans-serif';
-        ctx.strokeText('Press SPACE or Click to Restart', canvas.width / 2, canvas.height / 2 + 45);
-        ctx.fillText('Press SPACE or Click to Restart', canvas.width / 2, canvas.height / 2 + 45);
+        ctx.restore();
     }
 }
 
 function resetGame() {
     bird.y = canvas.height / 2 - 12;
     bird.velocity = 0;
+    bird.wingAngle = 0;
     pipes = [];
     score = 0;
     frame = 0;
@@ -266,4 +783,5 @@ function resetGame() {
 }
 
 setup();
+
 
