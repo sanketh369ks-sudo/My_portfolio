@@ -215,6 +215,37 @@ document.addEventListener('DOMContentLoaded', () => {
         soundIcon.style.opacity = soundMuted ? '0.3' : '1.0';
     });
 
+    // Fullscreen / Max Screen Toggle
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    function toggleMaxScreen() {
+        const container = document.querySelector('.game-container');
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (container.requestFullscreen) {
+                container.requestFullscreen().catch(() => container.classList.toggle('fullscreen-mode'));
+            } else if (container.webkitRequestFullscreen) {
+                container.webkitRequestFullscreen();
+            } else {
+                container.classList.toggle('fullscreen-mode');
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => container.classList.remove('fullscreen-mode'));
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else {
+                container.classList.remove('fullscreen-mode');
+            }
+        }
+    }
+
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            toggleMaxScreen();
+        });
+    }
+
     // --- Game State Variables ---
     let gameState = 'start'; // 'start', 'playing', 'paused', 'gameover'
     let score = 0;
@@ -354,6 +385,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (e.code === 'KeyP') {
             togglePause();
+        }
+        if (e.code === 'KeyM') {
+            toggleMaxScreen();
         }
     });
 
