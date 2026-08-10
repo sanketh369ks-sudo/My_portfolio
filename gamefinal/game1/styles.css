@@ -389,3 +389,124 @@ canvas {
         height: 400px;
     }
 }
+
+/* Boss Health Bar HUD */
+.boss-hud-bar {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    max-width: 500px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 2px solid var(--spidey-red);
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 0 20px rgba(255, 30, 67, 0.5), inset 0 0 10px rgba(255, 30, 67, 0.2);
+    backdrop-filter: blur(8px);
+    z-index: 15;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.boss-hud-bar.active {
+    display: flex;
+    opacity: 1;
+}
+
+.boss-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.boss-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 1.5px;
+    color: #ff1e43;
+    text-shadow: 0 0 8px rgba(255, 30, 67, 0.8);
+}
+
+.boss-hp-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.boss-bar-bg {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 30, 67, 0.4);
+    overflow: hidden;
+}
+
+.boss-bar-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff1e43, #ff6600, #ff0055);
+    border-radius: 6px;
+    box-shadow: 0 0 12px #ff1e43;
+    transition: width 0.2s ease;
+}
+
+/* Boss Alert Banner */
+.boss-alert-banner {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(255, 30, 67, 0.9);
+    color: #ffffff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 3px;
+    padding: 12px 35px;
+    border-radius: 14px;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 30px rgba(255, 30, 67, 0.9), 0 0 60px rgba(255, 255, 255, 0.4);
+    z-index: 18;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+.boss-alert-banner.active {
+    display: block;
+    animation: bossAlertAnim 2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bossAlertAnim {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(1.0);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+.power-val {
+    color: var(--spidey-cyan);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+    font-size: 1.3rem;
+}

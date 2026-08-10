@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileBlastBtn = document.getElementById('mobileBlastBtn');
     const mobileJumpBtn = document.getElementById('mobileJumpBtn');
 
+    // Boss HUD Elements
+    const bossHudBar = document.getElementById('bossHudBar');
+    const bossHpText = document.getElementById('bossHpText');
+    const bossBarFill = document.getElementById('bossBarFill');
+    const bossAlertBanner = document.getElementById('bossAlertBanner');
+
     // --- Audio Engine (Web Audio API Synthesizer) ---
     let soundMuted = false;
     let audioCtx = null;
@@ -116,6 +122,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 osc.frequency.setValueAtTime(150, now);
                 osc.frequency.setValueAtTime(90, now + 0.1);
                 gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'boss_spawn') { // Boss siren warning sound
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(450, now + 0.4);
+                osc.frequency.linearRampToValueAtTime(200, now + 0.8);
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            } else if (type === 'boss_hit') { // Boss taking damage
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'boss_attack') { // Boss shooting energy projectile
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
                 osc.connect(gain);
                 gain.connect(actx.destination);
@@ -281,6 +324,56 @@ document.addEventListener('DOMContentLoaded', () => {
     let collectibles = [];
     let particles = [];
     let stars = [];
+    let bossProjectiles = [];
+    let nextBossDistance = 250;
+
+    // --- Red Spiky Boss Entity ---
+    const boss = {
+        active: false,
+        x: 0,
+        y: 130,
+        vx: 0,
+        vy: 0,
+        hp: 100,
+        maxHp: 100,
+        radius: 38,
+        spikes: 12,
+        phaseTimer: 0,
+        attackTimer: 0,
+        pulse: 0,
+
+        spawn(playerX) {
+            this.active = true;
+            this.x = playerX + 600;
+            this.y = 130;
+            this.hp = 100;
+            this.maxHp = 100;
+            this.phaseTimer = 0;
+            this.attackTimer = 60;
+            this.pulse = 0;
+
+            if (bossHudBar) bossHudBar.classList.add('active');
+            if (bossAlertBanner) {
+                bossAlertBanner.classList.remove('active');
+                void bossAlertBanner.offsetWidth;
+                bossAlertBanner.classList.add('active');
+            }
+            playSFX('boss_spawn');
+            updateBossHUD();
+        },
+
+        dismiss() {
+            this.active = false;
+            if (bossHudBar) bossHudBar.classList.remove('active');
+        }
+    };
+
+    function updateBossHUD() {
+        if (!bossHpText || !bossBarFill) return;
+        bossHpText.textContent = `${Math.max(0, Math.ceil(boss.hp))} / ${boss.maxHp}`;
+        const pct = Math.max(0, (boss.hp / boss.maxHp) * 100);
+        bossBarFill.style.width = pct + '%';
+    }
 
     // Initialize Stars for Background
     for (let i = 0; i < 80; i++) {
@@ -419,6 +512,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function update() {
         if (gameState !== 'playing') return;
 
+        // Check Boss Spawn Milestone
+        if (!boss.active && distance >= nextBossDistance) {
+            boss.spawn(player.x);
+        }
+
         // Web Fluid passive recharge on ground or decay when swinging
         if (player.onGround) {
             webFluid = Math.min(100, webFluid + 0.3);
@@ -513,12 +611,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update Camera Position smoothly tracking Spider-Man
         cameraX = player.x - 200;
 
-        // Update Web Blasts
+        // Update Web Blasts & Combat Collisions
         for (let i = webBlasts.length - 1; i >= 0; i--) {
             const b = webBlasts[i];
             b.x += b.vx;
             b.y += b.vy;
             b.life--;
+
+            // Check collision with Red Spiky Boss
+            if (boss.active) {
+                const distBoss = Math.hypot(b.x - boss.x, b.y - boss.y);
+                if (distBoss < b.radius + boss.radius) {
+                    boss.hp -= 15;
+                    playSFX('boss_hit');
+                    spawnExplosion(b.x, b.y, '#ff1e43', 16);
+                    webBlasts.splice(i, 1);
+                    updateBossHUD();
+
+                    if (boss.hp <= 0) {
+                        // Boss Defeated!
+                        spawnExplosion(boss.x, boss.y, '#ff1e43', 45);
+                        spawnExplosion(boss.x, boss.y, '#ffcb05', 30);
+                        spawnExplosion(boss.x, boss.y, '#ffffff', 20);
+                        playSFX('explosion');
+                        score += 2500;
+                        webFluid = 100;
+                        boss.dismiss();
+                        nextBossDistance = distance + 400;
+                    }
+                    continue;
+                }
+            }
 
             // Check collision with Pumpkin Bombs
             for (let j = pumpkinBombs.length - 1; j >= 0; j--) {
@@ -534,8 +657,81 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            if (b.life <= 0) {
+            // Check collision with Boss Projectiles
+            for (let k = bossProjectiles.length - 1; k >= 0; k--) {
+                const bp = bossProjectiles[k];
+                const distBp = Math.hypot(b.x - bp.x, b.y - bp.y);
+                if (distBp < b.radius + bp.radius) {
+                    spawnExplosion(bp.x, bp.y, '#ff0055', 12);
+                    playSFX('explosion');
+                    bossProjectiles.splice(k, 1);
+                    webBlasts.splice(i, 1);
+                    score += 50;
+                    break;
+                }
+            }
+
+            if (b.life <= 0 && webBlasts[i]) {
                 webBlasts.splice(i, 1);
+            }
+        }
+
+        // Update Boss Mechanics & AI
+        if (boss.active) {
+            boss.phaseTimer++;
+            boss.pulse += 0.06;
+
+            // Hovering physics staying ahead of Spider-Man
+            const targetX = player.x + 380;
+            const targetY = 135 + Math.sin(boss.phaseTimer * 0.04) * 45;
+            boss.x += (targetX - boss.x) * 0.04;
+            boss.y += (targetY - boss.y) * 0.04;
+
+            // Boss Attack Cycle
+            boss.attackTimer--;
+            if (boss.attackTimer <= 0) {
+                const angle = Math.atan2(player.y - boss.y, player.x - boss.x);
+                bossProjectiles.push({
+                    x: boss.x,
+                    y: boss.y,
+                    vx: Math.cos(angle) * 6.5,
+                    vy: Math.sin(angle) * 6.5,
+                    radius: 12,
+                    pulse: 0
+                });
+                playSFX('boss_attack');
+                boss.attackTimer = 100;
+            }
+
+            // Direct Player vs Boss Collision
+            const distPlayerBoss = Math.hypot(player.x - boss.x, player.y - boss.y);
+            if (distPlayerBoss < player.radius + boss.radius) {
+                spawnExplosion(player.x, player.y, '#ff1e43', 25);
+                playSFX('hurt');
+                takeDamage(false);
+            }
+        }
+
+        // Update Boss Projectiles
+        for (let i = bossProjectiles.length - 1; i >= 0; i--) {
+            const bp = bossProjectiles[i];
+            bp.x += bp.vx;
+            bp.y += bp.vy;
+            bp.pulse += 0.1;
+
+            // Collision with Player
+            const dist = Math.hypot(player.x - bp.x, player.y - bp.y);
+            if (dist < player.radius + bp.radius) {
+                spawnExplosion(bp.x, bp.y, '#ff0055', 20);
+                playSFX('hurt');
+                bossProjectiles.splice(i, 1);
+                takeDamage(false);
+                continue;
+            }
+
+            // Despawn offscreen projectiles
+            if (bp.x < cameraX - 100 || bp.x > cameraX + canvas.width + 200 || bp.y > canvas.height + 100) {
+                bossProjectiles.splice(i, 1);
             }
         }
 
@@ -619,6 +815,109 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Canvas Rendering ---
+    function renderWebGrid(ctx, cameraX) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+        ctx.lineWidth = 1;
+
+        const centerX = canvas.width / 2 - (cameraX * 0.05) % 80;
+        const centerY = 110;
+
+        // Radial web grid rays
+        const numRays = 12;
+        for (let i = 0; i < numRays; i++) {
+            const angle = (i * Math.PI * 2) / numRays;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + Math.cos(angle) * 750, centerY + Math.sin(angle) * 750);
+            ctx.stroke();
+        }
+
+        // Concentric web polygon rings
+        const rings = [50, 110, 190, 290, 420];
+        rings.forEach(r => {
+            ctx.beginPath();
+            for (let i = 0; i < numRays; i++) {
+                const angle = (i * Math.PI * 2) / numRays;
+                const wx = centerX + Math.cos(angle) * r;
+                const wy = centerY + Math.sin(angle) * r;
+                if (i === 0) ctx.moveTo(wx, wy);
+                else ctx.lineTo(wx, wy);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        });
+
+        ctx.restore();
+    }
+
+    function drawSpikyBoss(ctx, x, y, radius, spikes, pulse) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        // 1. Red Glow Aura radiating behind Boss
+        const glowGrad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius * 2.6);
+        glowGrad.addColorStop(0, 'rgba(255, 30, 67, 0.85)');
+        glowGrad.addColorStop(0.5, 'rgba(255, 0, 85, 0.4)');
+        glowGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius * 2.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Draw Multi-pointed Spiky Starburst Body
+        const outerRadius = radius + Math.sin(pulse * 3) * 3;
+        const innerRadius = radius * 0.45;
+        const step = Math.PI / spikes;
+
+        ctx.beginPath();
+        for (let i = 0; i < spikes * 2; i++) {
+            const r = (i % 2 === 0) ? outerRadius : innerRadius;
+            const angle = i * step + pulse;
+            const px = Math.cos(angle) * r;
+            const py = Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+
+        // Crimson Red Fill
+        ctx.fillStyle = '#ff1e43';
+        ctx.fill();
+
+        // Thick Outer White Glow Stroke (matching user image)
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 14;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // 3. Glowing White Angry Eyes (matching user image)
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 10;
+
+        // Left eye
+        ctx.beginPath();
+        ctx.moveTo(-12, -6);
+        ctx.lineTo(-4, 0);
+        ctx.lineTo(-10, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Right eye
+        ctx.beginPath();
+        ctx.moveTo(12, -6);
+        ctx.lineTo(4, 0);
+        ctx.lineTo(10, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    // --- Canvas Rendering ---
     function render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -630,7 +929,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = skyGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Stars
+        // 2. Web Grid Overlay in Background
+        renderWebGrid(ctx, cameraX);
+
+        // 3. Stars
         ctx.fillStyle = '#ffffff';
         stars.forEach(s => {
             ctx.globalAlpha = s.alpha;
@@ -638,7 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         ctx.globalAlpha = 1.0;
 
-        // 3. Moon
+        // 4. Moon
         ctx.fillStyle = '#fef08a';
         ctx.shadowColor = '#fef08a';
         ctx.shadowBlur = 20;
@@ -765,6 +1067,27 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.shadowBlur = 0;
         });
 
+        // 9.5 Draw Boss & Boss Projectiles
+        if (boss.active) {
+            drawSpikyBoss(ctx, boss.x, boss.y, boss.radius, boss.spikes, boss.pulse);
+        }
+
+        bossProjectiles.forEach(bp => {
+            ctx.fillStyle = '#ff0055';
+            ctx.shadowColor = '#ff1e43';
+            ctx.shadowBlur = 14 + Math.sin(bp.pulse) * 4;
+            ctx.beginPath();
+            ctx.arc(bp.x, bp.y, bp.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Core white glow center
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(bp.x, bp.y, bp.radius * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+
         // 10. Draw Particles
         particles.forEach(p => {
             ctx.fillStyle = p.color;
@@ -820,6 +1143,9 @@ document.addEventListener('DOMContentLoaded', () => {
         distance = 0;
         lives = 3;
         webFluid = 100;
+        bossProjectiles = [];
+        nextBossDistance = 250;
+        boss.dismiss();
         player.reset();
         generateWorld();
         gameState = 'playing';
