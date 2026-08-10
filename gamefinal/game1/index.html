@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider-Man: City Web-Slinger</title>
+    <meta name="description"
+        content="High-octane Spider-Man web swinging arcade game in NYC skyline. Swing, shoot webs, defeat Goblin bombs, and beat high scores!">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Top Navigation & HUD -->
+        <header class="top-bar">
+            <div class="title-box">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#ff1e43" stroke="#ffffff" stroke-width="4" />
+                    <path d="M50 20 L50 80 M20 50 L80 50 M28 28 L72 72 M28 72 L72 28" stroke="#ffffff" stroke-width="3"
+                        stroke-linecap="round" />
+                    <ellipse cx="50" cy="52" rx="14" ry="20" fill="#000000" />
+                    <polygon points="40,42 48,50 38,58" fill="#ffffff" />
+                    <polygon points="60,42 52,50 62,58" fill="#ffffff" />
+                </svg>
+                <h1 class="game-title">WEB-SLINGER</h1>
+            </div>
+
+            <div class="hud-stats">
+                <div class="stat-card">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="scoreDisplay">0</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Distance</span>
+                    <span class="stat-value" id="distanceDisplay">0m</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">High Score</span>
+                    <span class="stat-value" id="highScoreDisplay">0</span>
+                </div>
+
+                <div class="fluid-container">
+                    <span class="stat-label">Web Fluid</span>
+                    <div class="fluid-bar-bg">
+                        <div class="fluid-bar-fill" id="fluidBar"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Lives</span>
+                    <span class="stat-value" id="livesDisplay">❤️❤️❤️</span>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-icon" id="soundBtn" title="Toggle Sound">
+                    <svg id="soundIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    </svg>
+                </button>
+                <button class="btn-icon" id="pauseBtn" title="Pause Game">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="4" width="4" height="16" />
+                        <rect x="14" y="4" width="4" height="16" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Canvas Viewport -->
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+            <!-- Start Game Overlay -->
+            <div class="overlay active" id="startOverlay">
+                <div class="modal-card">
+                    <h2 class="modal-title">SPIDER-MAN</h2>
+                    <p class="modal-subtitle">City Web-Slinger Arcade</p>
+                    <p style="margin-bottom: 20px; color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">
+                        Swing between NYC skyscrapers, shoot web blasts to destroy Pumpkin Bombs, collect Spider Badges,
+                        and keep your Web Fluid topped up!
+                    </p>
+                    <button class="btn-primary" id="startBtn">START MISSION</button>
+                    <a href="../final.html" class="btn-secondary"
+                        style="display:inline-block; text-decoration:none;">EXIT TO STORE</a>
+                </div>
+            </div>
+
+            <!-- Pause Overlay -->
+            <div class="overlay" id="pauseOverlay">
+                <div class="modal-card">
+                    <h2 class="modal-title">MISSION PAUSED</h2>
+                    <p class="modal-subtitle">Take a breather, Web-Head!</p>
+                    <button class="btn-primary" id="resumeBtn">RESUME</button>
+                    <button class="btn-secondary" id="restartPauseBtn">RESTART</button>
+                    <a href="../final.html" class="btn-secondary"
+                        style="display:inline-block; text-decoration:none;">EXIT TO STORE</a>
+                </div>
+            </div>
+
+            <!-- Game Over Overlay -->
+            <div class="overlay" id="gameOverOverlay">
+                <div class="modal-card">
+                    <h2 class="modal-title" id="gameOverTitle">MISSION FAILED</h2>
+                    <p class="modal-subtitle" id="gameOverSub">Spider-Man needs a rest...</p>
+
+                    <div class="score-summary">
+                        <div class="summary-item">
+                            <label>Final Score</label>
+                            <span id="finalScore">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Distance</label>
+                            <span id="finalDistance">0m</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Best Score</label>
+                            <span id="bestScore">0</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="restartBtn">TRY AGAIN</button>
+                    <a href="../final.html" class="btn-secondary"
+                        style="display:inline-block; text-decoration:none;">EXIT TO STORE</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Info Footer -->
+        <div class="controls-info">
+            <div class="control-item">
+                <span class="key">SPACE</span> or <span class="key">CLICK</span> Shoot Web Rope & Swing
+            </div>
+            <div class="control-item">
+                <span class="key">E</span> or <span class="key">RIGHT CLICK</span> Shoot Web Blast
+            </div>
+            <div class="control-item">
+                <span class="key">W</span> / <span class="key">UP</span> Jump / Boost
+            </div>
+            <div class="control-item">
+                <span class="key">P</span> Pause
+            </div>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div class="mobile-controls">
+            <button class="touch-btn" id="mobileSwingBtn">🕸️ SWING</button>
+            <button class="touch-btn" id="mobileBlastBtn">⚡ BLAST</button>
+            <button class="touch-btn" id="mobileJumpBtn">🚀 JUMP</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
