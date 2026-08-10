@@ -45,8 +45,8 @@ body {
 /* Header & HUD */
 .game-container {
     position: relative;
-    width: 100%;
-    max-width: 960px;
+    width: 98%;
+    max-width: 1240px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -169,7 +169,7 @@ body {
 .canvas-wrapper {
     position: relative;
     width: 100%;
-    max-width: 960px;
+    max-width: 1240px;
     aspect-ratio: 16 / 9;
     height: auto;
     border-radius: 20px;
@@ -397,22 +397,58 @@ canvas {
 }
 
 @media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+
+    .game-container {
+        width: 100%;
+    }
+
     .controls-info {
         display: none;
     }
 
     .top-bar {
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
+        padding: 8px 12px;
+        justify-content: center;
     }
 
     .hud-stats {
-        gap: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .fluid-container {
+        width: 80px;
+    }
+
+    .action-controls {
+        gap: 6px;
+    }
+
+    .touch-btn {
+        padding: 10px 10px;
+        font-size: 0.85rem;
+        flex: 1 1 calc(33.33% - 6px);
+        justify-content: center;
+    }
+
+    .btn-hint {
+        display: none;
     }
 
     .canvas-wrapper {
         aspect-ratio: 16 / 9;
         height: auto;
+        border-radius: 12px;
     }
 }
 
