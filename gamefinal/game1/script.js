@@ -988,173 +988,247 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
-    function drawHumanoidSpiderMan(ctx, player) {
+    let playerTrail = []; // Motion blur trail history
+
+    function drawHeroicSpiderMan(ctx, player) {
+        // Record trail positions for high-speed hero motion blur
+        const speed = Math.hypot(player.vx, player.vy);
+        if (speed > 6 || player.isSwinging) {
+            playerTrail.push({ x: player.x, y: player.y, angle: player.ropeAngle || 0, alpha: 0.5 });
+            if (playerTrail.length > 5) playerTrail.shift();
+        } else {
+            if (playerTrail.length > 0) playerTrail.shift();
+        }
+
+        // 1. Draw Hero Speed Ghost Trails
+        playerTrail.forEach((t, i) => {
+            ctx.save();
+            ctx.translate(t.x, t.y);
+            ctx.globalAlpha = (i / playerTrail.length) * 0.35;
+            ctx.fillStyle = '#ff1e43';
+            ctx.beginPath();
+            ctx.arc(0, 0, 24, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+
+        // 2. Main Hero Character Context Setup
         ctx.save();
         ctx.translate(player.x, player.y);
 
-        // 1. Dynamic Body Orientation Angle
+        // Calculate dynamic tilt angle
         let angle = 0;
         if (player.isSwinging && player.webAnchor) {
             angle = player.ropeAngle + Math.PI / 2;
         } else {
-            angle = Math.atan2(player.vy, player.vx) * 0.25;
+            angle = Math.atan2(player.vy, player.vx) * 0.22;
         }
         ctx.rotate(angle);
 
-        // Glowing Spider-Man Hero Aura
+        // Superhero Intense Red Aura Glow
         ctx.shadowColor = '#ff1e43';
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 18;
 
-        // --- 2. LEGS & BOOTS ---
-        const runCycle = Math.sin(player.x * 0.15);
-        ctx.lineWidth = 4;
+        const runCycle = Math.sin(player.x * 0.12);
+
+        // --- 3. MUSCULAR LEGS & BOOTS ---
         ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
 
-        // Left Leg (Behind)
-        ctx.strokeStyle = '#0055ff'; // Blue suit tights
+        // Left Leg (Thigh + Calf + Boot)
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#021a44'; // Deep navy blue suit
         ctx.beginPath();
-        ctx.moveTo(-3, 10);
-        let leg1X = player.isSwinging ? -12 : (player.onGround ? -3 + runCycle * 8 : -8);
-        let leg1Y = player.isSwinging ? 22 : (player.onGround ? 22 : 18);
-        ctx.lineTo(leg1X, leg1Y);
+        ctx.moveTo(-6, 16);
+        let k1X = player.isSwinging ? -18 : (player.onGround ? -6 + runCycle * 14 : -12);
+        let k1Y = player.isSwinging ? 32 : (player.onGround ? 32 : 28);
+        ctx.lineTo(k1X, k1Y); // Knee joint
         ctx.stroke();
 
-        // Left Red Boot
+        ctx.strokeStyle = '#ff1e43'; // Red Boot
+        ctx.beginPath();
+        ctx.moveTo(k1X, k1Y);
+        let b1X = k1X + (player.isSwinging ? -6 : 6);
+        let b1Y = k1Y + 12;
+        ctx.lineTo(b1X, b1Y);
+        ctx.stroke();
+
+        // Right Leg (Foreground Thigh + Calf + Boot)
+        ctx.lineWidth = 6.5;
+        ctx.strokeStyle = '#0044cc';
+        ctx.beginPath();
+        ctx.moveTo(6, 16);
+        let k2X = player.isSwinging ? 14 : (player.onGround ? 6 - runCycle * 14 : 16);
+        let k2Y = player.isSwinging ? 38 : (player.onGround ? 32 : 30);
+        ctx.lineTo(k2X, k2Y);
+        ctx.stroke();
+
         ctx.strokeStyle = '#ff1e43';
         ctx.beginPath();
-        ctx.moveTo(leg1X, leg1Y);
-        ctx.lineTo(leg1X + 4, leg1Y + 6);
+        ctx.moveTo(k2X, k2Y);
+        let b2X = k2X + 8;
+        let b2Y = k2Y + 12;
+        ctx.lineTo(b2X, b2Y);
         ctx.stroke();
 
-        // Right Leg (Foreground)
-        ctx.strokeStyle = '#0055ff';
+        // --- 4. UNDERARM WEB WINGS ---
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 1;
+
+        // Left Web Wing
         ctx.beginPath();
-        ctx.moveTo(3, 10);
-        let leg2X = player.isSwinging ? 8 : (player.onGround ? 3 - runCycle * 8 : 10);
-        let leg2Y = player.isSwinging ? 25 : (player.onGround ? 22 : 20);
-        ctx.lineTo(leg2X, leg2Y);
+        ctx.moveTo(-14, -12);
+        ctx.lineTo(player.isSwinging ? -8 : -22, player.isSwinging ? -30 : 2);
+        ctx.lineTo(-8, 6);
+        ctx.closePath();
+        ctx.fill();
         ctx.stroke();
 
-        // Right Red Boot
-        ctx.strokeStyle = '#ff1e43';
+        // Right Web Wing
         ctx.beginPath();
-        ctx.moveTo(leg2X, leg2Y);
-        ctx.lineTo(leg2X + 5, leg2Y + 6);
+        ctx.moveTo(14, -12);
+        ctx.lineTo(blastAnimTimer > 0 ? 30 : 24, blastAnimTimer > 0 ? -8 : 4);
+        ctx.lineTo(8, 6);
+        ctx.closePath();
+        ctx.fill();
         ctx.stroke();
 
-        // --- 3. TORSO & SUIT ---
-        // Blue Waist / Hips
-        ctx.fillStyle = '#0055ff';
-        ctx.fillRect(-6, 4, 12, 8);
+        // --- 5. V-TAPER MUSCULAR TORSO & SUIT ---
+        // Blue Waist & Obliques
+        ctx.fillStyle = '#021a44';
+        ctx.fillRect(-9, 6, 18, 12);
 
-        // Red Muscular Chest & Shoulders
+        // Muscle Side Panels
+        ctx.fillStyle = '#0044cc';
+        ctx.beginPath();
+        ctx.moveTo(-9, 6); ctx.lineTo(-14, -14); ctx.lineTo(-9, -14); ctx.lineTo(-6, 6);
+        ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(9, 6); ctx.lineTo(14, -14); ctx.lineTo(9, -14); ctx.lineTo(6, 6);
+        ctx.closePath(); ctx.fill();
+
+        // Broad Red Muscular Pectoral Chest
         ctx.fillStyle = '#ff1e43';
         ctx.beginPath();
-        ctx.moveTo(-7, 4);
-        ctx.lineTo(-9, -10);
-        ctx.lineTo(9, -10);
-        ctx.lineTo(7, 4);
+        ctx.moveTo(-11, 6);
+        ctx.lineTo(-15, -16);
+        ctx.lineTo(15, -16);
+        ctx.lineTo(11, 6);
         ctx.closePath();
         ctx.fill();
 
-        // Chest Spider Emblem 🕷️
+        // Pectoral Muscle Outline & Abs Detailing
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -16); ctx.lineTo(0, 6); // Sternum line
+        ctx.moveTo(-10, -5); ctx.lineTo(0, -3); ctx.lineTo(10, -5); // Pec cut
+        ctx.moveTo(-6, 1); ctx.lineTo(6, 1); // Ab line
+        ctx.stroke();
+
+        // Iconic Black Spider Emblem 🕷️
         ctx.fillStyle = '#000000';
         ctx.beginPath();
-        ctx.ellipse(0, -3, 2.5, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, -6, 3.5, 6, 0, 0, Math.PI * 2); // Body
         ctx.fill();
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
-        ctx.moveTo(0, -5); ctx.lineTo(-6, -8);
-        ctx.moveTo(0, -5); ctx.lineTo(6, -8);
-        ctx.moveTo(0, -2); ctx.lineTo(-6, 2);
-        ctx.moveTo(0, -2); ctx.lineTo(6, 2);
+        // Spider legs extending outward
+        ctx.moveTo(0, -9); ctx.lineTo(-9, -13);
+        ctx.moveTo(0, -9); ctx.lineTo(9, -13);
+        ctx.moveTo(0, -6); ctx.lineTo(-11, -4);
+        ctx.moveTo(0, -6); ctx.lineTo(11, -4);
+        ctx.moveTo(0, -3); ctx.lineTo(-10, 3);
+        ctx.moveTo(0, -3); ctx.lineTo(10, 3);
         ctx.stroke();
 
-        // --- 4. ARMS & HANDS (THWIP POSES) ---
-        ctx.lineWidth = 3.5;
+        // --- 6. MUSCULAR ARMS & SILVER WEB SHOOTERS ---
+        ctx.lineWidth = 5.5;
 
-        // Left Arm (Holding Web Line if swinging)
+        // Left Arm (Upper Bicep + Forearm)
         ctx.strokeStyle = '#ff1e43';
         ctx.beginPath();
-        ctx.moveTo(-7, -8);
-        if (player.isSwinging) {
-            ctx.lineTo(-4, -22); // Reaching up to web rope
-        } else {
-            ctx.lineTo(-14, 2);
-        }
+        ctx.moveTo(-12, -14);
+        let arm1X = player.isSwinging ? -6 : -22;
+        let arm1Y = player.isSwinging ? -34 : 4;
+        ctx.lineTo(arm1X, arm1Y);
         ctx.stroke();
 
-        // Right Arm (Shooting Arm with Thwip Gesture!)
+        // Silver Web Shooter Wrist Cuffs
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(arm1X - 3, arm1Y - 3, 6, 6);
+
+        // Right Arm (Shooting Arm with Thwip Gesture)
         ctx.strokeStyle = '#ff1e43';
         ctx.beginPath();
-        ctx.moveTo(7, -8);
-        if (blastAnimTimer > 0) {
-            ctx.lineTo(22, -6); // Straight forward aiming web blast!
-        } else if (player.isSwinging) {
-            ctx.lineTo(12, 6);
-        } else {
-            ctx.lineTo(15, -2);
-        }
+        ctx.moveTo(12, -14);
+        let arm2X = blastAnimTimer > 0 ? 32 : (player.isSwinging ? 18 : 22);
+        let arm2Y = blastAnimTimer > 0 ? -10 : (player.isSwinging ? 8 : -2);
+        ctx.lineTo(arm2X, arm2Y);
         ctx.stroke();
 
-        // Thwip Hand Gesture & Gauntlet
-        let handX = blastAnimTimer > 0 ? 22 : (player.isSwinging ? 12 : 15);
-        let handY = blastAnimTimer > 0 ? -6 : (player.isSwinging ? 6 : -2);
+        // Silver Web Shooter Wrist Cuffs (Right)
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(arm2X - 3, arm2Y - 3, 6, 6);
+
+        // Thwip Hand & Extended Web Spark
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(handX, handY, 2.5, 0, Math.PI * 2);
+        ctx.arc(arm2X, arm2Y, 3.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Web blast spark from hand when shooting
         if (blastAnimTimer > 0) {
             ctx.fillStyle = '#00f0ff';
             ctx.shadowColor = '#00f0ff';
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur = 18;
             ctx.beginPath();
-            ctx.arc(handX + 5, handY, 6, 0, Math.PI * 2);
+            ctx.arc(arm2X + 8, arm2Y, 9, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // --- 5. MASK HEAD & WHITE EYES ---
-        // Neck
+        // --- 7. MASKED HERO HEAD & SHARP EYES ---
+        // Muscular Neck
         ctx.fillStyle = '#ff1e43';
-        ctx.fillRect(-3, -13, 6, 4);
+        ctx.fillRect(-4.5, -21, 9, 6);
 
         // Head Oval Mask
         ctx.beginPath();
-        ctx.ellipse(0, -18, 7.5, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, -28, 10.5, 12, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Web Lattice Lines on Mask
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.lineWidth = 1;
+        // 3D Curved Web Grid Lattice on Mask
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.moveTo(0, -27); ctx.lineTo(0, -9);
-        ctx.moveTo(-7.5, -18); ctx.lineTo(7.5, -18);
+        ctx.moveTo(0, -40); ctx.lineTo(0, -16);
+        ctx.moveTo(-10.5, -28); ctx.lineTo(10.5, -28);
+        ctx.moveTo(-7, -35); ctx.lineTo(7, -21);
+        ctx.moveTo(-7, -21); ctx.lineTo(7, -35);
         ctx.stroke();
 
-        // Large Iconic White Spider Eyes with Black Borders
+        // Sharp Metallic Reflective Spider Eyes
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2;
         ctx.shadowColor = '#ffffff';
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 10;
 
         // Left Eye
         ctx.beginPath();
-        ctx.moveTo(-1, -19);
-        ctx.lineTo(-7, -21);
-        ctx.lineTo(-5, -15);
+        ctx.moveTo(-1.5, -30);
+        ctx.lineTo(-10, -33);
+        ctx.lineTo(-7, -23);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
         // Right Eye
         ctx.beginPath();
-        ctx.moveTo(1, -19);
-        ctx.lineTo(7, -21);
-        ctx.lineTo(5, -15);
+        ctx.moveTo(1.5, -30);
+        ctx.lineTo(10, -33);
+        ctx.lineTo(7, -23);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
@@ -1367,8 +1441,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         ctx.globalAlpha = 1.0;
 
-        // 11. Draw Humanoid Animated Spider-Man Character
-        drawHumanoidSpiderMan(ctx, player);
+        // 11. Draw Muscular Hero Spider-Man Character
+        drawHeroicSpiderMan(ctx, player);
 
         ctx.restore(); // Restore camera translation
     }
