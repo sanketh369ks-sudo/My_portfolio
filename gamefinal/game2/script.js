@@ -1,4 +1,4 @@
-/* T20 CRICKET CHAMPIONSHIP - COMPLETE REALISTIC GAME ENGINE */
+/* T20 CRICKET CHAMPIONSHIP - COMPLETE REALISTIC GAME ENGINE WITH REAL HUMAN PLAYER GRAPHICS */
 
 // ==========================================
 // 1. AUDIO SYNTHESIZER ENGINE (Web Audio API)
@@ -24,18 +24,16 @@ class SoundEngine {
     return this.enabled;
   }
 
-  // Bat hitting ball (solid wood crack)
   playBatHit() {
     if (!this.enabled) return;
     this.init();
     const now = this.ctx.currentTime;
     
-    // Thump oscillator
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(160, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+    osc.frequency.setValueAtTime(170, now);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
     
     gain.gain.setValueAtTime(1.0, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
@@ -45,7 +43,6 @@ class SoundEngine {
     osc.start(now);
     osc.stop(now + 0.12);
 
-    // Noise snap
     const bufferSize = this.ctx.sampleRate * 0.05;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -62,7 +59,6 @@ class SoundEngine {
     noise.start(now);
   }
 
-  // Coin Flip Ping
   playCoinFlip() {
     if (!this.enabled) return;
     this.init();
@@ -80,7 +76,6 @@ class SoundEngine {
     osc.stop(now + 0.3);
   }
 
-  // Four Chime
   playFour() {
     if (!this.enabled) return;
     this.init();
@@ -101,14 +96,12 @@ class SoundEngine {
     });
   }
 
-  // Six Fanfare & Crowd Roar
   playSix() {
     if (!this.enabled) return;
     this.playFour();
     this.playCheer();
   }
 
-  // Wicket Clatter
   playWicket() {
     if (!this.enabled) return;
     this.init();
@@ -116,7 +109,7 @@ class SoundEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(240, now);
+    osc.frequency.setValueAtTime(250, now);
     osc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
     gain.gain.setValueAtTime(0.8, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
@@ -126,7 +119,6 @@ class SoundEngine {
     osc.stop(now + 0.25);
   }
 
-  // Crowd Cheer Noise
   playCheer() {
     if (!this.enabled) return;
     this.init();
@@ -161,7 +153,7 @@ class SoundEngine {
 const sounds = new SoundEngine();
 
 // ==========================================
-// 2. HTML5 CANVAS STADIUM & PITCH RENDERER
+// 2. HTML5 CANVAS STADIUM & HUMAN PLAYER RENDERER
 // ==========================================
 class StadiumRenderer {
   constructor(canvasId) {
@@ -170,10 +162,11 @@ class StadiumRenderer {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     
-    this.ball = { x: 260, y: 160, vx: 0, vy: 0, visible: false, targetX: 0, targetY: 0 };
-    this.animating = false;
-    this.bowlerPos = { x: 240, y: 160 };
-    this.batsmanPos = { x: 560, y: 160 };
+    this.ball = { x: 270, y: 160, rotation: 0, visible: false };
+    this.batsmanSwingAngle = 0;
+    this.bailsFlying = false;
+    this.bailOffset = 0;
+    this.bowlerRunX = 220;
     
     this.fielders = [
       { x: 580, y: 110, role: "Slip" },
@@ -193,85 +186,228 @@ class StadiumRenderer {
     const w = this.width;
     const h = this.height;
 
-    // Grass Field
-    ctx.fillStyle = "#0a2e1c";
+    // Grass Stadium Field
+    ctx.fillStyle = "#092918";
     ctx.fillRect(0, 0, w, h);
 
     // Grass Stripes
-    ctx.fillStyle = "#0c3621";
+    ctx.fillStyle = "#0c3620";
     for (let i = 0; i < w; i += 60) {
       ctx.fillRect(i, 0, 30, h);
     }
 
-    // Boundary Oval Line
+    // Boundary Rope
     ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.ellipse(w / 2, h / 2, w / 2 - 20, h / 2 - 20, 0, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 30-Yard Circle
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
-    ctx.setLineDash([6, 6]);
+    // 30-Yard Inner Circle
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([8, 8]);
     ctx.beginPath();
     ctx.ellipse(w / 2, h / 2, 180, 100, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
 
     // Pitch Rect
-    ctx.fillStyle = "#c2a378";
-    ctx.fillRect(250, h / 2 - 20, 300, 40);
-    ctx.strokeStyle = "rgba(255,255,255,0.6)";
-    ctx.strokeRect(250, h / 2 - 20, 300, 40);
+    ctx.fillStyle = "#d4b886";
+    ctx.fillRect(250, h / 2 - 22, 300, 44);
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(250, h / 2 - 22, 300, 44);
 
     // Crease Lines
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(270, h / 2 - 18, 4, 36);
-    ctx.fillRect(530, h / 2 - 18, 4, 36);
+    ctx.fillRect(270, h / 2 - 20, 4, 40);
+    ctx.fillRect(530, h / 2 - 20, 4, 40);
 
-    // Stumps (Yellow)
-    ctx.fillStyle = "#ffd700";
-    ctx.fillRect(265, h / 2 - 8, 4, 16);
-    ctx.fillRect(535, h / 2 - 8, 4, 16);
+    // Draw Stumps & Bails
+    this.drawStumps(ctx, 265, h / 2 - 12, false);
+    this.drawStumps(ctx, 535, h / 2 - 12, this.bailsFlying);
 
-    // Draw Fielders
+    // Draw Fielders (Human Sprites with Caps & Kits)
+    const batKitColor = (GameState.match && GameState.match.innings1) ? GameState.match.innings1.battingTeam.color : "#0066cc";
+    const bowlKitColor = (GameState.match && GameState.match.innings1) ? GameState.match.innings1.bowlingTeam.color : "#ffcc00";
+
     this.fielders.forEach(f => {
-      ctx.fillStyle = "#00e5ff";
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#000000";
-      ctx.stroke();
+      this.drawHumanSprite(ctx, f.x, f.y, bowlKitColor, "fielder", 0);
     });
 
-    // Bowler Icon
-    ctx.fillStyle = "#ffcc00";
-    ctx.beginPath();
-    ctx.arc(this.bowlerPos.x, this.bowlerPos.y, 8, 0, Math.PI * 2);
-    ctx.fill();
+    // Draw Bowler
+    this.drawHumanSprite(ctx, this.bowlerRunX, h / 2 - 2, bowlKitColor, "bowler", 0);
 
-    // Batsman Icon
-    ctx.fillStyle = "#00ff88";
-    ctx.beginPath();
-    ctx.arc(this.batsmanPos.x, this.batsmanPos.y, 8, 0, Math.PI * 2);
-    ctx.fill();
+    // Draw Wicketkeeper
+    this.drawHumanSprite(ctx, 560, h / 2 - 2, bowlKitColor, "keeper", 0);
 
-    // Animated Ball
+    // Draw Non-Striker Batsman
+    this.drawHumanSprite(ctx, 275, h / 2 - 28, batKitColor, "batsman", 0);
+
+    // Draw Striker Batsman with Real Cricket Bat
+    this.drawHumanBatsmanWithBat(ctx, 525, h / 2 - 2, batKitColor, this.batsmanSwingAngle);
+
+    // Draw Leather Cricket Ball with Seam
     if (this.ball.visible) {
-      ctx.fillStyle = "#ff3333";
-      ctx.beginPath();
-      ctx.arc(this.ball.x, this.ball.y, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowColor = "#ff0000";
-      ctx.shadowBlur = 10;
-      ctx.shadowBlur = 0;
+      this.drawLeatherBall(ctx, this.ball.x, this.ball.y, this.ball.rotation);
     }
+  }
+
+  // Draw Human Sprite Body (Head, Torso, Legs, Arms)
+  drawHumanSprite(ctx, x, y, jerseyColor, type, frame) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Shadow
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.beginPath();
+    ctx.ellipse(0, 10, 8, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Legs (White Cricket Pants / Socks)
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(-4, 0, 3, 10);
+    ctx.fillRect(1, 0, 3, 10);
+
+    // Torso (Jersey Color)
+    ctx.fillStyle = jerseyColor;
+    ctx.fillRect(-5, -10, 10, 10);
+
+    // Head & Cap / Helmet
+    ctx.fillStyle = "#ffd59e"; // Skin tone
+    ctx.beginPath();
+    ctx.arc(0, -14, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cap / Helmet visor
+    ctx.fillStyle = type === "batsman" ? "#0f172a" : jerseyColor;
+    ctx.beginPath();
+    ctx.arc(0, -15, 4.5, Math.PI, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // Draw Batsman holding Real Cricket Bat & Swing Arc
+  drawHumanBatsmanWithBat(ctx, x, y, jerseyColor, swingAngle) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Shadow
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.beginPath();
+    ctx.ellipse(0, 10, 10, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Leg Pads (White Cricket Pads)
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(-6, -2, 5, 12);
+    ctx.fillRect(1, -2, 5, 12);
+
+    // Torso (Jersey Color)
+    ctx.fillStyle = jerseyColor;
+    ctx.fillRect(-6, -12, 12, 10);
+
+    // Helmet (Dark with visor)
+    ctx.fillStyle = "#ffd59e";
+    ctx.beginPath();
+    ctx.arc(0, -16, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#0f172a";
+    ctx.beginPath();
+    ctx.arc(0, -17, 5.5, Math.PI, Math.PI * 2);
+    ctx.fill();
+    // Visor line
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-4, -15);
+    ctx.lineTo(4, -15);
+    ctx.stroke();
+
+    // Arms & Real Wooden Cricket Bat
+    ctx.save();
+    ctx.rotate(swingAngle * Math.PI / 180);
+
+    // Gloves
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(-8, -4, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cricket Bat Handle (Black rubber grip)
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(-12, -6, 8, 3);
+
+    // Cricket Bat Blade (Willow Wood Texture)
+    ctx.fillStyle = "#e2b87f";
+    ctx.fillRect(-22, -8, 12, 6);
+    ctx.strokeStyle = "#8d5b28";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-22, -8, 12, 6);
+
+    ctx.restore();
+    ctx.restore();
+  }
+
+  // Draw Stumps & Bails
+  drawStumps(ctx, x, y, bailsFlying) {
+    ctx.save();
+    ctx.fillStyle = "#facc15"; // Wooden yellow stumps
+
+    // 3 Stumps
+    ctx.fillRect(x - 4, y, 2.5, 16);
+    ctx.fillRect(x, y, 2.5, 16);
+    ctx.fillRect(x + 4, y, 2.5, 16);
+
+    // Bails
+    if (!bailsFlying) {
+      ctx.fillStyle = "#eab308";
+      ctx.fillRect(x - 5, y - 2, 11, 2);
+    } else {
+      // Exploding bails flying in air!
+      ctx.save();
+      ctx.translate(x, y - 10 - this.bailOffset);
+      ctx.rotate(this.bailOffset * 0.1);
+      ctx.fillStyle = "#ff3366";
+      ctx.fillRect(-5, 0, 11, 3);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  // Draw Leather Cricket Ball with Seam
+  drawLeatherBall(ctx, x, y, rotation) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+
+    // Red Leather Ball Body
+    ctx.fillStyle = "#dc2626";
+    ctx.beginPath();
+    ctx.arc(0, 0, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // White Seam Stitch Arc
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 5, -Math.PI / 3, Math.PI / 3);
+    ctx.stroke();
+
+    ctx.restore();
   }
 
   animateDelivery(outcome, callback) {
     this.ball.visible = true;
     this.ball.x = 270;
     this.ball.y = this.height / 2;
+    this.bailsFlying = false;
+    this.bailOffset = 0;
+    this.batsmanSwingAngle = 0;
 
     let targetX = 530;
     let targetY = this.height / 2;
@@ -285,6 +421,7 @@ class StadiumRenderer {
     } else if (outcome === "W") {
       targetX = 535;
       targetY = this.height / 2;
+      this.bailsFlying = true;
     } else if (typeof outcome === "number" && outcome > 0) {
       targetX = 580 + outcome * 30;
       targetY = this.height / 2 + (Math.random() > 0.5 ? 60 : -60);
@@ -298,6 +435,15 @@ class StadiumRenderer {
     const interval = setInterval(() => {
       this.ball.x += dx;
       this.ball.y += dy;
+      this.ball.rotation += 0.4;
+
+      if (currentStep > 15) {
+        this.batsmanSwingAngle = -45; // Swing bat
+      }
+      if (this.bailsFlying) {
+        this.bailOffset += 2;
+      }
+
       this.draw();
 
       currentStep++;
@@ -305,9 +451,11 @@ class StadiumRenderer {
         clearInterval(interval);
         setTimeout(() => {
           this.ball.visible = false;
+          this.batsmanSwingAngle = 0;
+          this.bailsFlying = false;
           this.draw();
           if (callback) callback();
-        }, 300);
+        }, 350);
       }
     }, 20);
   }
@@ -320,7 +468,7 @@ let stadiumCanvas;
 // ==========================================
 class TimingMeter {
   constructor() {
-    this.pointerPos = 0; // 0 to 100
+    this.pointerPos = 0;
     this.direction = 1;
     this.speed = 2.2;
     this.animating = true;
@@ -349,7 +497,6 @@ class TimingMeter {
   }
 
   getCurrentTiming() {
-    // 0 to 35: Early, 35 to 65: Perfect, 65 to 100: Late
     const pos = this.pointerPos;
     if (pos >= 35 && pos <= 65) {
       return "perfect";
@@ -492,7 +639,7 @@ function renderPlayingXIScreen() {
         <div class="player-role-badge">${roleIcon}</div>
         <div>
           <div class="player-info-name">${player.name}</div>
-          <div class="player-info-sub">${player.role} • Bat:${player.battingSkill} Bowl:${player.bowlingSkill}</div>
+          <div class="player-info-sub">${player.role} • ${player.battingStyle}</div>
         </div>
       </div>
       <div class="player-tags">
@@ -754,19 +901,14 @@ function playBall(shotChoice, deliveryChoice) {
   if (!shotChoice) shotChoice = getAIShotChoice(striker, inn);
   if (!deliveryChoice) deliveryChoice = getAIDeliveryChoice(bowler);
 
-  // Capture Timing Quality
   const timingQuality = timingMeter.getCurrentTiming();
-
-  // Generate Ball Speed
   const speedKm = generateBallSpeed(deliveryChoice);
   document.getElementById("ball-speed-val").innerText = `${speedKm} km/h`;
 
-  // Outcome Calculation
   const outcome = resolveBallOutcome(shotChoice, deliveryChoice, striker, bowler, GameState.pitchCondition, timingQuality);
 
   sounds.playBatHit();
 
-  // Animate on Stadium Canvas
   stadiumCanvas.animateDelivery(outcome, () => {
     let runValue = 0;
 
