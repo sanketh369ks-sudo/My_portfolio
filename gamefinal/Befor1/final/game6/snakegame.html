@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <a href="../final.html" class="back-btn">← Game Store</a>
+            <h1>🐍 Snake Game</h1>
+        </div>
+        <div class="scoreboard">
+            <div id="score">Score: 0</div>
+            <div id="highScore">High Score: 0</div>
+        </div>
+        
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            
+            <div id="startOverlay" class="overlay">
+                <h2>Ready to Play?</h2>
+                <p>Tap Start or Swipe on screen to move!<br>Controls: D-Pad or Swipe</p>
+                <button id="startBtn">Start Game</button>
+            </div>
+
+            <div id="gameOverOverlay" class="overlay hidden">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="finalScore">0</span></p>
+                <button id="restartBtn">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Touch / On-Screen D-Pad for Mobile Devices -->
+        <div class="d-pad">
+            <button id="btnUp" class="d-pad-btn up" aria-label="Up">▲</button>
+            <div class="d-pad-middle">
+                <button id="btnLeft" class="d-pad-btn left" aria-label="Left">◀</button>
+                <button id="btnPause" class="d-pad-btn center" aria-label="Pause/Play">⏯</button>
+                <button id="btnRight" class="d-pad-btn right" aria-label="Right">▶</button>
+            </div>
+            <button id="btnDown" class="d-pad-btn down" aria-label="Down">▼</button>
+        </div>
+        
+        <div class="controls-hint">
+            <span><strong>Desktop</strong>: Arrow Keys / WASD / Space</span>
+            <span><strong>Mobile</strong>: Swipe / On-Screen D-Pad</span>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+

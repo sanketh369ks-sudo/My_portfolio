@@ -1,0 +1,232 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    font-family: 'Outfit', Arial, sans-serif;
+    color: #ffffff;
+    padding: 12px;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 16px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.back-btn {
+    color: #7bed9f;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+    background: rgba(46, 213, 115, 0.2);
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #2ed573, #7bed9f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#score {
+    color: #7bed9f;
+}
+
+#highScore {
+    color: #eccc68;
+}
+
+.canvas-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    touch-action: none;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a2e;
+    touch-action: none;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 12, 41, 0.88);
+    backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.overlay h2 {
+    font-size: 1.8rem;
+    color: #ff4757;
+}
+
+#startOverlay h2 {
+    color: #2ed573;
+}
+
+.overlay p {
+    font-size: 0.95rem;
+    color: #dfe4ea;
+    line-height: 1.5;
+}
+
+button {
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #ffffff;
+    background: linear-gradient(45deg, #2ed573, #26af5f);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(46, 213, 115, 0.5);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Touch D-Pad Controls for Mobile */
+.d-pad {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.d-pad-middle {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.d-pad-btn {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    font-size: 1.3rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(5px);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.d-pad-btn.center {
+    font-size: 1.1rem;
+    background: rgba(46, 213, 115, 0.2);
+    border-color: rgba(46, 213, 115, 0.4);
+}
+
+.d-pad-btn:active {
+    background: rgba(46, 213, 115, 0.8) !important;
+    transform: scale(0.92);
+    box-shadow: 0 0 15px rgba(46, 213, 115, 0.6);
+}
+
+.controls-hint {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #a4b0be;
+}
+
+@media (min-width: 480px) {
+    .controls-hint {
+        flex-direction: row;
+        gap: 20px;
+    }
+}
+
+
+

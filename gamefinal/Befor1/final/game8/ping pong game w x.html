@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Player Ping Pong Game</title>
+    <style>
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #000;
+        }
+        #scoreboard {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 15px; margin-bottom: 15px;">
+        <a href="../final.html" style="color: #333; text-decoration: none; font-size: 1rem; font-weight: bold; background: #ddd; padding: 8px 16px; border-radius: 8px; font-family: sans-serif;">← Game Store</a>
+    </div>
+    <div id="scoreboard">
+        Player 1: <span id="score1">0</span> | Player 2: <span id="score2">0</span>
+    </div>
+    <canvas id="pingPongGame" width="800" height="400"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
+
