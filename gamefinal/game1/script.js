@@ -387,13 +387,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateHUD();
 
-        // Target vector towards mouse or straight forward
-        const worldMouseX = mousePos.x + cameraX;
-        const worldMouseY = mousePos.y;
-        let dx = worldMouseX - player.x;
-        let dy = worldMouseY - player.y;
+        // Target vector towards mouse or nearest enemy glider villain
+        let targetX = mousePos.x + cameraX;
+        let targetY = mousePos.y;
+
+        // Smart Magnetic Target Lock-On to nearest Glider Villain ahead
+        let bestTarget = null;
+        let minDist = 320;
+        for (let b of pumpkinBombs) {
+            if (b.x > player.x - 20) {
+                const d = Math.hypot(b.x - targetX, b.y - targetY);
+                if (d < minDist) {
+                    minDist = d;
+                    bestTarget = b;
+                }
+            }
+        }
+        if (bestTarget) {
+            targetX = bestTarget.x;
+            targetY = bestTarget.y;
+        }
+
+        let dx = targetX - player.x;
+        let dy = targetY - player.y;
         const len = Math.hypot(dx, dy) || 1;
-        const speed = isSuperShot ? 16 : 12;
+        const speed = isSuperShot ? 18 : 14;
         dx = (dx / len) * speed;
         dy = (dy / len) * speed;
 
@@ -402,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
             y: player.y - 6,
             vx: dx,
             vy: dy,
-            radius: isSuperShot ? 16 : 8,
+            radius: isSuperShot ? 22 : 14,
             isSuper: isSuperShot,
             life: 75
         });
@@ -582,13 +600,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 anchorY: bY
             });
 
-            // Add Pumpkin Bombs above gaps
+            // Add Humanoid Glider Villains above gaps
             if (Math.random() > 0.4) {
                 pumpkinBombs.push({
                     x: bX - gap / 2,
                     y: bY - Math.random() * 100 - 80,
                     vy: (Math.random() - 0.5) * 2,
-                    radius: 16,
+                    radius: 34, // Fits glider wings and villain body
                     pulse: 0
                 });
             }
@@ -633,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         x: bX - gap / 2,
                         y: bY - Math.random() * 110 - 70,
                         vy: (Math.random() - 0.5) * 2.5,
-                        radius: 16,
+                        radius: 34, // Fits glider wings and villain body
                         pulse: 0
                     });
                 }
@@ -809,12 +827,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Check collision with Pumpkin Bombs
+            // Check collision with Glider Villains
             for (let j = pumpkinBombs.length - 1; j >= 0; j--) {
                 const bomb = pumpkinBombs[j];
                 const dist = Math.hypot(b.x - bomb.x, b.y - bomb.y);
-                if (dist < b.radius + bomb.radius) {
-                    spawnExplosion(bomb.x, bomb.y, '#ff6600', 20);
+                if (dist < b.radius + bomb.radius + 10) {
+                    spawnExplosion(bomb.x, bomb.y, '#ff6600', 26);
                     playSFX('explosion');
                     pumpkinBombs.splice(j, 1);
                     if (!b.isSuper) webBlasts.splice(i, 1);
