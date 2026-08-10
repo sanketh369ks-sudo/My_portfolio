@@ -48,7 +48,7 @@ const pipeSpeed = 1.6;
 const groundHeight = 36;
 const groundY = canvasHeight - groundHeight;
 
-// FPS Throttling variables (prevents hyper-speed on 120Hz/144Hz monitors)
+// FPS Throttling variables
 let lastTime = 0;
 const fps = 60;
 const frameInterval = 1000 / fps;
@@ -58,7 +58,7 @@ let bgOffsetFar = 0;
 let bgOffsetMid = 0;
 let bgOffsetNear = 0;
 
-// Nature elements: Clouds, Houses, Drifting Leaves & Walking Man
+// Nature + Algebra elements
 let clouds = [
     { x: 20, y: 45, scale: 0.8, speed: 0.15 },
     { x: 140, y: 75, scale: 1.1, speed: 0.2 },
@@ -90,25 +90,27 @@ let walkingMan = {
     stepCycle: 0
 };
 
+// Floating Algebra / Math Symbols Particles
+const mathSymbolsList = ['π', '∑', '√x', 'f(x)', '∞', 'θ', 'Δ', 'α', 'β', 'x²', '∫', 'y=mx+c'];
 let particles = [];
 function initParticles() {
     particles = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 16; i++) {
         particles.push({
             x: Math.random() * canvasWidth,
-            y: Math.random() * (groundY - 20),
-            size: Math.random() * 3 + 2,
-            speedX: Math.random() * 0.4 + 0.3,
-            speedY: Math.random() * 0.3 + 0.1,
+            y: Math.random() * (groundY - 30),
+            symbol: mathSymbolsList[Math.floor(Math.random() * mathSymbolsList.length)],
+            fontSize: Math.random() * 5 + 10,
+            speedX: Math.random() * 0.4 + 0.25,
+            speedY: Math.random() * 0.25 + 0.05,
             oscillation: Math.random() * Math.PI * 2,
             oscSpeed: Math.random() * 0.03 + 0.01,
-            color: Math.random() > 0.4 ? '#8dc63f' : (Math.random() > 0.5 ? '#ffb7c5' : '#7cb342')
+            color: Math.random() > 0.5 ? '#38bdf8' : (Math.random() > 0.5 ? '#c084fc' : '#4ade80')
         });
     }
 }
 
 function setup() {
-    // Keyboard listener for Space, ArrowUp, or Enter key
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'Enter' || e.code === 'NumpadEnter' || e.key === 'Enter') {
             e.preventDefault();
@@ -116,7 +118,6 @@ function setup() {
         }
     });
 
-    // Mouse click or touch listener
     canvas.addEventListener('mousedown', (e) => {
         e.preventDefault();
         handleJump();
@@ -148,7 +149,6 @@ function handleJump() {
 function gameLoop(currentTime) {
     requestAnimationFrame(gameLoop);
 
-    // Limit execution to 60 FPS max
     if (!lastTime) lastTime = currentTime;
     const elapsed = currentTime - lastTime;
 
@@ -157,24 +157,20 @@ function gameLoop(currentTime) {
     }
     lastTime = currentTime - (elapsed % frameInterval);
 
-    // Apply device pixel ratio transformation for ultra-sharp rendering
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     if (gameStarted && !gameOver) {
         frame++;
 
-        // Update Parallax Offsets
         bgOffsetFar = (bgOffsetFar + 0.2) % canvasWidth;
         bgOffsetMid = (bgOffsetMid + 0.6) % canvasWidth;
         bgOffsetNear = (bgOffsetNear + pipeSpeed) % canvasWidth;
 
-        // Bird physics
         bird.velocity += bird.gravity;
         bird.y += bird.velocity;
         bird.wingAngle += 0.25;
 
-        // Pipe generation (every ~2 seconds at 60 FPS)
         if (frame % 110 === 0) {
             const minPipeHeight = 40;
             const maxPipeHeight = groundY - pipeGap - minPipeHeight;
@@ -196,12 +192,10 @@ function gameLoop(currentTime) {
             });
         }
 
-        // Update pipes and check collisions
         for (let i = 0; i < pipes.length; i++) {
             let pipe = pipes[i];
             pipe.x -= pipeSpeed;
 
-            // Collision detection
             const padding = 2;
             if (
                 bird.x + padding < pipe.x + pipeWidth &&
@@ -212,7 +206,6 @@ function gameLoop(currentTime) {
                 triggerGameOver();
             }
 
-            // Score counting
             if (pipe.isTop && pipe.x + pipeWidth < bird.x && !pipe.scored) {
                 score++;
                 pipe.scored = true;
@@ -223,45 +216,39 @@ function gameLoop(currentTime) {
             }
         }
 
-        // Remove off-screen pipes
         pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
 
-        // Ground and ceiling collision
         if (bird.y + bird.height >= groundY || bird.y <= 0) {
             triggerGameOver();
         }
     } else {
-        // Gentle wing idle animation on start/over screens
         bird.wingAngle += 0.1;
-        // Slow ambient background drift on menu
         bgOffsetFar = (bgOffsetFar + 0.08) % canvasWidth;
         bgOffsetMid = (bgOffsetMid + 0.2) % canvasWidth;
     }
 
-    // Update nature particles
     particles.forEach(p => {
         p.x -= p.speedX;
-        p.y += p.speedY + Math.sin(p.oscillation) * 0.3;
+        p.y += p.speedY + Math.sin(p.oscillation) * 0.35;
         p.oscillation += p.oscSpeed;
 
-        if (p.x < -10) p.x = canvasWidth + 10;
-        if (p.y > groundY) p.y = -5;
+        if (p.x < -20) p.x = canvasWidth + 20;
+        if (p.y > groundY - 10) p.y = 10;
     });
 
-    // Update clouds
     clouds.forEach(c => {
         c.x -= c.speed;
         if (c.x < -70) c.x = canvasWidth + 50;
     });
 
-    // --- DRAWING NATURE SCENE LAYERS ---
-    drawSkyAndSun();
+    // --- RENDER SCENE LAYERS ---
+    drawSkyAndAlgebraGrid();
     drawClouds();
     drawDistantMountains();
     drawMidgroundHills();
     drawHouses();
     drawPipes();
-    drawNatureParticles();
+    drawMathParticles();
     drawGround();
     drawWalkingMan();
     drawBird();
@@ -276,189 +263,56 @@ function triggerGameOver() {
     }
 }
 
-// --- NATURE GRAPHICS RENDERING FUNCTIONS ---
+// --- RENDERING FUNCTIONS (ALGEBRA NATURE THEME) ---
 
-function drawHouses() {
-    let shift = bgOffsetMid * 1.2;
-
-    const housePositions = [
-        { x: 70 },
-        { x: 260 }
-    ];
-
-    housePositions.forEach((h, idx) => {
-        let posX = (h.x - shift % (canvasWidth + 120) + canvasWidth + 120) % (canvasWidth + 120) - 30;
-        let posY = groundY - 26;
-
-        ctx.save();
-        if (idx === 0) {
-            // House 1: Cozy Stone Cottage with Chimney Smoke
-            updateChimneySmoke(posX, posY);
-            chimneySmoke.forEach(s => {
-                ctx.fillStyle = `rgba(240, 240, 245, ${s.alpha})`;
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // Chimney
-            ctx.fillStyle = '#6d4c41';
-            ctx.fillRect(posX + 17, posY - 7, 5, 9);
-
-            // House Walls
-            ctx.fillStyle = '#f5f5f5';
-            ctx.fillRect(posX, posY, 26, 18);
-            ctx.strokeStyle = '#4e342e';
-            ctx.lineWidth = 1.2;
-            ctx.strokeRect(posX, posY, 26, 18);
-
-            // Roof
-            ctx.fillStyle = '#d84315';
-            ctx.beginPath();
-            ctx.moveTo(posX - 4, posY);
-            ctx.lineTo(posX + 13, posY - 12);
-            ctx.lineTo(posX + 30, posY);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-
-            // Door
-            ctx.fillStyle = '#5d4037';
-            ctx.fillRect(posX + 10, posY + 8, 6, 10);
-
-            // Windows with Warm Glow
-            ctx.fillStyle = '#ffe082';
-            ctx.fillRect(posX + 3, posY + 4, 5, 5);
-            ctx.fillRect(posX + 18, posY + 4, 5, 5);
-            ctx.strokeStyle = '#ffb300';
-            ctx.lineWidth = 0.8;
-            ctx.strokeRect(posX + 3, posY + 4, 5, 5);
-            ctx.strokeRect(posX + 18, posY + 4, 5, 5);
-        } else {
-            // House 2: Rustic Mountain Log Cabin
-            ctx.fillStyle = '#8d6e63';
-            ctx.fillRect(posX, posY + 3, 22, 15);
-            ctx.strokeStyle = '#3e2723';
-            ctx.lineWidth = 1.2;
-            ctx.strokeRect(posX, posY + 3, 22, 15);
-
-            // Roof
-            ctx.fillStyle = '#37474f';
-            ctx.beginPath();
-            ctx.moveTo(posX - 3, posY + 3);
-            ctx.lineTo(posX + 11, posY - 7);
-            ctx.lineTo(posX + 25, posY + 3);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-
-            // Door
-            ctx.fillStyle = '#3e2723';
-            ctx.fillRect(posX + 8, posY + 9, 5, 9);
-
-            // Window
-            ctx.fillStyle = '#ffecb3';
-            ctx.fillRect(posX + 2, posY + 6, 4, 4);
-        }
-        ctx.restore();
-    });
-}
-
-function drawWalkingMan() {
-    // Update Walking Man position & leg animation cycle
-    if (gameStarted && !gameOver) {
-        walkingMan.x -= (pipeSpeed - 0.35);
-    } else {
-        walkingMan.x += 0.35;
-    }
-
-    if (walkingMan.x < -30) {
-        walkingMan.x = canvasWidth + 40;
-    } else if (walkingMan.x > canvasWidth + 50) {
-        walkingMan.x = -30;
-    }
-
-    walkingMan.stepCycle += 0.15;
-
-    ctx.save();
-    let mx = walkingMan.x;
-    let my = groundY - 10;
-    let legSwing = Math.sin(walkingMan.stepCycle) * 4;
-
-    // Shadow on grass
-    ctx.fillStyle = 'rgba(30, 60, 15, 0.35)';
-    ctx.beginPath();
-    ctx.ellipse(mx, groundY - 2, 6, 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Legs (Animated Walking Loop)
-    ctx.strokeStyle = '#263238';
-    ctx.lineWidth = 2;
-
-    // Left Leg
-    ctx.beginPath();
-    ctx.moveTo(mx, my - 5);
-    ctx.lineTo(mx + legSwing, groundY - 2);
-    ctx.stroke();
-
-    // Right Leg
-    ctx.beginPath();
-    ctx.moveTo(mx, my - 5);
-    ctx.lineTo(mx - legSwing, groundY - 2);
-    ctx.stroke();
-
-    // Torso / Jacket
-    ctx.fillStyle = '#e53935'; // Red jacket
-    ctx.beginPath();
-    ctx.roundRect(mx - 3, my - 12, 6, 8, 2);
-    ctx.fill();
-
-    // Backpack / Satchel
-    ctx.fillStyle = '#5d4037';
-    ctx.beginPath();
-    ctx.roundRect(mx - 5, my - 11, 3, 5, 1);
-    ctx.fill();
-
-    // Head
-    ctx.fillStyle = '#ffcc80';
-    ctx.beginPath();
-    ctx.arc(mx, my - 16, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Cap (Green Traveler Cap)
-    ctx.fillStyle = '#2e7d32';
-    ctx.beginPath();
-    ctx.arc(mx, my - 17, 3.8, Math.PI, Math.PI * 2);
-    ctx.fill();
-    ctx.fillRect(mx, my - 17, 4, 1.2); // Cap visor
-
-    // Arms Swinging
-    ctx.strokeStyle = '#ffcc80';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(mx, my - 10);
-    ctx.lineTo(mx - legSwing * 0.8, my - 5);
-    ctx.stroke();
-
-    ctx.restore();
-}
-
-function drawSkyAndSun() {
+function drawSkyAndAlgebraGrid() {
+    // Algebra Midnight Sky Gradient
     let skyGrad = ctx.createLinearGradient(0, 0, 0, canvasHeight);
-    skyGrad.addColorStop(0, '#4a90e2');   
-    skyGrad.addColorStop(0.45, '#7bc0ed'); 
-    skyGrad.addColorStop(0.75, '#bfe3f7'); 
-    skyGrad.addColorStop(1.0, '#eaf7e3');  
+    skyGrad.addColorStop(0, '#0f172a');    // Deep algebra navy
+    skyGrad.addColorStop(0.35, '#1e293b'); // Dark indigo
+    skyGrad.addColorStop(0.7, '#0369a1');  // Vibrant mathematical cyan blue
+    skyGrad.addColorStop(1.0, '#0284c7');  // Electric horizon glow
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+    // Subtle Coordinate Graph Grid Lines
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+    ctx.lineWidth = 1;
+
+    // Vertical grid lines
+    for (let x = 0; x < canvasWidth; x += 25) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, groundY);
+        ctx.stroke();
+    }
+    // Horizontal grid lines
+    for (let y = 0; y < groundY; y += 25) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvasWidth, y);
+        ctx.stroke();
+    }
+
+    // Mathematical Sine Wave Function Curve: f(x) = sin(x)
+    ctx.strokeStyle = 'rgba(192, 132, 252, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let x = 0; x <= canvasWidth; x += 4) {
+        let waveY = 110 + Math.sin((x + bgOffsetFar * 15) * 0.03) * 18;
+        if (x === 0) ctx.moveTo(x, waveY);
+        else ctx.lineTo(x, waveY);
+    }
+    ctx.stroke();
+
+    // Glowing Algebra Sun Disk (Golden Ratio Spiral Sun)
     const sunX = 250;
     const sunY = 70;
     
     let auraGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 55);
-    auraGrad.addColorStop(0, 'rgba(255, 245, 200, 0.8)');
-    auraGrad.addColorStop(0.5, 'rgba(255, 220, 130, 0.35)');
-    auraGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    auraGrad.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+    auraGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.25)');
+    auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = auraGrad;
     ctx.beginPath();
     ctx.arc(sunX, sunY, 55, 0, Math.PI * 2);
@@ -466,8 +320,8 @@ function drawSkyAndSun() {
 
     let sunGrad = ctx.createRadialGradient(sunX - 4, sunY - 4, 2, sunX, sunY, 18);
     sunGrad.addColorStop(0, '#ffffff');
-    sunGrad.addColorStop(0.3, '#fff3a8');
-    sunGrad.addColorStop(1, '#ffc845');
+    sunGrad.addColorStop(0.4, '#e0f2fe');
+    sunGrad.addColorStop(1, '#38bdf8');
     ctx.fillStyle = sunGrad;
     ctx.beginPath();
     ctx.arc(sunX, sunY, 18, 0, Math.PI * 2);
@@ -477,7 +331,7 @@ function drawSkyAndSun() {
 function drawClouds() {
     clouds.forEach(c => {
         ctx.save();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
         let x = c.x;
         let y = c.y;
         let s = c.scale;
@@ -490,7 +344,7 @@ function drawClouds() {
         ctx.closePath();
         ctx.fill();
 
-        ctx.fillStyle = 'rgba(180, 210, 230, 0.3)';
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.2)';
         ctx.beginPath();
         ctx.ellipse(x + 24 * s, y + 4 * s, 26 * s, 6 * s, 0, 0, Math.PI * 2);
         ctx.fill();
@@ -500,7 +354,8 @@ function drawClouds() {
 }
 
 function drawDistantMountains() {
-    ctx.fillStyle = '#6589a6';
+    // Parallax Violet/Indigo Math Peaks
+    ctx.fillStyle = '#4c1d95';
     ctx.beginPath();
 
     const mountainPoints = [
@@ -524,7 +379,8 @@ function drawDistantMountains() {
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = 'rgba(245, 250, 255, 0.7)';
+    // Glowing Neon Purple Snow Caps
+    ctx.fillStyle = 'rgba(192, 132, 252, 0.75)';
     for (let i = 0; i < 3; i++) {
         let offsetX = i * 360 - shift;
         let p1x = 140 + offsetX;
@@ -548,7 +404,8 @@ function drawDistantMountains() {
 function drawMidgroundHills() {
     let shift = bgOffsetMid;
 
-    ctx.fillStyle = '#56a347';
+    // Back Emerald Sine-wave Hill
+    ctx.fillStyle = '#059669';
     ctx.beginPath();
     ctx.moveTo(-20, groundY);
 
@@ -561,7 +418,8 @@ function drawMidgroundHills() {
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#428e34';
+    // Front Neon Teal Hill
+    ctx.fillStyle = '#10b981';
     ctx.beginPath();
     ctx.moveTo(-20, groundY);
 
@@ -574,15 +432,16 @@ function drawMidgroundHills() {
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#2d6823';
+    // Pine Trees along the hill ridge
+    ctx.fillStyle = '#047857';
     for (let i = -1; i < 6; i++) {
         let treeX = (i * 85 - (shift * 1.5) % 85 + 85) % (canvasWidth + 80) - 20;
         let treeBaseY = groundY - 42 + Math.sin((treeX + shift * 1.5) * 0.025 + 1.2) * 16;
 
-        ctx.fillStyle = '#4a3319';
+        ctx.fillStyle = '#1e293b';
         ctx.fillRect(treeX - 2, treeBaseY - 6, 4, 8);
 
-        ctx.fillStyle = '#255e1c';
+        ctx.fillStyle = '#065f46';
         ctx.beginPath();
         ctx.moveTo(treeX, treeBaseY - 24);
         ctx.lineTo(treeX - 9, treeBaseY - 12);
@@ -599,22 +458,101 @@ function drawMidgroundHills() {
     }
 }
 
+function drawHouses() {
+    let shift = bgOffsetMid * 1.2;
+
+    const housePositions = [
+        { x: 70 },
+        { x: 260 }
+    ];
+
+    housePositions.forEach((h, idx) => {
+        let posX = (h.x - shift % (canvasWidth + 120) + canvasWidth + 120) % (canvasWidth + 120) - 30;
+        let posY = groundY - 26;
+
+        ctx.save();
+        if (idx === 0) {
+            // House 1: Geometric Math Cottage with Chimney Smoke
+            updateChimneySmoke(posX, posY);
+            chimneySmoke.forEach(s => {
+                ctx.fillStyle = `rgba(56, 189, 248, ${s.alpha * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(posX + 17, posY - 7, 5, 9);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(posX, posY, 26, 18);
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 1.4;
+            ctx.strokeRect(posX, posY, 26, 18);
+
+            ctx.fillStyle = '#7c3aed'; // Vibrant Purple Roof
+            ctx.beginPath();
+            ctx.moveTo(posX - 4, posY);
+            ctx.lineTo(posX + 13, posY - 12);
+            ctx.lineTo(posX + 30, posY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(posX + 10, posY + 8, 6, 10);
+
+            // Windows with Electric Cyan Glow
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(posX + 3, posY + 4, 5, 5);
+            ctx.fillRect(posX + 18, posY + 4, 5, 5);
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(posX + 3, posY + 4, 5, 5);
+            ctx.strokeRect(posX + 18, posY + 4, 5, 5);
+        } else {
+            // House 2: Indigo Math Cabin
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(posX, posY + 3, 22, 15);
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(posX, posY + 3, 22, 15);
+
+            ctx.fillStyle = '#0284c7'; // Cyan Roof
+            ctx.beginPath();
+            ctx.moveTo(posX - 3, posY + 3);
+            ctx.lineTo(posX + 11, posY - 7);
+            ctx.lineTo(posX + 25, posY + 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(posX + 8, posY + 9, 5, 9);
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(posX + 2, posY + 6, 4, 4);
+        }
+        ctx.restore();
+    });
+}
+
 function drawPipes() {
     pipes.forEach(pipe => {
         let pipeGrad = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipeWidth, 0);
-        pipeGrad.addColorStop(0, '#4e8c25');
-        pipeGrad.addColorStop(0.3, '#7bc437');
-        pipeGrad.addColorStop(0.7, '#64aa2b');
-        pipeGrad.addColorStop(1, '#3b6e1b');
+        pipeGrad.addColorStop(0, '#059669');
+        pipeGrad.addColorStop(0.35, '#34d399');
+        pipeGrad.addColorStop(0.7, '#10b981');
+        pipeGrad.addColorStop(1, '#047857');
 
         ctx.fillStyle = pipeGrad;
         ctx.fillRect(pipe.x, pipe.y, pipeWidth, pipe.height);
 
-        ctx.strokeStyle = '#244710';
+        ctx.strokeStyle = '#022c22';
         ctx.lineWidth = 2;
         ctx.strokeRect(pipe.x, pipe.y, pipeWidth, pipe.height);
 
-        ctx.strokeStyle = 'rgba(30, 60, 12, 0.25)';
+        ctx.strokeStyle = 'rgba(6, 78, 59, 0.3)';
         ctx.lineWidth = 1.5;
         for (let strokeY = pipe.y + 15; strokeY < pipe.y + pipe.height - 10; strokeY += 22) {
             ctx.beginPath();
@@ -629,17 +567,17 @@ function drawPipes() {
         let capY = pipe.isTop ? pipe.height - capHeight : pipe.y;
 
         let capGrad = ctx.createLinearGradient(capX, 0, capX + capW, 0);
-        capGrad.addColorStop(0, '#65aa2d');
-        capGrad.addColorStop(0.5, '#95dc48');
-        capGrad.addColorStop(1, '#4e8a20');
+        capGrad.addColorStop(0, '#10b981');
+        capGrad.addColorStop(0.5, '#6ee7b7');
+        capGrad.addColorStop(1, '#059669');
 
         ctx.fillStyle = capGrad;
         ctx.fillRect(capX, capY, capW, capHeight);
-        ctx.strokeStyle = '#244710';
+        ctx.strokeStyle = '#022c22';
         ctx.lineWidth = 2;
         ctx.strokeRect(capX, capY, capW, capHeight);
 
-        ctx.fillStyle = '#8bc34a';
+        ctx.fillStyle = '#38bdf8';
         if (pipe.isTop) {
             ctx.beginPath();
             ctx.ellipse(capX + 10, capY + capHeight + 4, 5, 8, 0.4, 0, Math.PI * 2);
@@ -656,16 +594,16 @@ function drawPipes() {
 
 function drawGround() {
     let soilGrad = ctx.createLinearGradient(0, groundY, 0, canvasHeight);
-    soilGrad.addColorStop(0, '#8c5e38');
-    soilGrad.addColorStop(0.3, '#6e4526');
-    soilGrad.addColorStop(1, '#4a2c15');
+    soilGrad.addColorStop(0, '#334155');
+    soilGrad.addColorStop(0.4, '#1e293b');
+    soilGrad.addColorStop(1, '#0f172a');
     ctx.fillStyle = soilGrad;
     ctx.fillRect(0, groundY, canvasWidth, groundHeight);
 
-    ctx.fillStyle = '#3a200d';
+    ctx.fillStyle = '#0284c7';
     ctx.fillRect(0, groundY, canvasWidth, 2);
 
-    ctx.fillStyle = 'rgba(60, 35, 15, 0.4)';
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.3)';
     for (let i = 0; i < canvasWidth; i += 24) {
         let px = (i - bgOffsetNear % 24 + canvasWidth) % canvasWidth;
         ctx.fillRect(px, groundY + 14, 5, 3);
@@ -673,13 +611,13 @@ function drawGround() {
     }
 
     let grassGrad = ctx.createLinearGradient(0, groundY - 6, 0, groundY + 6);
-    grassGrad.addColorStop(0, '#8ed433');
-    grassGrad.addColorStop(1, '#539e1b');
+    grassGrad.addColorStop(0, '#4ade80');
+    grassGrad.addColorStop(1, '#16a34a');
     ctx.fillStyle = grassGrad;
     ctx.fillRect(0, groundY - 6, canvasWidth, 8);
 
-    ctx.fillStyle = '#8ed433';
-    ctx.strokeStyle = '#3d7811';
+    ctx.fillStyle = '#4ade80';
+    ctx.strokeStyle = '#15803d';
     ctx.lineWidth = 1;
 
     const bladeWidth = 8;
@@ -697,14 +635,14 @@ function drawGround() {
         let flowerX = (i - bgOffsetNear % 75 + canvasWidth) % canvasWidth;
         let flowerY = groundY - 8;
 
-        ctx.strokeStyle = '#4e8c25';
+        ctx.strokeStyle = '#16a34a';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(flowerX, groundY);
         ctx.lineTo(flowerX, flowerY);
         ctx.stroke();
 
-        ctx.fillStyle = (i % 150 === 0) ? '#ffea00' : '#ffffff';
+        ctx.fillStyle = (i % 150 === 0) ? '#38bdf8' : '#c084fc';
         ctx.beginPath();
         ctx.arc(flowerX - 2, flowerY, 2, 0, Math.PI * 2);
         ctx.arc(flowerX + 2, flowerY, 2, 0, Math.PI * 2);
@@ -712,26 +650,98 @@ function drawGround() {
         ctx.arc(flowerX, flowerY + 2, 2, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#ff9800';
+        ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
         ctx.arc(flowerX, flowerY, 1.5, 0, Math.PI * 2);
         ctx.fill();
     }
 }
 
-function drawNatureParticles() {
+function drawMathParticles() {
     particles.forEach(p => {
         ctx.save();
         ctx.translate(p.x, p.y);
-        ctx.rotate(p.oscillation);
 
         ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.font = `bold ${p.fontSize}px "Segoe UI", monospace`;
+        ctx.textAlign = 'center';
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.fillText(p.symbol, 0, 0);
 
         ctx.restore();
     });
+}
+
+function drawWalkingMan() {
+    if (gameStarted && !gameOver) {
+        walkingMan.x -= (pipeSpeed - 0.35);
+    } else {
+        walkingMan.x += 0.35;
+    }
+
+    if (walkingMan.x < -30) {
+        walkingMan.x = canvasWidth + 40;
+    } else if (walkingMan.x > canvasWidth + 50) {
+        walkingMan.x = -30;
+    }
+
+    walkingMan.stepCycle += 0.15;
+
+    ctx.save();
+    let mx = walkingMan.x;
+    let my = groundY - 10;
+    let legSwing = Math.sin(walkingMan.stepCycle) * 4;
+
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+    ctx.beginPath();
+    ctx.ellipse(mx, groundY - 2, 6, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(mx, my - 5);
+    ctx.lineTo(mx + legSwing, groundY - 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(mx, my - 5);
+    ctx.lineTo(mx - legSwing, groundY - 2);
+    ctx.stroke();
+
+    // Torso (Electric Blue Hoodie)
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.roundRect(mx - 3, my - 12, 6, 8, 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#475569';
+    ctx.beginPath();
+    ctx.roundRect(mx - 5, my - 11, 3, 5, 1);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffcc80';
+    ctx.beginPath();
+    ctx.arc(mx, my - 16, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cap (Cyan Cap)
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.arc(mx, my - 17, 3.8, Math.PI, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(mx, my - 17, 4, 1.2);
+
+    ctx.strokeStyle = '#ffcc80';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(mx, my - 10);
+    ctx.lineTo(mx - legSwing * 0.8, my - 5);
+    ctx.stroke();
+
+    ctx.restore();
 }
 
 function drawBird() {
@@ -809,25 +819,25 @@ function drawUI() {
     let plateW = 100;
     let plateH = 34;
 
-    ctx.fillStyle = 'rgba(30, 45, 20, 0.55)';
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
     ctx.beginPath();
     ctx.roundRect(plateX, plateY, plateW, plateH, 10);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.strokeStyle = '#38bdf8';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 18px "Segoe UI", Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#38bdf8';
+    ctx.shadowBlur = 6;
     ctx.fillText(`${score}`, canvasWidth / 2, plateY + 23);
     ctx.restore();
 
     if (!gameStarted) {
         ctx.save();
-        ctx.fillStyle = 'rgba(15, 30, 20, 0.45)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
         let cardW = 240;
@@ -836,22 +846,25 @@ function drawUI() {
         let cardY = (canvasHeight - cardH) / 2 - 10;
 
         let cardGrad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
-        cardGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-        cardGrad.addColorStop(1, 'rgba(240, 248, 235, 0.92)');
+        cardGrad.addColorStop(0, 'rgba(30, 41, 59, 0.96)');
+        cardGrad.addColorStop(1, 'rgba(15, 23, 42, 0.94)');
         ctx.fillStyle = cardGrad;
         ctx.beginPath();
         ctx.roundRect(cardX, cardY, cardW, cardH, 16);
         ctx.fill();
-        ctx.strokeStyle = '#8bc34a';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.fillStyle = '#2e7d32';
+        ctx.fillStyle = '#38bdf8';
         ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Flappy Nature', canvasWidth / 2, cardY + 38);
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 8;
+        ctx.fillText('Flappy Algebra', canvasWidth / 2, cardY + 38);
+        ctx.shadowBlur = 0;
 
-        ctx.fillStyle = '#424242';
+        ctx.fillStyle = '#94a3b8';
         ctx.font = '13px "Segoe UI", Arial, sans-serif';
         ctx.fillText('Press SPACE, ENTER or Click', canvasWidth / 2, cardY + 68);
 
@@ -861,8 +874,8 @@ function drawUI() {
         let btnY = cardY + 98;
 
         let btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
-        btnGrad.addColorStop(0, '#7cb342');
-        btnGrad.addColorStop(1, '#558b2f');
+        btnGrad.addColorStop(0, '#0284c7');
+        btnGrad.addColorStop(1, '#0369a1');
         ctx.fillStyle = btnGrad;
         ctx.beginPath();
         ctx.roundRect(btnX, btnY, btnW, btnH, 17);
@@ -873,7 +886,7 @@ function drawUI() {
         ctx.fillText('TAP / ENTER TO PLAY', canvasWidth / 2, btnY + 22);
 
         if (highScore > 0) {
-            ctx.fillStyle = '#558b2f';
+            ctx.fillStyle = '#c084fc';
             ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
             ctx.fillText(`Best Score: ${highScore}`, canvasWidth / 2, cardY + cardH + 25);
         }
@@ -882,7 +895,7 @@ function drawUI() {
 
     } else if (gameOver) {
         ctx.save();
-        ctx.fillStyle = 'rgba(20, 15, 10, 0.55)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
         let cardW = 240;
@@ -891,25 +904,28 @@ function drawUI() {
         let cardY = (canvasHeight - cardH) / 2 - 10;
 
         let cardGrad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
-        cardGrad.addColorStop(0, 'rgba(255, 255, 255, 0.96)');
-        cardGrad.addColorStop(1, 'rgba(240, 248, 235, 0.94)');
+        cardGrad.addColorStop(0, 'rgba(30, 41, 59, 0.96)');
+        cardGrad.addColorStop(1, 'rgba(15, 23, 42, 0.94)');
         ctx.fillStyle = cardGrad;
         ctx.beginPath();
         ctx.roundRect(cardX, cardY, cardW, cardH, 16);
         ctx.fill();
-        ctx.strokeStyle = '#ff7043';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.fillStyle = '#d84315';
+        ctx.fillStyle = '#fb7185';
         ctx.font = 'bold 22px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center';
+        ctx.shadowColor = '#f43f5e';
+        ctx.shadowBlur = 8;
         ctx.fillText('GAME OVER', canvasWidth / 2, cardY + 40);
+        ctx.shadowBlur = 0;
 
-        ctx.fillStyle = '#37474f';
+        ctx.fillStyle = '#cbd5e1';
         ctx.font = 'bold 15px "Segoe UI", Arial, sans-serif';
         ctx.fillText(`Score: ${score}`, canvasWidth / 2, cardY + 75);
-        ctx.fillStyle = '#689f38';
+        ctx.fillStyle = '#38bdf8';
         ctx.fillText(`High Score: ${highScore}`, canvasWidth / 2, cardY + 98);
 
         let btnW = 140;
@@ -918,8 +934,8 @@ function drawUI() {
         let btnY = cardY + 124;
 
         let btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
-        btnGrad.addColorStop(0, '#ff7043');
-        btnGrad.addColorStop(1, '#d84315');
+        btnGrad.addColorStop(0, '#f43f5e');
+        btnGrad.addColorStop(1, '#e11d48');
         ctx.fillStyle = btnGrad;
         ctx.beginPath();
         ctx.roundRect(btnX, btnY, btnW, btnH, 17);
