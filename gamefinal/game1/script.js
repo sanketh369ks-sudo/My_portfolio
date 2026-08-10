@@ -1008,69 +1008,143 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
-    function drawSpikyBoss(ctx, x, y, radius, spikes, pulse) {
+    function drawBossMan(ctx, boss) {
         ctx.save();
-        ctx.translate(x, y);
+        ctx.translate(boss.x, boss.y);
 
-        // 1. Red Glow Aura radiating behind Boss
-        const glowGrad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius * 2.6);
-        glowGrad.addColorStop(0, 'rgba(255, 30, 67, 0.85)');
-        glowGrad.addColorStop(0.5, 'rgba(255, 0, 85, 0.4)');
-        glowGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
-        ctx.fillStyle = glowGrad;
+        // Hover tilt
+        const tilt = Math.sin(boss.pulse * 0.8) * 0.1;
+        ctx.rotate(tilt);
+
+        // Intense Crimson Symbiote Aura Glow
+        ctx.shadowColor = '#ff1e43';
+        ctx.shadowBlur = 24;
+
+        // --- 1. GIANT MUSCULAR SYMBIOTE TORSO ---
+        // Dark crimson body background gradient
+        const bodyGrad = ctx.createLinearGradient(-30, -40, 30, 40);
+        bodyGrad.addColorStop(0, '#dc2626');
+        bodyGrad.addColorStop(0.5, '#991b1b');
+        bodyGrad.addColorStop(1, '#450a0a');
+
+        // Muscular Legs / Lower Body
+        ctx.strokeStyle = '#7f1d1d';
+        ctx.lineWidth = 10;
         ctx.beginPath();
-        ctx.arc(0, 0, radius * 2.6, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 2. Draw Multi-pointed Spiky Starburst Body
-        const outerRadius = radius + Math.sin(pulse * 3) * 3;
-        const innerRadius = radius * 0.45;
-        const step = Math.PI / spikes;
-
-        ctx.beginPath();
-        for (let i = 0; i < spikes * 2; i++) {
-            const r = (i % 2 === 0) ? outerRadius : innerRadius;
-            const angle = i * step + pulse;
-            const px = Math.cos(angle) * r;
-            const py = Math.sin(angle) * r;
-            if (i === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-
-        // Crimson Red Fill
-        ctx.fillStyle = '#ff1e43';
-        ctx.fill();
-
-        // Thick Outer White Glow Stroke (matching user image)
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3.5;
-        ctx.shadowColor = '#ffffff';
-        ctx.shadowBlur = 14;
+        ctx.moveTo(-14, 25); ctx.lineTo(-24, 55);
+        ctx.moveTo(14, 25); ctx.lineTo(24, 55);
         ctx.stroke();
-        ctx.shadowBlur = 0;
 
-        // 3. Glowing White Angry Eyes (matching user image)
+        // Broad Muscular Chest (V-Taper)
+        ctx.fillStyle = bodyGrad;
+        ctx.beginPath();
+        ctx.moveTo(-20, 20);
+        ctx.lineTo(-32, -28);
+        ctx.lineTo(32, -28);
+        ctx.lineTo(20, 20);
+        ctx.closePath();
+        ctx.fill();
+
+        // White Symbiote Chest Logo 🕷️
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = '#ffffff';
         ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.ellipse(0, -10, 6, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -16); ctx.lineTo(-18, -24);
+        ctx.moveTo(0, -16); ctx.lineTo(18, -24);
+        ctx.moveTo(0, -10); ctx.lineTo(-22, -6);
+        ctx.moveTo(0, -10); ctx.lineTo(22, -6);
+        ctx.moveTo(0, -4); ctx.lineTo(-20, 10);
+        ctx.moveTo(0, -4); ctx.lineTo(20, 10);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // --- 2. FLEXING ARMS & SYMBIOTE CLAWS ---
+        ctx.lineWidth = 9;
+        ctx.lineCap = 'round';
+
+        // Left Arm (Reaching Forward)
+        ctx.strokeStyle = '#b91c1c';
+        ctx.beginPath();
+        ctx.moveTo(-26, -24);
+        ctx.lineTo(-44, 4);
+        ctx.stroke();
+
+        // Left Claws
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-44, 4, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Right Arm (Aiming Energy Blasts!)
+        ctx.strokeStyle = '#b91c1c';
+        ctx.beginPath();
+        ctx.moveTo(26, -24);
+        let rArmX = 42 + Math.sin(boss.pulse * 2) * 6;
+        let rArmY = -12;
+        ctx.lineTo(rArmX, rArmY);
+        ctx.stroke();
+
+        // Right Claws & Energy Spark
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(rArmX, rArmY, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ff1e43';
+        ctx.shadowColor = '#ff1e43';
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.arc(rArmX + 10, rArmY, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // --- 3. SYMBIOTE HEAD & JAGGED TEETH ---
+        ctx.shadowBlur = 0;
+        // Muscular Neck
+        ctx.fillStyle = '#991b1b';
+        ctx.fillRect(-8, -38, 16, 10);
+
+        // Head Mask
+        ctx.fillStyle = '#b91c1c';
+        ctx.beginPath();
+        ctx.ellipse(0, -48, 16, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Razor-sharp White Teeth Visor
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, -44, 10, 0, Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(-10, -45, 20, 2);
+
+        // Sharp Glowing White Symbiote Eyes
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 14;
 
         // Left Eye
         ctx.beginPath();
-        ctx.moveTo(-12, -6);
-        ctx.lineTo(-4, 0);
-        ctx.lineTo(-10, 4);
+        ctx.moveTo(-2, -50);
+        ctx.lineTo(-14, -56);
+        ctx.lineTo(-10, -44);
         ctx.closePath();
         ctx.fill();
 
         // Right Eye
         ctx.beginPath();
-        ctx.moveTo(12, -6);
-        ctx.lineTo(4, 0);
-        ctx.lineTo(10, 4);
+        ctx.moveTo(2, -50);
+        ctx.lineTo(14, -56);
+        ctx.lineTo(10, -44);
         ctx.closePath();
         ctx.fill();
 
+        ctx.shadowBlur = 0;
         ctx.restore();
     }
 
@@ -1600,9 +1674,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.shadowBlur = 0;
         });
 
-        // 9.5 Draw Boss & Boss Projectiles
+        // 9.5 Draw Muscular Symbiote Boss Man & Boss Projectiles
         if (boss.active) {
-            drawSpikyBoss(ctx, boss.x, boss.y, boss.radius, boss.spikes, boss.pulse);
+            drawBossMan(ctx, boss);
         }
 
         bossProjectiles.forEach(bp => {
