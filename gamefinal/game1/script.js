@@ -944,8 +944,8 @@ document.addEventListener('DOMContentLoaded', () => {
             takeDamage(true);
         }
 
-        // Update Camera Position smoothly tracking Spider-Man
-        cameraX = player.x - 200;
+        // Update Camera Position smoothly tracking Spider-Man (30% from left edge of screen)
+        cameraX = player.x - Math.min(280, canvas.width * 0.3);
 
         // Update Web Blasts & Combat Collisions
         for (let i = webBlasts.length - 1; i >= 0; i--) {
