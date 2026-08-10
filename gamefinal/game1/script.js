@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reset() {
             this.x = 150;
             this.y = 200;
-            this.vx = 6;
+            this.vx = 4.8;
             this.vy = 0;
             this.isSwinging = false;
             this.webAnchor = null;
@@ -348,8 +348,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function spideyJump() {
         if (player.onGround || player.isSwinging) {
-            player.vy = -12;
-            player.vx += 2;
+            player.vy = -10.5;
+            player.vx += 1.2;
             if (player.isSwinging) {
                 player.isSwinging = false;
                 player.webAnchor = null;
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let dx = worldMouseX - player.x;
         let dy = worldMouseY - player.y;
         const len = Math.hypot(dx, dy) || 1;
-        const speed = isSuperShot ? 22 : 16;
+        const speed = isSuperShot ? 16 : 12;
         dx = (dx / len) * speed;
         dy = (dy / len) * speed;
 
@@ -666,26 +666,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             if (player.isSwinging) {
-                // Release web swing momentum boost
+                // Release web swing momentum boost (Medium Speed Boost)
                 player.isSwinging = false;
-                player.vx += Math.cos(player.ropeAngle + Math.PI / 2) * (player.ropeAngularVel * 12);
-                player.vy += Math.sin(player.ropeAngle + Math.PI / 2) * (player.ropeAngularVel * 12);
+                player.vx += Math.cos(player.ropeAngle + Math.PI / 2) * (player.ropeAngularVel * 7.5);
+                player.vy += Math.sin(player.ropeAngle + Math.PI / 2) * (player.ropeAngularVel * 7.5);
                 player.webAnchor = null;
             }
         }
 
-        // Physics Updates
+        // Physics Updates (Smooth Medium Speed)
         if (player.isSwinging && player.webAnchor) {
-            webFluid = Math.max(0, webFluid - 0.15);
+            webFluid = Math.max(0, webFluid - 0.12);
             // Pendulum physics
-            const g = 0.5;
+            const g = 0.42;
             const d2theta = (-g / player.ropeLength) * Math.cos(player.ropeAngle);
             player.ropeAngularVel += d2theta;
             player.ropeAngle += player.ropeAngularVel;
 
-            // Apply forward thrust force
-            player.ropeAngularVel *= 0.992;
-            player.ropeAngularVel += 0.0015;
+            // Apply smooth forward thrust force
+            player.ropeAngularVel *= 0.993;
+            player.ropeAngularVel += 0.0009;
 
             player.x = player.webAnchor.x + Math.cos(player.ropeAngle) * player.ropeLength;
             player.y = player.webAnchor.y + Math.sin(player.ropeAngle) * player.ropeLength;
@@ -693,10 +693,10 @@ document.addEventListener('DOMContentLoaded', () => {
             player.vx = -Math.sin(player.ropeAngle) * player.ropeLength * player.ropeAngularVel;
             player.vy = Math.cos(player.ropeAngle) * player.ropeLength * player.ropeAngularVel;
         } else {
-            // Gravity & Air Resistance
-            player.vy += 0.45; // Gravity
-            player.vx *= 0.99; // Air drag
-            player.vx = Math.max(4, Math.min(player.vx, 14)); // Speed boundaries
+            // Smooth Medium Gravity & Air Resistance
+            player.vy += 0.38; // Gentle medium gravity
+            player.vx *= 0.985; // Air drag
+            player.vx = Math.max(3.5, Math.min(player.vx, 8.5)); // Comfortable medium speed cap
 
             player.x += player.vx;
             player.y += player.vy;
