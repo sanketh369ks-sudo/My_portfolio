@@ -32,15 +32,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileBlastBtn = document.getElementById('mobileBlastBtn');
     const mobileJumpBtn = document.getElementById('mobileJumpBtn');
 
-    // Boss HUD & Power Elements
+    // Boss HUD, Power & Combo Elements
     const bossHudBar = document.getElementById('bossHudBar');
     const bossHpText = document.getElementById('bossHpText');
     const bossBarFill = document.getElementById('bossBarFill');
     const bossAlertBanner = document.getElementById('bossAlertBanner');
     const powerDisplay = document.getElementById('powerDisplay');
+    const comboDisplay = document.getElementById('comboDisplay');
+    const spiderSenseBadge = document.getElementById('spiderSenseBadge');
 
     let shootingPower = 100;
     let blastAnimTimer = 0;
+    let comboCount = 0;
+    let comboTimer = 0;
+    let spiderSenseActive = false;
+    let spiderSenseTimer = 0;
+    let timeDilation = 1.0;
 
     // --- Audio Engine (Web Audio API Synthesizer) ---
     let soundMuted = false;
@@ -274,6 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'KeyE') {
             triggerWebBlast();
         }
+        if (e.code === 'KeyQ') {
+            triggerWebTsunami();
+        }
+        if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+            triggerSpiderSense();
+        }
         if (e.code === 'KeyP') {
             togglePause();
         }
@@ -370,6 +383,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Firing sparks
         spawnExplosion(player.x + 15, player.y - 6, isSuperShot ? '#00f0ff' : '#ffffff', isSuperShot ? 16 : 6);
+    }
+
+    function triggerWebTsunami() {
+        if (gameState !== 'playing' || webFluid < 15) return;
+        webFluid -= 15;
+        blastAnimTimer = 22;
+        playSFX('super_blast');
+
+        const baseAngle = Math.atan2(mousePos.y - player.y, (mousePos.x + cameraX) - player.x) || 0;
+        const angles = [-0.4, -0.2, 0, 0.2, 0.4];
+
+        angles.forEach(offset => {
+            const a = baseAngle + offset;
+            webBlasts.push({
+                x: player.x + 18,
+                y: player.y - 6,
+                vx: Math.cos(a) * 18,
+                vy: Math.sin(a) * 18,
+                radius: 10,
+                isSuper: true,
+                life: 65
+            });
+        });
+        spawnExplosion(player.x + 18, player.y - 6, '#00f0ff', 24);
+        updateHUD();
+    }
+
+    function triggerSpiderSense() {
+        if (gameState !== 'playing' || spiderSenseActive) return;
+        spiderSenseActive = true;
+        spiderSenseTimer = 160; // ~3 seconds slow-mo Matrix reflex
+        timeDilation = 0.35;
+        if (spiderSenseBadge) spiderSenseBadge.classList.add('active');
+        playSFX('boss_spawn');
+        spawnExplosion(player.x, player.y, '#ffcb05', 30);
     }
 
     // --- Game World Entities ---
@@ -708,8 +756,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     spawnExplosion(bomb.x, bomb.y, '#ff6600', 20);
                     playSFX('explosion');
                     pumpkinBombs.splice(j, 1);
-                    webBlasts.splice(i, 1);
+                    if (!b.isSuper) webBlasts.splice(i, 1);
                     score += 150;
+                    comboCount++;
+                    comboTimer = 180;
                     break;
                 }
             }
@@ -838,6 +888,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Spider-Sense Matrix Slow-Mo timer
+        if (spiderSenseActive) {
+            spiderSenseTimer--;
+            if (spiderSenseTimer <= 0) {
+                spiderSenseActive = false;
+                timeDilation = 1.0;
+                if (spiderSenseBadge) spiderSenseBadge.classList.remove('active');
+            }
+        }
+
+        // Combo decay timer
+        if (comboTimer > 0) {
+            comboTimer--;
+            if (comboTimer <= 0) {
+                comboCount = 0;
+            }
+        }
+
         // Passive Shooting Power Recharge & Arm Animation Decrement
         shootingPower = Math.min(100, shootingPower + 0.4);
         if (blastAnimTimer > 0) blastAnimTimer--;
@@ -882,6 +950,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 powerDisplay.textContent = `⚡ ${Math.floor(shootingPower)}%`;
                 powerDisplay.style.color = '#ffcb05';
             }
+        }
+
+        if (comboDisplay) {
+            comboDisplay.textContent = comboCount > 0 ? `${comboCount}x` : '0x';
+            comboDisplay.style.color = comboCount >= 3 ? '#ffcb05' : '#ffffff';
         }
     }
 
@@ -1460,6 +1533,12 @@ document.addEventListener('DOMContentLoaded', () => {
         distance = 0;
         lives = 3;
         webFluid = 100;
+        comboCount = 0;
+        comboTimer = 0;
+        spiderSenseActive = false;
+        spiderSenseTimer = 0;
+        timeDilation = 1.0;
+        if (spiderSenseBadge) spiderSenseBadge.classList.remove('active');
         bossProjectiles = [];
         nextBossDistance = 250;
         boss.dismiss();

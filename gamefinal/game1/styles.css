@@ -509,3 +509,39 @@ canvas {
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
     font-size: 1.3rem;
 }
+
+.combo-val {
+    color: var(--spidey-gold);
+    text-shadow: 0 0 10px rgba(255, 203, 5, 0.6);
+    font-size: 1.3rem;
+}
+
+/* Spider-Sense Badge */
+.spider-sense-badge {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 203, 5, 0.95);
+    color: #000000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    padding: 6px 20px;
+    border-radius: 10px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 25px rgba(255, 203, 5, 0.9);
+    z-index: 17;
+    display: none;
+    pointer-events: none;
+}
+
+.spider-sense-badge.active {
+    display: block;
+    animation: sensePulse 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes sensePulse {
+    0% { transform: translateX(-50%) scale(0.95); opacity: 0.8; }
+    100% { transform: translateX(-50%) scale(1.08); opacity: 1.0; }
+}
