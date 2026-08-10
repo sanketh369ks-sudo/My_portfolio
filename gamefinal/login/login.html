@@ -5,39 +5,47 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Responsive Animated Login Form</title>
+	<title>Login - Arcade Hub</title>
+	<!-- Google Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="login.css">
 </head>
 
 <body>
-	<section>
+	<section class="login-wrapper">
 		<div class="login-box">
-			<div>
-				<h2 class="sanketh-h1">Login</h2>
-				<div class="input-box">
-					<span class="icon"><ion-icon name="Username"></ion-icon></span>
-					<input type="Username" required id="username">
-					<label>Email:-sankethmlr@gmail.com</label>
-				</div>
-
-				<div class="input-box">
-					<span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
-					<input type="password" required id="password">
-					<label>Password:-password@369</label>
-				</div>
-
-				<div class="remember-forgot">
-					<!-- <label ><input type="checkbox">Remember me</label> -->
-					<!-- <a href="#">Forgot Password</a> -->
-				</div>
-				<button type="submit" id="submit">Login</button>
-				<div class="register-link">
-					<!-- <p>Don't have an account? <a href="#">Register</a></p> -->
-				</div>
+			<a href="../final.html" class="back-link" title="Return to Arcade Hub Store">← BACK TO STORE</a>
+			
+			<div class="brand-header">
+				<div class="logo-icon">🎮</div>
+				<h2 class="arcade-title">ARCADE HUB</h2>
+				<p class="login-sub">Sign in to access your player profile</p>
 			</div>
 
+			<form id="loginForm">
+				<div class="input-box">
+					<input type="email" required id="username" autocomplete="off" placeholder=" ">
+					<label for="username">Email Address</label>
+				</div>
+
+				<div class="input-box">
+					<input type="password" required id="password" autocomplete="off" placeholder=" ">
+					<label for="password">Password</label>
+				</div>
+
+				<div class="hint-card">
+					<span class="hint-title">🔑 DEMO CREDENTIALS:</span>
+					<span>Email: <code>sankethmlr@gmail.com</code></span>
+					<span>Pass: <code>password@369</code></span>
+				</div>
+
+				<button type="submit" id="submit" class="submit-btn">LOGIN NOW 🚀</button>
+			</form>
 		</div>
 	</section>
+
 	<script src="login.js"></script>
 </body>
 

@@ -142,6 +142,27 @@
             border-radius: 2px;
         }
 
+        .btn-login-nav {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #000000;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login-nav:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+        }
+
         /* Hero */
         .page-hero {
             padding: 70px 5% 30px;
@@ -376,6 +397,7 @@
             <a href="about.html">About</a>
             <a href="services.html">Services</a>
             <a href="contact.html" class="active">Contact</a>
+            <a href="login/login.html"><button id="loginBtn" class="btn-login-nav">Login</button></a>
         </nav>
     </header>
 
