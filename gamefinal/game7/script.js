@@ -58,12 +58,37 @@ let bgOffsetFar = 0;
 let bgOffsetMid = 0;
 let bgOffsetNear = 0;
 
-// Nature elements: Clouds & Drifting Leaves
+// Nature elements: Clouds, Houses, Drifting Leaves & Walking Man
 let clouds = [
     { x: 20, y: 45, scale: 0.8, speed: 0.15 },
     { x: 140, y: 75, scale: 1.1, speed: 0.2 },
     { x: 260, y: 30, scale: 0.7, speed: 0.12 }
 ];
+
+let chimneySmoke = [];
+function updateChimneySmoke(houseX, houseY) {
+    if (Math.random() < 0.09) {
+        chimneySmoke.push({
+            x: houseX + 19,
+            y: houseY - 6,
+            radius: Math.random() * 2 + 1.5,
+            alpha: 0.6,
+            speedY: Math.random() * 0.25 + 0.15
+        });
+    }
+    chimneySmoke.forEach(s => {
+        s.y -= s.speedY;
+        s.x += 0.12;
+        s.radius += 0.04;
+        s.alpha -= 0.008;
+    });
+    chimneySmoke = chimneySmoke.filter(s => s.alpha > 0);
+}
+
+let walkingMan = {
+    x: 60,
+    stepCycle: 0
+};
 
 let particles = [];
 function initParticles() {
@@ -234,9 +259,11 @@ function gameLoop(currentTime) {
     drawClouds();
     drawDistantMountains();
     drawMidgroundHills();
+    drawHouses();
     drawPipes();
     drawNatureParticles();
     drawGround();
+    drawWalkingMan();
     drawBird();
     drawUI();
 }
@@ -250,6 +277,171 @@ function triggerGameOver() {
 }
 
 // --- NATURE GRAPHICS RENDERING FUNCTIONS ---
+
+function drawHouses() {
+    let shift = bgOffsetMid * 1.2;
+
+    const housePositions = [
+        { x: 70 },
+        { x: 260 }
+    ];
+
+    housePositions.forEach((h, idx) => {
+        let posX = (h.x - shift % (canvasWidth + 120) + canvasWidth + 120) % (canvasWidth + 120) - 30;
+        let posY = groundY - 26;
+
+        ctx.save();
+        if (idx === 0) {
+            // House 1: Cozy Stone Cottage with Chimney Smoke
+            updateChimneySmoke(posX, posY);
+            chimneySmoke.forEach(s => {
+                ctx.fillStyle = `rgba(240, 240, 245, ${s.alpha})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Chimney
+            ctx.fillStyle = '#6d4c41';
+            ctx.fillRect(posX + 17, posY - 7, 5, 9);
+
+            // House Walls
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(posX, posY, 26, 18);
+            ctx.strokeStyle = '#4e342e';
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(posX, posY, 26, 18);
+
+            // Roof
+            ctx.fillStyle = '#d84315';
+            ctx.beginPath();
+            ctx.moveTo(posX - 4, posY);
+            ctx.lineTo(posX + 13, posY - 12);
+            ctx.lineTo(posX + 30, posY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Door
+            ctx.fillStyle = '#5d4037';
+            ctx.fillRect(posX + 10, posY + 8, 6, 10);
+
+            // Windows with Warm Glow
+            ctx.fillStyle = '#ffe082';
+            ctx.fillRect(posX + 3, posY + 4, 5, 5);
+            ctx.fillRect(posX + 18, posY + 4, 5, 5);
+            ctx.strokeStyle = '#ffb300';
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(posX + 3, posY + 4, 5, 5);
+            ctx.strokeRect(posX + 18, posY + 4, 5, 5);
+        } else {
+            // House 2: Rustic Mountain Log Cabin
+            ctx.fillStyle = '#8d6e63';
+            ctx.fillRect(posX, posY + 3, 22, 15);
+            ctx.strokeStyle = '#3e2723';
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(posX, posY + 3, 22, 15);
+
+            // Roof
+            ctx.fillStyle = '#37474f';
+            ctx.beginPath();
+            ctx.moveTo(posX - 3, posY + 3);
+            ctx.lineTo(posX + 11, posY - 7);
+            ctx.lineTo(posX + 25, posY + 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Door
+            ctx.fillStyle = '#3e2723';
+            ctx.fillRect(posX + 8, posY + 9, 5, 9);
+
+            // Window
+            ctx.fillStyle = '#ffecb3';
+            ctx.fillRect(posX + 2, posY + 6, 4, 4);
+        }
+        ctx.restore();
+    });
+}
+
+function drawWalkingMan() {
+    // Update Walking Man position & leg animation cycle
+    if (gameStarted && !gameOver) {
+        walkingMan.x -= (pipeSpeed - 0.35);
+    } else {
+        walkingMan.x += 0.35;
+    }
+
+    if (walkingMan.x < -30) {
+        walkingMan.x = canvasWidth + 40;
+    } else if (walkingMan.x > canvasWidth + 50) {
+        walkingMan.x = -30;
+    }
+
+    walkingMan.stepCycle += 0.15;
+
+    ctx.save();
+    let mx = walkingMan.x;
+    let my = groundY - 10;
+    let legSwing = Math.sin(walkingMan.stepCycle) * 4;
+
+    // Shadow on grass
+    ctx.fillStyle = 'rgba(30, 60, 15, 0.35)';
+    ctx.beginPath();
+    ctx.ellipse(mx, groundY - 2, 6, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Legs (Animated Walking Loop)
+    ctx.strokeStyle = '#263238';
+    ctx.lineWidth = 2;
+
+    // Left Leg
+    ctx.beginPath();
+    ctx.moveTo(mx, my - 5);
+    ctx.lineTo(mx + legSwing, groundY - 2);
+    ctx.stroke();
+
+    // Right Leg
+    ctx.beginPath();
+    ctx.moveTo(mx, my - 5);
+    ctx.lineTo(mx - legSwing, groundY - 2);
+    ctx.stroke();
+
+    // Torso / Jacket
+    ctx.fillStyle = '#e53935'; // Red jacket
+    ctx.beginPath();
+    ctx.roundRect(mx - 3, my - 12, 6, 8, 2);
+    ctx.fill();
+
+    // Backpack / Satchel
+    ctx.fillStyle = '#5d4037';
+    ctx.beginPath();
+    ctx.roundRect(mx - 5, my - 11, 3, 5, 1);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = '#ffcc80';
+    ctx.beginPath();
+    ctx.arc(mx, my - 16, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cap (Green Traveler Cap)
+    ctx.fillStyle = '#2e7d32';
+    ctx.beginPath();
+    ctx.arc(mx, my - 17, 3.8, Math.PI, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(mx, my - 17, 4, 1.2); // Cap visor
+
+    // Arms Swinging
+    ctx.strokeStyle = '#ffcc80';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(mx, my - 10);
+    ctx.lineTo(mx - legSwing * 0.8, my - 5);
+    ctx.stroke();
+
+    ctx.restore();
+}
 
 function drawSkyAndSun() {
     let skyGrad = ctx.createLinearGradient(0, 0, 0, canvasHeight);
