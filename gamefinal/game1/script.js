@@ -1420,6 +1420,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let playerTrail = []; // Motion blur trail history
 
     function drawHeroicSpiderMan(ctx, player) {
+        // Suit Color Palette Definitions
+        let suitMain = '#0044cc';
+        let suitAccent = '#ff1e43';
+        let suitGlow = '#ff1e43';
+        let suitLegs = '#021a44';
+        let spiderLogoColor = '#000000';
+
+        if (selectedSuit === 'symbiote') {
+            suitMain = '#111318';
+            suitAccent = '#1f2430';
+            suitGlow = '#ff1e43';
+            suitLegs = '#06070a';
+            spiderLogoColor = '#ffffff';
+        } else if (selectedSuit === 'iron') {
+            suitMain = '#991b1b';
+            suitAccent = '#eab308';
+            suitGlow = '#eab308';
+            suitLegs = '#450a0a';
+            spiderLogoColor = '#eab308';
+        } else if (selectedSuit === '2099') {
+            suitMain = '#0284c7';
+            suitAccent = '#00f0ff';
+            suitGlow = '#00f0ff';
+            suitLegs = '#0369a1';
+            spiderLogoColor = '#ff1e43';
+        }
+
         // Record trail positions for high-speed hero motion blur
         const speed = Math.hypot(player.vx, player.vy);
         if (speed > 6 || player.isSwinging) {
@@ -1434,7 +1461,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.save();
             ctx.translate(t.x, t.y);
             ctx.globalAlpha = (i / playerTrail.length) * 0.35;
-            ctx.fillStyle = '#ff1e43';
+            ctx.fillStyle = suitGlow;
             ctx.beginPath();
             ctx.arc(0, 0, 24, 0, Math.PI * 2);
             ctx.fill();
@@ -1454,8 +1481,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         ctx.rotate(angle);
 
-        // Superhero Intense Red Aura Glow
-        ctx.shadowColor = '#ff1e43';
+        // Superhero Intense Aura Glow
+        ctx.shadowColor = suitGlow;
         ctx.shadowBlur = 18;
 
         const runCycle = Math.sin(player.x * 0.12);
@@ -1466,7 +1493,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Left Leg (Thigh + Calf + Boot)
         ctx.lineWidth = 6;
-        ctx.strokeStyle = '#021a44'; // Deep navy blue suit
+        ctx.strokeStyle = suitLegs;
         ctx.beginPath();
         ctx.moveTo(-6, 16);
         let k1X = player.isSwinging ? -18 : (player.onGround ? -6 + runCycle * 14 : -12);
@@ -1474,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(k1X, k1Y); // Knee joint
         ctx.stroke();
 
-        ctx.strokeStyle = '#ff1e43'; // Red Boot
+        ctx.strokeStyle = suitAccent;
         ctx.beginPath();
         ctx.moveTo(k1X, k1Y);
         let b1X = k1X + (player.isSwinging ? -6 : 6);
@@ -1484,7 +1511,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Right Leg (Foreground Thigh + Calf + Boot)
         ctx.lineWidth = 6.5;
-        ctx.strokeStyle = '#0044cc';
+        ctx.strokeStyle = suitMain;
         ctx.beginPath();
         ctx.moveTo(6, 16);
         let k2X = player.isSwinging ? 14 : (player.onGround ? 6 - runCycle * 14 : 16);
@@ -1492,7 +1519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(k2X, k2Y);
         ctx.stroke();
 
-        ctx.strokeStyle = '#ff1e43';
+        ctx.strokeStyle = suitAccent;
         ctx.beginPath();
         ctx.moveTo(k2X, k2Y);
         let b2X = k2X + 8;
@@ -1524,12 +1551,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
 
         // --- 5. V-TAPER MUSCULAR TORSO & SUIT ---
-        // Blue Waist & Obliques
-        ctx.fillStyle = '#021a44';
+        // Waist & Obliques
+        ctx.fillStyle = suitLegs;
         ctx.fillRect(-9, 6, 18, 12);
 
         // Muscle Side Panels
-        ctx.fillStyle = '#0044cc';
+        ctx.fillStyle = suitMain;
         ctx.beginPath();
         ctx.moveTo(-9, 6); ctx.lineTo(-14, -14); ctx.lineTo(-9, -14); ctx.lineTo(-6, 6);
         ctx.closePath(); ctx.fill();
@@ -1537,8 +1564,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.moveTo(9, 6); ctx.lineTo(14, -14); ctx.lineTo(9, -14); ctx.lineTo(6, 6);
         ctx.closePath(); ctx.fill();
 
-        // Broad Red Muscular Pectoral Chest
-        ctx.fillStyle = '#ff1e43';
+        // Broad Muscular Pectoral Chest
+        ctx.fillStyle = suitAccent;
         ctx.beginPath();
         ctx.moveTo(-11, 6);
         ctx.lineTo(-15, -16);
@@ -1551,20 +1578,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(0, -16); ctx.lineTo(0, 6); // Sternum line
-        ctx.moveTo(-10, -5); ctx.lineTo(0, -3); ctx.lineTo(10, -5); // Pec cut
-        ctx.moveTo(-6, 1); ctx.lineTo(6, 1); // Ab line
+        ctx.moveTo(0, -16); ctx.lineTo(0, 6);
+        ctx.moveTo(-10, -5); ctx.lineTo(0, -3); ctx.lineTo(10, -5);
+        ctx.moveTo(-6, 1); ctx.lineTo(6, 1);
         ctx.stroke();
 
-        // Iconic Black Spider Emblem 🕷️
-        ctx.fillStyle = '#000000';
+        // Iconic Spider Emblem 🕷️
+        ctx.fillStyle = spiderLogoColor;
         ctx.beginPath();
-        ctx.ellipse(0, -6, 3.5, 6, 0, 0, Math.PI * 2); // Body
+        ctx.ellipse(0, -6, 3.5, 6, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = spiderLogoColor;
         ctx.lineWidth = 1.6;
         ctx.beginPath();
-        // Spider legs extending outward
         ctx.moveTo(0, -9); ctx.lineTo(-9, -13);
         ctx.moveTo(0, -9); ctx.lineTo(9, -13);
         ctx.moveTo(0, -6); ctx.lineTo(-11, -4);
@@ -2205,6 +2231,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gameOverOverlay.classList.add('active');
     }
+
+    // Multiverse Suit Selection State
+    let selectedSuit = 'classic';
+    const suitBtns = document.querySelectorAll('.suit-btn');
+    suitBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            suitBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedSuit = btn.dataset.suit || 'classic';
+            playSFX('thwip');
+        });
+    });
 
     // Button Click & Overlay Listeners
     startBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); startGame(); });

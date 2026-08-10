@@ -860,3 +860,73 @@ canvas {
     0% { transform: translateY(-50%) scale(0.9); }
     100% { transform: translateY(-50%) scale(1.25); }
 }
+
+/* Multiverse Suit Locker Styles */
+.suit-locker {
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.suit-locker-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+.suit-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.suit-btn {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 8px 4px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.suit-btn:hover {
+    border-color: var(--spidey-cyan);
+    transform: translateY(-2px);
+    background: rgba(0, 240, 255, 0.1);
+}
+
+.suit-btn.active {
+    border-color: var(--spidey-gold);
+    background: linear-gradient(135deg, rgba(255, 30, 67, 0.4) 0%, rgba(255, 203, 5, 0.2) 100%);
+    box-shadow: 0 0 14px rgba(255, 203, 5, 0.4);
+}
+
+.suit-icon {
+    font-size: 1.3rem;
+}
+
+.suit-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .suit-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    
+    .suit-btn {
+        padding: 6px 4px;
+    }
+}
