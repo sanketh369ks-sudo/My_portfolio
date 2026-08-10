@@ -375,13 +375,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e) e.preventDefault();
             onEnd();
         };
-        element.addEventListener('pointerdown', start);
-        element.addEventListener('pointerup', end);
-        element.addEventListener('pointercancel', end);
-        element.addEventListener('mousedown', start);
-        element.addEventListener('mouseup', end);
-        element.addEventListener('touchstart', start);
-        element.addEventListener('touchend', end);
+        if (window.PointerEvent) {
+            element.addEventListener('pointerdown', start);
+            element.addEventListener('pointerup', end);
+            element.addEventListener('pointercancel', end);
+        } else {
+            element.addEventListener('mousedown', start);
+            element.addEventListener('mouseup', end);
+            element.addEventListener('touchstart', start);
+            element.addEventListener('touchend', end);
+        }
     };
 
     addHoldListener(mobileSwingBtn, () => { isSwingingInput = true; }, () => { isSwingingInput = false; });
@@ -2052,9 +2055,32 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore(); // Restore camera translation
     }
 
-    // --- Main Game Loop ---
-    function loop() {
-        update();
+    // --- Fixed 60 FPS Timestep Game Loop ---
+    let lastFrameTime = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS; // ~16.667ms per frame
+    let accumDelta = 0;
+
+    function loop(timestamp) {
+        if (!lastFrameTime) {
+            lastFrameTime = timestamp;
+        }
+        let deltaTime = timestamp - lastFrameTime;
+        lastFrameTime = timestamp;
+
+        // Prevent frame time explosion after tab switching or long pauses
+        if (deltaTime > 250) deltaTime = 250;
+
+        accumDelta += deltaTime;
+
+        // Update physics & game logic at consistent 60 FPS medium speed across all displays (60Hz, 120Hz, 144Hz, 240Hz)
+        while (accumDelta >= frameInterval) {
+            if (gameState === 'playing') {
+                update();
+            }
+            accumDelta -= frameInterval;
+        }
+
         render();
         requestAnimationFrame(loop);
     }
@@ -2070,6 +2096,8 @@ document.addEventListener('DOMContentLoaded', () => {
         spiderSenseActive = false;
         spiderSenseTimer = 0;
         timeDilation = 1.0;
+        lastFrameTime = 0;
+        accumDelta = 0;
         if (spiderSenseBadge) spiderSenseBadge.classList.remove('active');
         bossProjectiles = [];
         nextBossDistance = 250;
@@ -2089,6 +2117,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pauseOverlay.classList.add('active');
         } else if (gameState === 'paused') {
             gameState = 'playing';
+            lastFrameTime = 0;
+            accumDelta = 0;
             pauseOverlay.classList.remove('active');
         }
     }
