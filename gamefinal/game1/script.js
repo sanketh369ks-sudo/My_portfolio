@@ -32,11 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileBlastBtn = document.getElementById('mobileBlastBtn');
     const mobileJumpBtn = document.getElementById('mobileJumpBtn');
 
-    // Boss HUD Elements
+    // Boss HUD & Power Elements
     const bossHudBar = document.getElementById('bossHudBar');
     const bossHpText = document.getElementById('bossHpText');
     const bossBarFill = document.getElementById('bossBarFill');
     const bossAlertBanner = document.getElementById('bossAlertBanner');
+    const powerDisplay = document.getElementById('powerDisplay');
+
+    let shootingPower = 100;
+    let blastAnimTimer = 0;
 
     // --- Audio Engine (Web Audio API Synthesizer) ---
     let soundMuted = false;
@@ -164,6 +168,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 gain.connect(actx.destination);
                 osc.start(now);
                 osc.stop(now + 0.2);
+            } else if (type === 'super_blast') { // Mega Web Cannon shot
+                const osc1 = actx.createOscillator();
+                const osc2 = actx.createOscillator();
+                const gain = actx.createGain();
+                osc1.type = 'sawtooth';
+                osc2.type = 'square';
+                osc1.frequency.setValueAtTime(1100, now);
+                osc1.exponentialRampToValueAtTime(150, now + 0.35);
+                osc2.frequency.setValueAtTime(550, now);
+                osc2.exponentialRampToValueAtTime(90, now + 0.35);
+                gain.gain.setValueAtTime(0.45, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(actx.destination);
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 0.35);
+                osc2.stop(now + 0.35);
             }
         } catch (e) {
             console.log('Audio playback error:', e);
@@ -293,10 +316,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function triggerWebBlast() {
-        if (gameState !== 'playing' || webFluid < 10) return;
-        webFluid -= 10;
+        if (gameState !== 'playing' || webFluid < 8) return;
+        webFluid -= 8;
+        blastAnimTimer = 18; // Trigger thwip arm shooting pose for 18 frames
+
+        const isSuperShot = shootingPower >= 100;
+        if (isSuperShot) {
+            shootingPower = 0;
+            playSFX('super_blast');
+        } else {
+            shootingPower = Math.max(0, shootingPower - 25);
+            playSFX('blast');
+        }
         updateHUD();
-        playSFX('blast');
 
         // Target vector towards mouse or straight forward
         const worldMouseX = mousePos.x + cameraX;
@@ -304,17 +336,22 @@ document.addEventListener('DOMContentLoaded', () => {
         let dx = worldMouseX - player.x;
         let dy = worldMouseY - player.y;
         const len = Math.hypot(dx, dy) || 1;
-        dx = (dx / len) * 16;
-        dy = (dy / len) * 16;
+        const speed = isSuperShot ? 22 : 16;
+        dx = (dx / len) * speed;
+        dy = (dy / len) * speed;
 
         webBlasts.push({
-            x: player.x + 10,
-            y: player.y,
+            x: player.x + 15,
+            y: player.y - 6,
             vx: dx,
             vy: dy,
-            radius: 6,
-            life: 60
+            radius: isSuperShot ? 16 : 8,
+            isSuper: isSuperShot,
+            life: 75
         });
+
+        // Firing sparks
+        spawnExplosion(player.x + 15, player.y - 6, isSuperShot ? '#00f0ff' : '#ffffff', isSuperShot ? 16 : 6);
     }
 
     // --- Game World Entities ---
@@ -622,10 +659,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (boss.active) {
                 const distBoss = Math.hypot(b.x - boss.x, b.y - boss.y);
                 if (distBoss < b.radius + boss.radius) {
-                    boss.hp -= 15;
+                    const dmg = b.isSuper ? 35 : 15;
+                    boss.hp -= dmg;
                     playSFX('boss_hit');
-                    spawnExplosion(b.x, b.y, '#ff1e43', 16);
-                    webBlasts.splice(i, 1);
+                    spawnExplosion(b.x, b.y, b.isSuper ? '#00f0ff' : '#ff1e43', b.isSuper ? 28 : 16);
+                    if (!b.isSuper) webBlasts.splice(i, 1);
                     updateBossHUD();
 
                     if (boss.hp <= 0) {
@@ -636,10 +674,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         playSFX('explosion');
                         score += 2500;
                         webFluid = 100;
+                        shootingPower = 100;
                         boss.dismiss();
                         nextBossDistance = distance + 400;
                     }
-                    continue;
+                    if (!b.isSuper) continue;
                 }
             }
 
@@ -781,6 +820,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Passive Shooting Power Recharge & Arm Animation Decrement
+        shootingPower = Math.min(100, shootingPower + 0.4);
+        if (blastAnimTimer > 0) blastAnimTimer--;
+
         // Score & Distance Progress
         score += 1;
         distance = Math.floor(player.x / 10);
@@ -812,6 +855,16 @@ document.addEventListener('DOMContentLoaded', () => {
         distanceDisplay.textContent = distance + 'm';
         fluidBar.style.width = Math.max(0, Math.min(100, webFluid)) + '%';
         livesDisplay.textContent = '❤️'.repeat(Math.max(0, lives));
+
+        if (powerDisplay) {
+            if (shootingPower >= 100) {
+                powerDisplay.textContent = '⚡ SUPER';
+                powerDisplay.style.color = '#00f0ff';
+            } else {
+                powerDisplay.textContent = `⚡ ${Math.floor(shootingPower)}%`;
+                powerDisplay.style.color = '#ffcb05';
+            }
+        }
     }
 
     // --- Canvas Rendering ---
@@ -846,9 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             ctx.closePath();
             ctx.stroke();
-        });
-
-        ctx.restore();
+             ctx.restore();
     }
 
     function drawSpikyBoss(ctx, x, y, radius, spikes, pulse) {
@@ -898,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowColor = '#ffffff';
         ctx.shadowBlur = 10;
 
-        // Left eye
+        // Left Eye
         ctx.beginPath();
         ctx.moveTo(-12, -6);
         ctx.lineTo(-4, 0);
@@ -906,7 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
         ctx.fill();
 
-        // Right eye
+        // Right Eye
         ctx.beginPath();
         ctx.moveTo(12, -6);
         ctx.lineTo(4, 0);
@@ -914,6 +965,181 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
         ctx.fill();
 
+        ctx.restore();
+    }
+
+    function drawHumanoidSpiderMan(ctx, player) {
+        ctx.save();
+        ctx.translate(player.x, player.y);
+
+        // 1. Dynamic Body Orientation Angle
+        let angle = 0;
+        if (player.isSwinging && player.webAnchor) {
+            angle = player.ropeAngle + Math.PI / 2;
+        } else {
+            angle = Math.atan2(player.vy, player.vx) * 0.25;
+        }
+        ctx.rotate(angle);
+
+        // Glowing Spider-Man Hero Aura
+        ctx.shadowColor = '#ff1e43';
+        ctx.shadowBlur = 12;
+
+        // --- 2. LEGS & BOOTS ---
+        const runCycle = Math.sin(player.x * 0.15);
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+
+        // Left Leg (Behind)
+        ctx.strokeStyle = '#0055ff'; // Blue suit tights
+        ctx.beginPath();
+        ctx.moveTo(-3, 10);
+        let leg1X = player.isSwinging ? -12 : (player.onGround ? -3 + runCycle * 8 : -8);
+        let leg1Y = player.isSwinging ? 22 : (player.onGround ? 22 : 18);
+        ctx.lineTo(leg1X, leg1Y);
+        ctx.stroke();
+
+        // Left Red Boot
+        ctx.strokeStyle = '#ff1e43';
+        ctx.beginPath();
+        ctx.moveTo(leg1X, leg1Y);
+        ctx.lineTo(leg1X + 4, leg1Y + 6);
+        ctx.stroke();
+
+        // Right Leg (Foreground)
+        ctx.strokeStyle = '#0055ff';
+        ctx.beginPath();
+        ctx.moveTo(3, 10);
+        let leg2X = player.isSwinging ? 8 : (player.onGround ? 3 - runCycle * 8 : 10);
+        let leg2Y = player.isSwinging ? 25 : (player.onGround ? 22 : 20);
+        ctx.lineTo(leg2X, leg2Y);
+        ctx.stroke();
+
+        // Right Red Boot
+        ctx.strokeStyle = '#ff1e43';
+        ctx.beginPath();
+        ctx.moveTo(leg2X, leg2Y);
+        ctx.lineTo(leg2X + 5, leg2Y + 6);
+        ctx.stroke();
+
+        // --- 3. TORSO & SUIT ---
+        // Blue Waist / Hips
+        ctx.fillStyle = '#0055ff';
+        ctx.fillRect(-6, 4, 12, 8);
+
+        // Red Muscular Chest & Shoulders
+        ctx.fillStyle = '#ff1e43';
+        ctx.beginPath();
+        ctx.moveTo(-7, 4);
+        ctx.lineTo(-9, -10);
+        ctx.lineTo(9, -10);
+        ctx.lineTo(7, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Chest Spider Emblem 🕷️
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.ellipse(0, -3, 2.5, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(0, -5); ctx.lineTo(-6, -8);
+        ctx.moveTo(0, -5); ctx.lineTo(6, -8);
+        ctx.moveTo(0, -2); ctx.lineTo(-6, 2);
+        ctx.moveTo(0, -2); ctx.lineTo(6, 2);
+        ctx.stroke();
+
+        // --- 4. ARMS & HANDS (THWIP POSES) ---
+        ctx.lineWidth = 3.5;
+
+        // Left Arm (Holding Web Line if swinging)
+        ctx.strokeStyle = '#ff1e43';
+        ctx.beginPath();
+        ctx.moveTo(-7, -8);
+        if (player.isSwinging) {
+            ctx.lineTo(-4, -22); // Reaching up to web rope
+        } else {
+            ctx.lineTo(-14, 2);
+        }
+        ctx.stroke();
+
+        // Right Arm (Shooting Arm with Thwip Gesture!)
+        ctx.strokeStyle = '#ff1e43';
+        ctx.beginPath();
+        ctx.moveTo(7, -8);
+        if (blastAnimTimer > 0) {
+            ctx.lineTo(22, -6); // Straight forward aiming web blast!
+        } else if (player.isSwinging) {
+            ctx.lineTo(12, 6);
+        } else {
+            ctx.lineTo(15, -2);
+        }
+        ctx.stroke();
+
+        // Thwip Hand Gesture & Gauntlet
+        let handX = blastAnimTimer > 0 ? 22 : (player.isSwinging ? 12 : 15);
+        let handY = blastAnimTimer > 0 ? -6 : (player.isSwinging ? 6 : -2);
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(handX, handY, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Web blast spark from hand when shooting
+        if (blastAnimTimer > 0) {
+            ctx.fillStyle = '#00f0ff';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(handX + 5, handY, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // --- 5. MASK HEAD & WHITE EYES ---
+        // Neck
+        ctx.fillStyle = '#ff1e43';
+        ctx.fillRect(-3, -13, 6, 4);
+
+        // Head Oval Mask
+        ctx.beginPath();
+        ctx.ellipse(0, -18, 7.5, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Web Lattice Lines on Mask
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, -27); ctx.lineTo(0, -9);
+        ctx.moveTo(-7.5, -18); ctx.lineTo(7.5, -18);
+        ctx.stroke();
+
+        // Large Iconic White Spider Eyes with Black Borders
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 8;
+
+        // Left Eye
+        ctx.beginPath();
+        ctx.moveTo(-1, -19);
+        ctx.lineTo(-7, -21);
+        ctx.lineTo(-5, -15);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Right Eye
+        ctx.beginPath();
+        ctx.moveTo(1, -19);
+        ctx.lineTo(7, -21);
+        ctx.lineTo(5, -15);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
         ctx.restore();
     }
 
@@ -1058,12 +1284,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 9. Draw Web Blasts
         webBlasts.forEach(b => {
-            ctx.fillStyle = '#00f0ff';
-            ctx.shadowColor = '#00f0ff';
-            ctx.shadowBlur = 12;
-            ctx.beginPath();
-            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-            ctx.fill();
+            if (b.isSuper) {
+                // Mega Super Web Cannon Shot
+                ctx.fillStyle = '#00f0ff';
+                ctx.shadowColor = '#00f0ff';
+                ctx.shadowBlur = 18;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Bright inner white core
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Trailing shockwave web rings
+                ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(b.x - b.vx * 0.8, b.y - b.vy * 0.8, b.radius * 1.4, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = '#00f0ff';
+                ctx.shadowColor = '#00f0ff';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.shadowBlur = 0;
         });
 
@@ -1098,34 +1347,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         ctx.globalAlpha = 1.0;
 
-        // 11. Draw Spider-Man Character
-        ctx.save();
-        ctx.translate(player.x, player.y);
-
-        // Character Glow
-        ctx.shadowColor = '#ff1e43';
-        ctx.shadowBlur = 15;
-
-        // Spidey Suit Body (Red/Blue Dual-tone)
-        ctx.fillStyle = '#ff1e43';
-        ctx.beginPath();
-        ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#0072ff';
-        ctx.beginPath();
-        ctx.arc(0, 3, player.radius * 0.6, 0, Math.PI);
-        ctx.fill();
-
-        // Spider Suit Eyes
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.ellipse(-6, -4, 5, 8, -Math.PI / 6, 0, Math.PI * 2);
-        ctx.ellipse(6, -4, 5, 8, Math.PI / 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        ctx.restore();
+        // 11. Draw Humanoid Animated Spider-Man Character
+        drawHumanoidSpiderMan(ctx, player);
 
         ctx.restore(); // Restore camera translation
     }
