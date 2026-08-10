@@ -1638,6 +1638,147 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    function drawRealisticBuilding(ctx, b, index) {
+        ctx.save();
+        const bTop = canvas.height - b.height;
+        const styleType = index % 3; // 0: Glass Skyscraper, 1: Brick High-Rise, 2: Steel Tech Tower
+
+        // 1. BUILDING BASE BODY & FACADE
+        let bodyGrad;
+        if (styleType === 0) {
+            bodyGrad = ctx.createLinearGradient(b.x, bTop, b.x + b.width, canvas.height);
+            bodyGrad.addColorStop(0, '#1e293b');
+            bodyGrad.addColorStop(0.5, '#0f172a');
+            bodyGrad.addColorStop(1, '#020617');
+        } else if (styleType === 1) {
+            bodyGrad = ctx.createLinearGradient(b.x, bTop, b.x + b.width, canvas.height);
+            bodyGrad.addColorStop(0, '#451a03');
+            bodyGrad.addColorStop(0.6, '#290e02');
+            bodyGrad.addColorStop(1, '#0f0501');
+        } else {
+            bodyGrad = ctx.createLinearGradient(b.x, bTop, b.x + b.width, canvas.height);
+            bodyGrad.addColorStop(0, '#1e1b4b');
+            bodyGrad.addColorStop(0.5, '#0f172a');
+            bodyGrad.addColorStop(1, '#020617');
+        }
+
+        ctx.fillStyle = bodyGrad;
+        ctx.fillRect(b.x, bTop, b.width, b.height);
+
+        // Architectural Border Highlight
+        ctx.strokeStyle = styleType === 0 ? 'rgba(56, 189, 248, 0.5)' : (styleType === 1 ? 'rgba(180, 83, 9, 0.5)' : 'rgba(99, 102, 241, 0.5)');
+        ctx.lineWidth = 2;
+        ctx.strokeRect(b.x, bTop, b.width, b.height);
+
+        // 2. ILLUMINATED WINDOW GRIDS
+        const winW = 8;
+        const winH = 12;
+        const padX = 14;
+        const padY = 18;
+        const cols = Math.floor((b.width - 20) / padX);
+        const rows = Math.floor((b.height - 30) / padY);
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const wx = b.x + 12 + c * padX;
+                const wy = bTop + 20 + r * padY;
+
+                // Deterministic window lighting pattern
+                const seed = (index * 997 + r * 31 + c * 17) % 100;
+                if (seed > 35) {
+                    ctx.fillStyle = seed > 70 ? '#fef08a' : (styleType === 0 ? '#38bdf8' : '#f59e0b');
+                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.shadowBlur = 5;
+                    ctx.fillRect(wx, wy, winW, winH);
+                } else {
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+                    ctx.shadowBlur = 0;
+                    ctx.fillRect(wx, wy, winW, winH);
+                }
+            }
+        }
+        ctx.shadowBlur = 0;
+
+        // Vertical Facade Ribs (Modern Glass Mullions)
+        if (styleType === 0) {
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+            ctx.lineWidth = 1;
+            for (let x = b.x + 25; x < b.x + b.width - 15; x += 25) {
+                ctx.beginPath();
+                ctx.moveTo(x, bTop);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+        }
+
+        // 3. ROOFTOP DETAILS
+        // Rooftop Ledge / Parapet
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(b.x - 4, bTop - 4, b.width + 8, 6);
+
+        if (index % 2 === 0) {
+            // Rooftop Wooden Water Tower
+            const wtX = b.x + b.width * 0.25;
+            const wtY = bTop - 32;
+
+            // Steel Legs
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(wtX - 10, bTop - 4); ctx.lineTo(wtX - 6, wtY + 18);
+            ctx.moveTo(wtX + 10, bTop - 4); ctx.lineTo(wtX + 6, wtY + 18);
+            ctx.stroke();
+
+            // Wooden Cylinder Barrel
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(wtX - 12, wtY, 24, 18);
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(wtX - 12, wtY + 6, 24, 2);
+            ctx.fillRect(wtX - 12, wtY + 12, 24, 2);
+
+            // Conical Roof
+            ctx.fillStyle = '#92400e';
+            ctx.beginPath();
+            ctx.moveTo(wtX - 14, wtY);
+            ctx.lineTo(wtX, wtY - 10);
+            ctx.lineTo(wtX + 14, wtY);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        if (index % 2 === 1) {
+            // Rooftop Antenna Spire with Flashing Red Beacon
+            const spX = b.x + b.width * 0.75;
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(spX, bTop - 4);
+            ctx.lineTo(spX, bTop - 45);
+            ctx.stroke();
+
+            // Flashing Red Beacon Light
+            const beaconPulse = Math.sin(Date.now() * 0.005 + index) > 0;
+            ctx.fillStyle = beaconPulse ? '#ef4444' : '#7f1d1d';
+            ctx.shadowColor = '#ef4444';
+            ctx.shadowBlur = beaconPulse ? 16 : 0;
+            ctx.beginPath();
+            ctx.arc(spX, bTop - 46, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        // Web Anchor Target Node atop rooftop
+        ctx.fillStyle = '#00f0ff';
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(b.anchorX, b.anchorY, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.restore();
+    }
+
     // --- Canvas Rendering ---
     function render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1681,40 +1822,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.save();
         ctx.translate(-cameraX, 0);
 
-        // 5. Foreground Skyscrapers & Web Anchor Targets
-        buildings.forEach(b => {
-            const bY = canvas.height - b.height;
-
-            // Building Shadow & Body Gradient
-            const bGradient = ctx.createLinearGradient(b.x, bY, b.x + b.width, canvas.height);
-            bGradient.addColorStop(0, '#1e293b');
-            bGradient.addColorStop(1, '#0f172a');
-            ctx.fillStyle = bGradient;
-            ctx.fillRect(b.x, bY, b.width, b.height);
-
-            // Building Neon Edge Top Border
-            ctx.strokeStyle = '#ff1e43';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(b.x, bY, b.width, b.height);
-
-            // Glowing Window Grid
-            ctx.fillStyle = 'rgba(255, 203, 5, 0.4)';
-            for (let wx = b.x + 15; wx < b.x + b.width - 15; wx += 25) {
-                for (let wy = bY + 20; wy < canvas.height - 30; wy += 35) {
-                    if ((wx + wy) % 3 === 0) {
-                        ctx.fillRect(wx, wy, 12, 18);
-                    }
-                }
-            }
-
-            // Web Anchor Target Node atop rooftop
-            ctx.fillStyle = '#00f0ff';
-            ctx.shadowColor = '#00f0ff';
-            ctx.shadowBlur = 12;
-            ctx.beginPath();
-            ctx.arc(b.anchorX, b.anchorY, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
+        // 5. Realistic NYC Skyscrapers & Rooftop Details
+        buildings.forEach((b, idx) => {
+            drawRealisticBuilding(ctx, b, idx);
         });
 
         // 6. Draw Web Line when Swinging
