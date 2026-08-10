@@ -90,8 +90,8 @@ let walkingMan = {
     stepCycle: 0
 };
 
-// Floating Algebra / Math Symbols Particles
-const mathSymbolsList = ['π', '∑', '√x', 'f(x)', '∞', 'θ', 'Δ', 'α', 'β', 'x²', '∫', 'y=mx+c'];
+// Floating Algebra / Math Symbols + Sanketh Branding Particles
+const mathSymbolsList = ['π', '∑', '√x', 'f(x)', '∞', 'θ', 'Δ', 'α', 'β', 'x²', 'Sanketh', 'y=mx+c'];
 let particles = [];
 function initParticles() {
     particles = [];
@@ -100,7 +100,7 @@ function initParticles() {
             x: Math.random() * canvasWidth,
             y: Math.random() * (groundY - 30),
             symbol: mathSymbolsList[Math.floor(Math.random() * mathSymbolsList.length)],
-            fontSize: Math.random() * 5 + 10,
+            fontSize: Math.random() * 4 + 10,
             speedX: Math.random() * 0.4 + 0.25,
             speedY: Math.random() * 0.25 + 0.05,
             oscillation: Math.random() * Math.PI * 2,
@@ -263,7 +263,7 @@ function triggerGameOver() {
     }
 }
 
-// --- RENDERING FUNCTIONS (ALGEBRA NATURE THEME) ---
+// --- RENDERING FUNCTIONS ---
 
 function drawSkyAndAlgebraGrid() {
     // Algebra Midnight Sky Gradient
@@ -279,14 +279,12 @@ function drawSkyAndAlgebraGrid() {
     ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
     ctx.lineWidth = 1;
 
-    // Vertical grid lines
     for (let x = 0; x < canvasWidth; x += 25) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, groundY);
         ctx.stroke();
     }
-    // Horizontal grid lines
     for (let y = 0; y < groundY; y += 25) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -294,7 +292,7 @@ function drawSkyAndAlgebraGrid() {
         ctx.stroke();
     }
 
-    // Mathematical Sine Wave Function Curve: f(x) = sin(x)
+    // Mathematical Sine Wave Function Curve
     ctx.strokeStyle = 'rgba(192, 132, 252, 0.35)';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -305,7 +303,7 @@ function drawSkyAndAlgebraGrid() {
     }
     ctx.stroke();
 
-    // Glowing Algebra Sun Disk (Golden Ratio Spiral Sun)
+    // Glowing Algebra Sun Disk
     const sunX = 250;
     const sunY = 70;
     
@@ -354,7 +352,6 @@ function drawClouds() {
 }
 
 function drawDistantMountains() {
-    // Parallax Violet/Indigo Math Peaks
     ctx.fillStyle = '#4c1d95';
     ctx.beginPath();
 
@@ -379,7 +376,6 @@ function drawDistantMountains() {
     ctx.closePath();
     ctx.fill();
 
-    // Glowing Neon Purple Snow Caps
     ctx.fillStyle = 'rgba(192, 132, 252, 0.75)';
     for (let i = 0; i < 3; i++) {
         let offsetX = i * 360 - shift;
@@ -404,7 +400,6 @@ function drawDistantMountains() {
 function drawMidgroundHills() {
     let shift = bgOffsetMid;
 
-    // Back Emerald Sine-wave Hill
     ctx.fillStyle = '#059669';
     ctx.beginPath();
     ctx.moveTo(-20, groundY);
@@ -418,7 +413,6 @@ function drawMidgroundHills() {
     ctx.closePath();
     ctx.fill();
 
-    // Front Neon Teal Hill
     ctx.fillStyle = '#10b981';
     ctx.beginPath();
     ctx.moveTo(-20, groundY);
@@ -432,7 +426,6 @@ function drawMidgroundHills() {
     ctx.closePath();
     ctx.fill();
 
-    // Pine Trees along the hill ridge
     ctx.fillStyle = '#047857';
     for (let i = -1; i < 6; i++) {
         let treeX = (i * 85 - (shift * 1.5) % 85 + 85) % (canvasWidth + 80) - 20;
@@ -472,7 +465,6 @@ function drawHouses() {
 
         ctx.save();
         if (idx === 0) {
-            // House 1: Geometric Math Cottage with Chimney Smoke
             updateChimneySmoke(posX, posY);
             chimneySmoke.forEach(s => {
                 ctx.fillStyle = `rgba(56, 189, 248, ${s.alpha * 0.8})`;
@@ -490,7 +482,7 @@ function drawHouses() {
             ctx.lineWidth = 1.4;
             ctx.strokeRect(posX, posY, 26, 18);
 
-            ctx.fillStyle = '#7c3aed'; // Vibrant Purple Roof
+            ctx.fillStyle = '#7c3aed';
             ctx.beginPath();
             ctx.moveTo(posX - 4, posY);
             ctx.lineTo(posX + 13, posY - 12);
@@ -502,7 +494,6 @@ function drawHouses() {
             ctx.fillStyle = '#334155';
             ctx.fillRect(posX + 10, posY + 8, 6, 10);
 
-            // Windows with Electric Cyan Glow
             ctx.fillStyle = '#38bdf8';
             ctx.fillRect(posX + 3, posY + 4, 5, 5);
             ctx.fillRect(posX + 18, posY + 4, 5, 5);
@@ -511,14 +502,13 @@ function drawHouses() {
             ctx.strokeRect(posX + 3, posY + 4, 5, 5);
             ctx.strokeRect(posX + 18, posY + 4, 5, 5);
         } else {
-            // House 2: Indigo Math Cabin
             ctx.fillStyle = '#64748b';
             ctx.fillRect(posX, posY + 3, 22, 15);
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1.2;
             ctx.strokeRect(posX, posY + 3, 22, 15);
 
-            ctx.fillStyle = '#0284c7'; // Cyan Roof
+            ctx.fillStyle = '#0284c7';
             ctx.beginPath();
             ctx.moveTo(posX - 3, posY + 3);
             ctx.lineTo(posX + 11, posY - 7);
@@ -711,7 +701,6 @@ function drawWalkingMan() {
     ctx.lineTo(mx - legSwing, groundY - 2);
     ctx.stroke();
 
-    // Torso (Electric Blue Hoodie)
     ctx.fillStyle = '#0284c7';
     ctx.beginPath();
     ctx.roundRect(mx - 3, my - 12, 6, 8, 2);
@@ -727,7 +716,6 @@ function drawWalkingMan() {
     ctx.arc(mx, my - 16, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Cap (Cyan Cap)
     ctx.fillStyle = '#38bdf8';
     ctx.beginPath();
     ctx.arc(mx, my - 17, 3.8, Math.PI, Math.PI * 2);
@@ -814,10 +802,33 @@ function drawBird() {
 function drawUI() {
     ctx.save();
     
-    let plateX = canvasWidth / 2 - 50;
+    // Creator Branding Badge: SANKETH
+    let brandX = 12;
+    let brandY = 12;
+    let brandW = 76;
+    let brandH = 26;
+
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+    ctx.beginPath();
+    ctx.roundRect(brandX, brandY, brandW, brandH, 8);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 11px "Segoe UI", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#38bdf8';
+    ctx.shadowBlur = 4;
+    ctx.fillText('SANKETH', brandX + brandW / 2, brandY + 17);
+    ctx.shadowBlur = 0;
+
+    // Score Plate (Center)
+    let plateX = canvasWidth / 2 - 35;
     let plateY = 12;
-    let plateW = 100;
-    let plateH = 34;
+    let plateW = 70;
+    let plateH = 30;
 
     ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
     ctx.beginPath();
@@ -828,20 +839,20 @@ function drawUI() {
     ctx.stroke();
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px "Segoe UI", Arial, sans-serif';
+    ctx.font = 'bold 17px "Segoe UI", Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.shadowColor = '#38bdf8';
     ctx.shadowBlur = 6;
-    ctx.fillText(`${score}`, canvasWidth / 2, plateY + 23);
+    ctx.fillText(`${score}`, canvasWidth / 2, plateY + 21);
     ctx.restore();
 
     if (!gameStarted) {
         ctx.save();
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.68)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        let cardW = 240;
-        let cardH = 160;
+        let cardW = 248;
+        let cardH = 175;
         let cardX = (canvasWidth - cardW) / 2;
         let cardY = (canvasHeight - cardH) / 2 - 10;
 
@@ -857,21 +868,25 @@ function drawUI() {
         ctx.stroke();
 
         ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 19px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.shadowColor = '#38bdf8';
         ctx.shadowBlur = 8;
-        ctx.fillText('Flappy Algebra', canvasWidth / 2, cardY + 38);
+        ctx.fillText("Sanketh's Flappy Algebra", canvasWidth / 2, cardY + 36);
         ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#c084fc';
+        ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Created by Sanketh', canvasWidth / 2, cardY + 56);
 
         ctx.fillStyle = '#94a3b8';
         ctx.font = '13px "Segoe UI", Arial, sans-serif';
-        ctx.fillText('Press SPACE, ENTER or Click', canvasWidth / 2, cardY + 68);
+        ctx.fillText('Press SPACE, ENTER or Click', canvasWidth / 2, cardY + 82);
 
-        let btnW = 130;
+        let btnW = 140;
         let btnH = 34;
         let btnX = canvasWidth / 2 - btnW / 2;
-        let btnY = cardY + 98;
+        let btnY = cardY + 112;
 
         let btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
         btnGrad.addColorStop(0, '#0284c7');
@@ -886,7 +901,7 @@ function drawUI() {
         ctx.fillText('TAP / ENTER TO PLAY', canvasWidth / 2, btnY + 22);
 
         if (highScore > 0) {
-            ctx.fillStyle = '#c084fc';
+            ctx.fillStyle = '#4ade80';
             ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
             ctx.fillText(`Best Score: ${highScore}`, canvasWidth / 2, cardY + cardH + 25);
         }
@@ -898,8 +913,8 @@ function drawUI() {
         ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        let cardW = 240;
-        let cardH = 180;
+        let cardW = 248;
+        let cardH = 195;
         let cardX = (canvasWidth - cardW) / 2;
         let cardY = (canvasHeight - cardH) / 2 - 10;
 
@@ -919,19 +934,23 @@ function drawUI() {
         ctx.textAlign = 'center';
         ctx.shadowColor = '#f43f5e';
         ctx.shadowBlur = 8;
-        ctx.fillText('GAME OVER', canvasWidth / 2, cardY + 40);
+        ctx.fillText('GAME OVER', canvasWidth / 2, cardY + 38);
         ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#c084fc';
+        ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+        ctx.fillText("Sanketh's Math Challenge", canvasWidth / 2, cardY + 58);
 
         ctx.fillStyle = '#cbd5e1';
         ctx.font = 'bold 15px "Segoe UI", Arial, sans-serif';
-        ctx.fillText(`Score: ${score}`, canvasWidth / 2, cardY + 75);
+        ctx.fillText(`Score: ${score}`, canvasWidth / 2, cardY + 88);
         ctx.fillStyle = '#38bdf8';
-        ctx.fillText(`High Score: ${highScore}`, canvasWidth / 2, cardY + 98);
+        ctx.fillText(`High Score: ${highScore}`, canvasWidth / 2, cardY + 110);
 
-        let btnW = 140;
+        let btnW = 145;
         let btnH = 34;
         let btnX = canvasWidth / 2 - btnW / 2;
-        let btnY = cardY + 124;
+        let btnY = cardY + 136;
 
         let btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
         btnGrad.addColorStop(0, '#f43f5e');
@@ -960,5 +979,3 @@ function resetGame() {
 }
 
 setup();
-
-
