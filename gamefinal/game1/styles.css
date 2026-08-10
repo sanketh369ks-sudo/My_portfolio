@@ -700,17 +700,21 @@ canvas {
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.5);
     }
+
     15% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1.1);
     }
+
     30% {
         transform: translate(-50%, -50%) scale(1.0);
     }
+
     80% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1.0);
     }
+
     100% {
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.8);
@@ -755,8 +759,15 @@ canvas {
 }
 
 @keyframes sensePulse {
-    0% { transform: translateX(-50%) scale(0.95); opacity: 0.8; }
-    100% { transform: translateX(-50%) scale(1.08); opacity: 1.0; }
+    0% {
+        transform: translateX(-50%) scale(0.95);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1.08);
+        opacity: 1.0;
+    }
 }
 
 /* Spider-Man Hero Profile Card */
@@ -857,8 +868,13 @@ canvas {
 }
 
 @keyframes bossBlipAnim {
-    0% { transform: translateY(-50%) scale(0.9); }
-    100% { transform: translateY(-50%) scale(1.25); }
+    0% {
+        transform: translateY(-50%) scale(0.9);
+    }
+
+    100% {
+        transform: translateY(-50%) scale(1.25);
+    }
 }
 
 /* Multiverse Suit Locker Styles */
@@ -925,7 +941,7 @@ canvas {
         grid-template-columns: repeat(2, 1fr);
         gap: 6px;
     }
-    
+
     .suit-btn {
         padding: 6px 4px;
     }
