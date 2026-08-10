@@ -1,4 +1,4 @@
-/* T20 CRICKET CHAMPIONSHIP - COMPLETE GAME ENGINE */
+/* T20 CRICKET CHAMPIONSHIP - COMPLETE REALISTIC GAME ENGINE */
 
 // ==========================================
 // 1. AUDIO SYNTHESIZER ENGINE (Web Audio API)
@@ -34,16 +34,16 @@ class SoundEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
     
     gain.gain.setValueAtTime(1.0, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
     
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.1);
+    osc.stop(now + 0.12);
 
     // Noise snap
     const bufferSize = this.ctx.sampleRate * 0.05;
@@ -55,7 +55,7 @@ class SoundEngine {
     const noise = this.ctx.createBufferSource();
     noise.buffer = buffer;
     const noiseGain = this.ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.8, now);
+    noiseGain.gain.setValueAtTime(0.9, now);
     noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
     noise.connect(noiseGain);
     noiseGain.connect(this.ctx.destination);
@@ -113,12 +113,11 @@ class SoundEngine {
     if (!this.enabled) return;
     this.init();
     const now = this.ctx.currentTime;
-    // Low crash
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(220, now);
-    osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+    osc.frequency.setValueAtTime(240, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
     gain.gain.setValueAtTime(0.8, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
     osc.connect(gain);
@@ -141,7 +140,6 @@ class SoundEngine {
     const noise = this.ctx.createBufferSource();
     noise.buffer = buffer;
     
-    // Filter noise to sound like crowd
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'bandpass';
     filter.frequency.value = 800;
@@ -163,7 +161,210 @@ class SoundEngine {
 const sounds = new SoundEngine();
 
 // ==========================================
-// 2. GAME STATE & APP CONTROLLER
+// 2. HTML5 CANVAS STADIUM & PITCH RENDERER
+// ==========================================
+class StadiumRenderer {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext("2d");
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+    
+    this.ball = { x: 260, y: 160, vx: 0, vy: 0, visible: false, targetX: 0, targetY: 0 };
+    this.animating = false;
+    this.bowlerPos = { x: 240, y: 160 };
+    this.batsmanPos = { x: 560, y: 160 };
+    
+    this.fielders = [
+      { x: 580, y: 110, role: "Slip" },
+      { x: 620, y: 70, role: "Gully" },
+      { x: 450, y: 60, role: "Cover" },
+      { x: 320, y: 80, role: "Mid-Off" },
+      { x: 320, y: 240, role: "Mid-On" },
+      { x: 450, y: 260, role: "Mid-Wicket" },
+      { x: 580, y: 220, role: "Square Leg" },
+      { x: 680, y: 160, role: "Third Man" },
+      { x: 720, y: 80, role: "Deep Cover" }
+    ];
+  }
+
+  draw() {
+    const ctx = this.ctx;
+    const w = this.width;
+    const h = this.height;
+
+    // Grass Field
+    ctx.fillStyle = "#0a2e1c";
+    ctx.fillRect(0, 0, w, h);
+
+    // Grass Stripes
+    ctx.fillStyle = "#0c3621";
+    for (let i = 0; i < w; i += 60) {
+      ctx.fillRect(i, 0, 30, h);
+    }
+
+    // Boundary Oval Line
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(w / 2, h / 2, w / 2 - 20, h / 2 - 20, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 30-Yard Circle
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.ellipse(w / 2, h / 2, 180, 100, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Pitch Rect
+    ctx.fillStyle = "#c2a378";
+    ctx.fillRect(250, h / 2 - 20, 300, 40);
+    ctx.strokeStyle = "rgba(255,255,255,0.6)";
+    ctx.strokeRect(250, h / 2 - 20, 300, 40);
+
+    // Crease Lines
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(270, h / 2 - 18, 4, 36);
+    ctx.fillRect(530, h / 2 - 18, 4, 36);
+
+    // Stumps (Yellow)
+    ctx.fillStyle = "#ffd700";
+    ctx.fillRect(265, h / 2 - 8, 4, 16);
+    ctx.fillRect(535, h / 2 - 8, 4, 16);
+
+    // Draw Fielders
+    this.fielders.forEach(f => {
+      ctx.fillStyle = "#00e5ff";
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#000000";
+      ctx.stroke();
+    });
+
+    // Bowler Icon
+    ctx.fillStyle = "#ffcc00";
+    ctx.beginPath();
+    ctx.arc(this.bowlerPos.x, this.bowlerPos.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Batsman Icon
+    ctx.fillStyle = "#00ff88";
+    ctx.beginPath();
+    ctx.arc(this.batsmanPos.x, this.batsmanPos.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Animated Ball
+    if (this.ball.visible) {
+      ctx.fillStyle = "#ff3333";
+      ctx.beginPath();
+      ctx.arc(this.ball.x, this.ball.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowColor = "#ff0000";
+      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  animateDelivery(outcome, callback) {
+    this.ball.visible = true;
+    this.ball.x = 270;
+    this.ball.y = this.height / 2;
+
+    let targetX = 530;
+    let targetY = this.height / 2;
+
+    if (outcome === 4) {
+      targetX = 760;
+      targetY = 40 + Math.random() * (this.height - 80);
+    } else if (outcome === 6) {
+      targetX = 780;
+      targetY = Math.random() > 0.5 ? 20 : this.height - 20;
+    } else if (outcome === "W") {
+      targetX = 535;
+      targetY = this.height / 2;
+    } else if (typeof outcome === "number" && outcome > 0) {
+      targetX = 580 + outcome * 30;
+      targetY = this.height / 2 + (Math.random() > 0.5 ? 60 : -60);
+    }
+
+    const steps = 30;
+    let currentStep = 0;
+    const dx = (targetX - this.ball.x) / steps;
+    const dy = (targetY - this.ball.y) / steps;
+
+    const interval = setInterval(() => {
+      this.ball.x += dx;
+      this.ball.y += dy;
+      this.draw();
+
+      currentStep++;
+      if (currentStep >= steps) {
+        clearInterval(interval);
+        setTimeout(() => {
+          this.ball.visible = false;
+          this.draw();
+          if (callback) callback();
+        }, 300);
+      }
+    }, 20);
+  }
+}
+
+let stadiumCanvas;
+
+// ==========================================
+// 3. INTERACTIVE SHOT TIMING METER
+// ==========================================
+class TimingMeter {
+  constructor() {
+    this.pointerPos = 0; // 0 to 100
+    this.direction = 1;
+    this.speed = 2.2;
+    this.animating = true;
+    this.pointerEl = document.getElementById("timing-pointer");
+    this.startLoop();
+  }
+
+  startLoop() {
+    const loop = () => {
+      if (this.animating) {
+        this.pointerPos += this.direction * this.speed;
+        if (this.pointerPos >= 100) {
+          this.pointerPos = 100;
+          this.direction = -1;
+        } else if (this.pointerPos <= 0) {
+          this.pointerPos = 0;
+          this.direction = 1;
+        }
+        if (this.pointerEl) {
+          this.pointerEl.style.left = `${this.pointerPos}%`;
+        }
+      }
+      requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
+  getCurrentTiming() {
+    // 0 to 35: Early, 35 to 65: Perfect, 65 to 100: Late
+    const pos = this.pointerPos;
+    if (pos >= 35 && pos <= 65) {
+      return "perfect";
+    } else if (pos < 35) {
+      return "early";
+    } else {
+      return "late";
+    }
+  }
+}
+
+let timingMeter;
+
+// ==========================================
+// 4. GAME STATE & APP CONTROLLER
 // ==========================================
 const GameState = {
   settings: {
@@ -178,6 +379,7 @@ const GameState = {
   captainId: null,
   keeperId: null,
   pitchCondition: "flat",
+  fieldPreset: "balanced",
   toss: {
     userCall: null,
     result: null,
@@ -191,6 +393,9 @@ const GameState = {
 document.addEventListener("DOMContentLoaded", () => {
   initTeamSelection();
   bindEvents();
+  stadiumCanvas = new StadiumRenderer("cricket-canvas");
+  stadiumCanvas.draw();
+  timingMeter = new TimingMeter();
 });
 
 // Navigation Screen Switcher
@@ -202,7 +407,7 @@ function showScreen(screenId) {
 }
 
 // ==========================================
-// 3. TEAM SELECTION SYSTEM (Phase 4)
+// 5. TEAM SELECTION SYSTEM
 // ==========================================
 function initTeamSelection() {
   const userSelect = document.getElementById("select-user-team");
@@ -211,14 +416,13 @@ function initTeamSelection() {
   userSelect.innerHTML = "";
   oppSelect.innerHTML = "";
 
-  TEAMS_DATA.forEach((team, index) => {
+  TEAMS_DATA.forEach((team) => {
     const opt1 = new Option(`${team.flag} ${team.name}`, team.id);
     const opt2 = new Option(`${team.flag} ${team.name}`, team.id);
     userSelect.add(opt1);
     oppSelect.add(opt2);
   });
 
-  // Default choices: India vs Australia
   userSelect.value = "ind";
   oppSelect.value = "aus";
 
@@ -226,7 +430,6 @@ function initTeamSelection() {
 
   userSelect.addEventListener("change", () => {
     if (userSelect.value === oppSelect.value) {
-      // Don't allow same team selection
       const fallback = TEAMS_DATA.find(t => t.id !== userSelect.value);
       oppSelect.value = fallback.id;
     }
@@ -259,14 +462,13 @@ function updateTeamSelectionUI() {
 }
 
 // ==========================================
-// 4. PLAYING XI SYSTEM (Phase 5)
+// 6. PLAYING XI SYSTEM
 // ==========================================
 function renderPlayingXIScreen() {
   document.getElementById("xi-team-name").innerText = `${GameState.userTeam.name} Squad`;
   const container = document.getElementById("squad-grid-container");
   container.innerHTML = "";
 
-  // Auto select first 11 by default if empty
   if (GameState.userPlayingXI.length !== 11) {
     autoSelectUserXI();
   }
@@ -299,7 +501,6 @@ function renderPlayingXIScreen() {
       </div>
     `;
 
-    // Checkbox toggle handler
     const chk = card.querySelector("input[type=checkbox]");
     chk.addEventListener("change", (e) => {
       e.stopPropagation();
@@ -312,7 +513,6 @@ function renderPlayingXIScreen() {
       }
     });
 
-    // Captain / Keeper buttons
     card.querySelector(`[data-cap]`).addEventListener("click", (e) => {
       e.stopPropagation();
       GameState.captainId = player.id;
@@ -349,9 +549,7 @@ function toggleUserPlayerSelection(player) {
 }
 
 function autoSelectUserXI() {
-  // Sort players by skill & pick best 11
   const squad = [...GameState.userTeam.players];
-  // Ensure 1 WK, 4 Bowlers minimum
   const wks = squad.filter(p => p.role === "Wicketkeeper");
   const bowlers = squad.filter(p => p.role === "Bowler");
   const batsmen = squad.filter(p => p.role === "Batsman" || p.role === "All-Rounder");
@@ -360,8 +558,6 @@ function autoSelectUserXI() {
   if (wks.length > 0) xi.push(wks[0]);
   bowlers.slice(0, 4).forEach(b => xi.push(b));
   batsmen.forEach(b => { if (xi.length < 11 && !xi.includes(b)) xi.push(b); });
-  
-  // Fill remaining if needed
   squad.forEach(p => { if (xi.length < 11 && !xi.includes(p)) xi.push(p); });
 
   GameState.userPlayingXI = xi;
@@ -389,7 +585,7 @@ function autoSelectOpponentXI() {
 }
 
 // ==========================================
-// 5. TOSS SYSTEM (Phase 6)
+// 7. TOSS SYSTEM
 // ==========================================
 function startTossAnimation(userCall) {
   sounds.playCoinFlip();
@@ -401,7 +597,6 @@ function startTossAnimation(userCall) {
 
   setTimeout(() => {
     coin.classList.remove("flipping");
-    // Random Toss result
     const isHeads = Math.random() >= 0.5;
     const tossResult = isHeads ? "heads" : "tails";
     GameState.toss.result = tossResult;
@@ -428,7 +623,6 @@ function startTossAnimation(userCall) {
       decisionBtns.style.display = "flex";
     } else {
       winnerTitle.innerText = `🪙 ${GameState.oppTeam.name} Won the Toss!`;
-      // AI toss decision
       const aiDecision = Math.random() > 0.4 ? "bat" : "bowl";
       GameState.toss.decision = aiDecision;
       decisionPrompt.innerText = `${GameState.oppTeam.name} elected to ${aiDecision.toUpperCase()} first.`;
@@ -443,11 +637,12 @@ function startTossAnimation(userCall) {
 }
 
 // ==========================================
-// 6. MATCH SETUP & ENGINE (Phases 7 to 16)
+// 8. MATCH ENGINE & BALL SYSTEM
 // ==========================================
 function setupMatchObject() {
   const oversLimit = parseInt(GameState.settings.oversLimit, 10);
   GameState.pitchCondition = document.getElementById("select-pitch").value;
+  GameState.fieldPreset = document.getElementById("select-field-preset").value;
 
   let teamBattingFirst, teamBowlingFirst;
   let isUserBattingFirst;
@@ -488,6 +683,7 @@ function setupMatchObject() {
   };
 
   updateMatchUI();
+  stadiumCanvas.draw();
 }
 
 function createInningsObject(battingTeam, bowlingTeam, battingXI, bowlingXI, isUserBatting) {
@@ -516,7 +712,6 @@ function createInningsObject(battingTeam, bowlingTeam, battingXI, bowlingXI, isU
     });
   });
 
-  // Pick Bowlers (only bowlers and all-rounders prefered)
   const availableBowlers = bowlingXI.filter(p => p.role === "Bowler" || p.role === "All-Rounder" || p.bowlingSkill > 40);
 
   return {
@@ -528,7 +723,7 @@ function createInningsObject(battingTeam, bowlingTeam, battingXI, bowlingXI, isU
     availableBowlers: availableBowlers,
     totalRuns: 0,
     totalWickets: 0,
-    totalBalls: 0, // legal balls
+    totalBalls: 0,
     currentStrikerIndex: 0,
     currentNonStrikerIndex: 1,
     currentBowlerIndex: 0,
@@ -546,178 +741,171 @@ function getCurrentInnings() {
   return GameState.match.currentInnings === 1 ? GameState.match.innings1 : GameState.match.innings2;
 }
 
-// ==========================================
-// 7. BATTING & BOWLING LOGIC ENGINE
-// ==========================================
 function playBall(shotChoice, deliveryChoice) {
   const inn = getCurrentInnings();
   if (!inn || GameState.match.isGameOver) return;
 
   const striker = inn.battingXI[inn.currentStrikerIndex];
-  const nonStriker = inn.battingXI[inn.currentNonStrikerIndex];
   const bowler = inn.availableBowlers[inn.currentBowlerIndex];
 
   const strikerStat = inn.batsmenStats.get(striker.id);
   const bowlerStat = inn.bowlerStats.get(bowler.id);
 
-  // If choices not passed (AI mode), generate choices
   if (!shotChoice) shotChoice = getAIShotChoice(striker, inn);
   if (!deliveryChoice) deliveryChoice = getAIDeliveryChoice(bowler);
 
-  // Probability resolution
-  const outcome = resolveBallOutcome(shotChoice, deliveryChoice, striker, bowler, GameState.pitchCondition);
+  // Capture Timing Quality
+  const timingQuality = timingMeter.getCurrentTiming();
+
+  // Generate Ball Speed
+  const speedKm = generateBallSpeed(deliveryChoice);
+  document.getElementById("ball-speed-val").innerText = `${speedKm} km/h`;
+
+  // Outcome Calculation
+  const outcome = resolveBallOutcome(shotChoice, deliveryChoice, striker, bowler, GameState.pitchCondition, timingQuality);
 
   sounds.playBatHit();
 
-  let ballText = "";
-  let runValue = 0;
-  let isWicket = false;
+  // Animate on Stadium Canvas
+  stadiumCanvas.animateDelivery(outcome, () => {
+    let runValue = 0;
 
-  if (outcome === "W") {
-    isWicket = true;
-    strikerStat.isOut = true;
-    strikerStat.balls++;
-    inn.totalWickets++;
-    inn.totalBalls++;
-    bowlerStat.wickets++;
-    bowlerStat.ballsInCurrentOver++;
+    if (outcome === "W") {
+      strikerStat.isOut = true;
+      strikerStat.balls++;
+      inn.totalWickets++;
+      inn.totalBalls++;
+      bowlerStat.wickets++;
+      bowlerStat.ballsInCurrentOver++;
 
-    // Dismissal type text generator
-    const dismissalTypes = ["b", "c & b", "lbw", "c fielder b"];
-    const dt = dismissalTypes[Math.floor(Math.random() * dismissalTypes.length)];
-    strikerStat.dismissalText = `${dt} ${bowler.name}`;
+      const dismissalTypes = ["b", "c & b", "lbw", "c fielder b"];
+      const dt = dismissalTypes[Math.floor(Math.random() * dismissalTypes.length)];
+      strikerStat.dismissalText = `${dt} ${bowler.name}`;
 
-    sounds.playWicket();
-    showEventOverlay("💥 OUT!", "event-wicket");
-    ballText = "W";
-    inn.overHistory.push("W");
+      sounds.playWicket();
+      showEventOverlay("💥 OUT!", "event-wicket");
+      inn.overHistory.push("W");
+      addCommentary(inn, `${striker.name} OUT! ${strikerStat.dismissalText} for ${strikerStat.runs} (${strikerStat.balls}b) [${speedKm} km/h].`);
 
-    // Commentary
-    addCommentary(inn, `${striker.name} OUT! ${strikerStat.dismissalText} for ${strikerStat.runs} (${strikerStat.balls}b).`);
+      inn.partnershipRuns = 0;
+      inn.partnershipBalls = 0;
 
-    // Partnership reset
-    inn.partnershipRuns = 0;
-    inn.partnershipBalls = 0;
+      const nextIdx = Math.max(inn.currentStrikerIndex, inn.currentNonStrikerIndex) + 1;
+      if (nextIdx < inn.battingXI.length && inn.totalWickets < 10) {
+        inn.currentStrikerIndex = nextIdx;
+      }
 
-    // Next batsman comes in if available
-    const nextIdx = Math.max(inn.currentStrikerIndex, inn.currentNonStrikerIndex) + 1;
-    if (nextIdx < inn.battingXI.length && inn.totalWickets < 10) {
-      inn.currentStrikerIndex = nextIdx;
+    } else if (outcome === 4) {
+      runValue = 4;
+      strikerStat.runs += 4;
+      strikerStat.balls++;
+      strikerStat.fours++;
+      inn.totalRuns += 4;
+      inn.totalBalls++;
+      bowlerStat.runsConceded += 4;
+      bowlerStat.ballsInCurrentOver++;
+      inn.partnershipRuns += 4;
+      inn.partnershipBalls++;
+
+      sounds.playFour();
+      showEventOverlay("4️⃣ FOUR!", "event-four");
+      inn.overHistory.push("4");
+      addCommentary(inn, `FOUR! ${striker.name} cracks a gorgeous shot through fielders for 4 runs (${speedKm} km/h). [Timing: ${timingQuality.toUpperCase()}]`);
+
+    } else if (outcome === 6) {
+      runValue = 6;
+      strikerStat.runs += 6;
+      strikerStat.balls++;
+      strikerStat.sixes++;
+      inn.totalRuns += 6;
+      inn.totalBalls++;
+      bowlerStat.runsConceded += 6;
+      bowlerStat.ballsInCurrentOver++;
+      inn.partnershipRuns += 6;
+      inn.partnershipBalls++;
+
+      sounds.playSix();
+      showEventOverlay("6️⃣ SIX!", "event-six");
+      inn.overHistory.push("6");
+      addCommentary(inn, `SIX! HUGE HIT! ${striker.name} dispatches ${bowler.name} out of the stadium! (${speedKm} km/h) [Timing: ${timingQuality.toUpperCase()}]`);
+
+    } else {
+      runValue = parseInt(outcome, 10) || 0;
+      strikerStat.runs += runValue;
+      strikerStat.balls++;
+      inn.totalRuns += runValue;
+      inn.totalBalls++;
+      bowlerStat.runsConceded += runValue;
+      bowlerStat.ballsInCurrentOver++;
+      inn.partnershipRuns += runValue;
+      inn.partnershipBalls++;
+
+      inn.overHistory.push(`${runValue}`);
+      addCommentary(inn, `${striker.name} plays ${shotChoice} to ${bowler.name} for ${runValue} run(s). (${speedKm} km/h)`);
+
+      if (runValue % 2 !== 0) {
+        swapStrikers(inn);
+      }
     }
 
-  } else if (outcome === 4) {
-    runValue = 4;
-    strikerStat.runs += 4;
-    strikerStat.balls++;
-    strikerStat.fours++;
-    inn.totalRuns += 4;
-    inn.totalBalls++;
-    bowlerStat.runsConceded += 4;
-    bowlerStat.ballsInCurrentOver++;
-    inn.partnershipRuns += 4;
-    inn.partnershipBalls++;
-
-    sounds.playFour();
-    showEventOverlay("4️⃣ FOUR!", "event-four");
-    ballText = "4";
-    inn.overHistory.push("4");
-    addCommentary(inn, `FOUR! Beautiful shot by ${striker.name} through the field for 4 runs.`);
-
-  } else if (outcome === 6) {
-    runValue = 6;
-    strikerStat.runs += 6;
-    strikerStat.balls++;
-    strikerStat.sixes++;
-    inn.totalRuns += 6;
-    inn.totalBalls++;
-    bowlerStat.runsConceded += 6;
-    bowlerStat.ballsInCurrentOver++;
-    inn.partnershipRuns += 6;
-    inn.partnershipBalls++;
-
-    sounds.playSix();
-    showEventOverlay("6️⃣ SIX!", "event-six");
-    ballText = "6";
-    inn.overHistory.push("6");
-    addCommentary(inn, `SIX! MASSIVE HIT! ${striker.name} launches it high over the boundary!`);
-
-  } else {
-    runValue = parseInt(outcome, 10) || 0;
-    strikerStat.runs += runValue;
-    strikerStat.balls++;
-    inn.totalRuns += runValue;
-    inn.totalBalls++;
-    bowlerStat.runsConceded += runValue;
-    bowlerStat.ballsInCurrentOver++;
-    inn.partnershipRuns += runValue;
-    inn.partnershipBalls++;
-
-    ballText = `${runValue}`;
-    inn.overHistory.push(`${runValue}`);
-    addCommentary(inn, `${striker.name} plays a ${shotChoice} to ${bowler.name} for ${runValue} run(s).`);
-
-    // Swap striker on odd runs
-    if (runValue % 2 !== 0) {
+    if (inn.totalBalls % 6 === 0) {
+      bowlerStat.overs++;
+      bowlerStat.ballsInCurrentOver = 0;
       swapStrikers(inn);
+      rotateBowler(inn);
+      inn.overHistory = [];
+      addCommentary(inn, `--- End of Over ${Math.floor(inn.totalBalls / 6)} ---`);
     }
-  }
 
-  // Check end of over (6 legal deliveries)
-  if (inn.totalBalls % 6 === 0) {
-    bowlerStat.overs++;
-    bowlerStat.ballsInCurrentOver = 0;
-
-    // Check maiden
-    // Swap striker at end of over
-    swapStrikers(inn);
-
-    // Rotate bowler
-    rotateBowler(inn);
-    inn.overHistory = [];
-    addCommentary(inn, `--- End of Over ${Math.floor(inn.totalBalls / 6)} ---`);
-  }
-
-  // Check Innings End / Target reached
-  checkInningsStatus();
-
-  updateMatchUI();
+    checkInningsStatus();
+    updateMatchUI();
+  });
 }
 
-function resolveBallOutcome(shot, delivery, striker, bowler, pitch) {
+function generateBallSpeed(delivery) {
+  if (delivery === "fast") return (142 + Math.random() * 12).toFixed(1);
+  if (delivery === "yorker") return (138 + Math.random() * 10).toFixed(1);
+  if (delivery === "bouncer") return (140 + Math.random() * 12).toFixed(1);
+  if (delivery === "spin") return (86 + Math.random() * 12).toFixed(1);
+  return (112 + Math.random() * 10).toFixed(1);
+}
+
+function resolveBallOutcome(shot, delivery, striker, bowler, pitch, timing) {
   let rand = Math.random() * 100;
 
-  // Skill difference modifier
+  if (timing === "perfect") rand += 25;
+  if (timing === "early") rand -= 15;
+  if (timing === "late") rand -= 20;
+
   const skillDiff = striker.battingSkill - bowler.bowlingSkill;
-  let boundaryBoost = Math.max(-10, Math.min(15, skillDiff * 0.3));
+  rand += skillDiff * 0.25;
 
   if (pitch === "green" && (delivery === "fast" || delivery === "bouncer")) rand -= 10;
   if (pitch === "dry" && delivery === "spin") rand -= 10;
   if (pitch === "flat") rand += 10;
-
-  rand += boundaryBoost;
 
   if (shot === "defend") {
     if (rand < 5) return "W";
     if (rand < 70) return 0;
     return 1;
   } else if (shot === "single") {
-    if (rand < 8) return "W";
+    if (rand < 6) return "W";
     if (rand < 60) return 1;
     if (rand < 90) return 2;
     return 3;
   } else if (shot === "lofted") {
-    if (rand < 20) return "W";
-    if (rand < 40) return 1;
-    if (rand < 65) return 2;
-    if (rand < 88) return 4;
+    if (rand < 15) return "W";
+    if (rand < 35) return 1;
+    if (rand < 60) return 2;
+    if (rand < 82) return 4;
     return 6;
   } else if (shot === "power") {
-    if (rand < 30) return "W";
-    if (rand < 50) return 0;
-    if (rand < 75) return 4;
+    if (rand < 25) return "W";
+    if (rand < 45) return 0;
+    if (rand < 70) return 4;
     return 6;
   } else if (shot === "scoop") {
-    if (rand < 35) return "W";
+    if (rand < 30) return "W";
     if (rand < 60) return 4;
     return 6;
   }
@@ -726,7 +914,6 @@ function resolveBallOutcome(shot, delivery, striker, bowler, pitch) {
 
 function getAIShotChoice(striker, inn) {
   const shots = ["defend", "single", "lofted", "power", "scoop"];
-  // If high required rate, be aggressive
   if (GameState.match.currentInnings === 2 && GameState.match.target) {
     const runsNeeded = GameState.match.target - inn.totalRuns;
     const ballsRemaining = (GameState.match.oversLimit * 6) - inn.totalBalls;
@@ -749,7 +936,6 @@ function swapStrikers(inn) {
 }
 
 function rotateBowler(inn) {
-  // Rotate bowler index to next available bowler
   const len = inn.availableBowlers.length;
   if (len > 1) {
     inn.currentBowlerIndex = (inn.currentBowlerIndex + 1) % len;
@@ -766,7 +952,6 @@ function checkInningsStatus() {
   const inn = getCurrentInnings();
   const maxBalls = GameState.match.oversLimit * 6;
 
-  // 2nd Innings Target Pass Check
   if (GameState.match.currentInnings === 2) {
     if (inn.totalRuns >= GameState.match.target) {
       endMatch();
@@ -774,7 +959,6 @@ function checkInningsStatus() {
     }
   }
 
-  // Innings Completion Check (10 Wickets or max overs reached)
   if (inn.totalWickets >= 10 || inn.totalBalls >= maxBalls) {
     if (GameState.match.currentInnings === 1) {
       startInningsBreak();
@@ -798,7 +982,6 @@ function startInningsBreak() {
 function startSecondInnings() {
   GameState.match.currentInnings = 2;
 
-  // Swapped batting and bowling teams
   const teamBattingSecond = GameState.match.innings1.bowlingTeam;
   const teamBowlingSecond = GameState.match.innings1.battingTeam;
   const battingXI = GameState.match.innings1.bowlingXI;
@@ -809,6 +992,7 @@ function startSecondInnings() {
 
   showScreen("screen-match");
   updateMatchUI();
+  stadiumCanvas.draw();
 }
 
 function endMatch() {
@@ -843,7 +1027,6 @@ function endMatch() {
   document.getElementById("result-t2-name").innerText = i2.battingTeam.name;
   document.getElementById("result-t2-score").innerText = `${i2.totalRuns}/${i2.totalWickets} (${formatOvers(i2.totalBalls)})`;
 
-  // Calculate Awards
   const potm = calculatePlayerOfTheMatch(i1, i2);
   document.getElementById("potm-name").innerText = potm.name;
   document.getElementById("potm-stat").innerText = potm.stat;
@@ -912,13 +1095,12 @@ function findBestBowler(i1, i2) {
 }
 
 // ==========================================
-// 8. UI UPDATE & SCOREBOARD BINDING
+// 9. UI UPDATE & SCOREBOARD BINDING
 // ==========================================
 function updateMatchUI() {
   const inn = getCurrentInnings();
   if (!inn) return;
 
-  // Header info
   document.getElementById("match-batting-flag").innerText = inn.battingTeam.flag;
   document.getElementById("match-batting-name").innerText = inn.battingTeam.name;
   document.getElementById("match-innings-label").innerText = `Innings ${GameState.match.currentInnings}`;
@@ -926,7 +1108,6 @@ function updateMatchUI() {
   document.getElementById("match-score-runs").innerText = `${inn.totalRuns} / ${inn.totalWickets}`;
   document.getElementById("match-overs-text").innerText = `${formatOvers(inn.totalBalls)} / ${GameState.match.oversLimit}.0 Overs`;
 
-  // Run Rates
   const crr = inn.totalBalls > 0 ? (inn.totalRuns / (inn.totalBalls / 6)).toFixed(2) : "0.00";
   document.getElementById("match-crr").innerText = crr;
 
@@ -947,7 +1128,6 @@ function updateMatchUI() {
     targetContainer.style.display = "none";
   }
 
-  // Striker / Non-Striker details
   const striker = inn.battingXI[inn.currentStrikerIndex];
   const nonStriker = inn.battingXI[inn.currentNonStrikerIndex];
   const strikerStat = inn.batsmenStats.get(striker.id);
@@ -961,13 +1141,11 @@ function updateMatchUI() {
 
   document.getElementById("partnership-runs").innerText = `${inn.partnershipRuns} runs (${inn.partnershipBalls}b)`;
 
-  // Bowler details
   const bowler = inn.availableBowlers[inn.currentBowlerIndex];
   const bowlerStat = inn.bowlerStats.get(bowler.id);
   document.getElementById("bowler-name").innerText = bowler.name;
   document.getElementById("bowler-figures").innerText = `${bowlerStat.overs}.${bowlerStat.ballsInCurrentOver} - ${bowlerStat.runsConceded} - ${bowlerStat.wickets}`;
 
-  // Over History Ticker
   const overBar = document.getElementById("over-history-bar");
   overBar.innerHTML = "";
   if (inn.overHistory.length === 0) {
@@ -982,7 +1160,6 @@ function updateMatchUI() {
     });
   }
 
-  // Controls Panel Toggle (Batting vs Bowling controls)
   const batControls = document.getElementById("batting-controls");
   const bowlControls = document.getElementById("bowling-controls");
   const title = document.getElementById("control-panel-title");
@@ -990,14 +1167,13 @@ function updateMatchUI() {
   if (inn.isUserBatting) {
     batControls.style.display = "grid";
     bowlControls.style.display = "none";
-    title.innerText = "Choose Shot Type (You are Batting):";
+    title.innerText = "Select Shot Type (You are Batting):";
   } else {
     batControls.style.display = "none";
     bowlControls.style.display = "grid";
-    title.innerText = "Choose Delivery Variation (You are Bowling):";
+    title.innerText = "Select Delivery Variation (You are Bowling):";
   }
 
-  // Commentary Update
   renderCommentary(inn);
   updateWinProbability();
 }
@@ -1050,26 +1226,13 @@ function showEventOverlay(text, className) {
   overlay.innerText = text;
   overlay.className = `event-overlay active ${className}`;
 
-  // Animated Ball movement
-  const ball = document.getElementById("animated-ball");
-  ball.style.display = "block";
-  ball.style.left = "20%";
-  ball.style.top = "50%";
-  setTimeout(() => {
-    ball.style.transition = "all 0.5s ease-out";
-    ball.style.left = "80%";
-    ball.style.top = `${30 + Math.random() * 40}%`;
-  }, 50);
-
   setTimeout(() => {
     overlay.classList.remove("active");
-    ball.style.display = "none";
-    ball.style.transition = "none";
   }, 1400);
 }
 
 // ==========================================
-// 9. SCORECARD MODAL GENERATOR
+// 10. SCORECARD MODAL GENERATOR
 // ==========================================
 function populateScorecardModal() {
   const i1 = GameState.match.innings1;
@@ -1123,10 +1286,9 @@ function renderInningsTable(battingBodyId, bowlingBodyId, inn) {
 }
 
 // ==========================================
-// 10. EVENT BINDINGS & HANDLERS
+// 11. EVENT BINDINGS & HANDLERS
 // ==========================================
 function bindEvents() {
-  // Navigation Bar
   document.getElementById("btn-sound-toggle").addEventListener("click", () => {
     const isEnabled = sounds.toggleSound();
     document.getElementById("sound-icon").innerText = isEnabled ? "🔊" : "🔇";
@@ -1143,7 +1305,6 @@ function bindEvents() {
     showScreen("screen-home");
   });
 
-  // Home Screen Cards
   document.getElementById("card-play-match").addEventListener("click", () => {
     showScreen("screen-team-select");
   });
@@ -1157,7 +1318,6 @@ function bindEvents() {
     document.getElementById("modal-settings").classList.add("active");
   });
 
-  // Settings Modal
   document.getElementById("btn-close-settings").addEventListener("click", () => {
     document.getElementById("modal-settings").classList.remove("active");
   });
@@ -1167,13 +1327,11 @@ function bindEvents() {
     document.getElementById("modal-settings").classList.remove("active");
   });
 
-  // Team Selection Proceed
   document.getElementById("btn-proceed-xi").addEventListener("click", () => {
     renderPlayingXIScreen();
     showScreen("screen-playing-xi");
   });
 
-  // Playing XI Screen Buttons
   document.getElementById("btn-auto-xi").addEventListener("click", () => {
     autoSelectUserXI();
     renderPlayingXIScreen();
@@ -1188,7 +1346,6 @@ function bindEvents() {
     showScreen("screen-toss");
   });
 
-  // Toss Screen Call Buttons
   document.getElementById("btn-call-heads").addEventListener("click", () => {
     startTossAnimation("heads");
   });
@@ -1196,7 +1353,6 @@ function bindEvents() {
     startTossAnimation("tails");
   });
 
-  // Toss Decision Buttons
   document.getElementById("btn-choose-bat").addEventListener("click", () => {
     GameState.toss.decision = "bat";
     setupMatchObject();
@@ -1208,7 +1364,6 @@ function bindEvents() {
     showScreen("screen-match");
   });
 
-  // Shot Controls (User Batting)
   document.querySelectorAll("[data-shot]").forEach(btn => {
     btn.addEventListener("click", () => {
       const shot = btn.getAttribute("data-shot");
@@ -1216,7 +1371,6 @@ function bindEvents() {
     });
   });
 
-  // Delivery Controls (User Bowling)
   document.querySelectorAll("[data-delivery]").forEach(btn => {
     btn.addEventListener("click", () => {
       const delivery = btn.getAttribute("data-delivery");
@@ -1224,7 +1378,6 @@ function bindEvents() {
     });
   });
 
-  // Quick Sim Controls
   document.getElementById("btn-auto-ball").addEventListener("click", () => {
     playBall(null, null);
   });
@@ -1246,12 +1399,10 @@ function bindEvents() {
     }
   });
 
-  // Innings Break Screen Button
   document.getElementById("btn-start-innings2").addEventListener("click", () => {
     startSecondInnings();
   });
 
-  // Result Screen Buttons
   document.getElementById("btn-view-scorecard").addEventListener("click", () => {
     document.getElementById("modal-scorecard").classList.add("active");
   });

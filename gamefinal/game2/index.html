@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>T20 Cricket Championship | Complete Cricket Game</title>
-  <meta name="description" content="An immersive HTML5 T20 Cricket web game featuring teams, 3D toss, realistic batting/bowling mechanics, full scorecard, commentary, and sound effects.">
+  <title>T20 Cricket Championship | Ultimate Realistic Cricket Game</title>
+  <meta name="description" content="An authentic interactive HTML5 T20 Cricket web game featuring full stadium canvas, shot timing meter, bowling target marker, ball physics, coin toss, commentary, and sound effects.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
     <header class="header-nav">
       <div class="brand-title">
         <span class="brand-icon">🏏</span>
-        <span>T20 CRICKET</span>
+        <span>T20 CRICKET CHAMPIONSHIP</span>
       </div>
       <div class="nav-controls">
         <button id="btn-sound-toggle" class="btn btn-outline btn-icon-only" title="Toggle Sound">
@@ -31,36 +31,36 @@
     <!-- 🟢 SCREEN 1: HOME SCREEN -->
     <section id="screen-home" class="screen active">
       <div class="home-hero">
-        <span class="home-title-badge">Official T20 League</span>
-        <h1 class="home-heading">Cricket Championship</h1>
-        <p class="home-subheading">Experience realistic T20 match action, custom team selection, toss strategy, tactical bowling, and dynamic scorecards!</p>
+        <span class="home-title-badge">PRO LEAGUE SIMULATOR</span>
+        <h1 class="home-heading">T20 Cricket Master</h1>
+        <p class="home-subheading">Experience authentic T20 cricket with real interactive timing meters, bowling spot targeting, field placement tactics, 2D stadium canvas physics, commentary, and full scorecards!</p>
         
         <div class="home-menu-grid">
           <div class="home-card" id="card-play-match">
             <span class="home-card-icon">🏆</span>
             <h3 class="home-card-title">Play Match</h3>
-            <p class="home-card-desc">Select teams, choose XI, flip coin and play a full match.</p>
+            <p class="home-card-desc">Select teams, choose XI, toss coin, control shots & bowling target.</p>
             <button class="btn btn-primary" style="width: 100%; margin-top: 8px;">Start Match</button>
           </div>
           
           <div class="home-card" id="card-practice">
             <span class="home-card-icon">🎯</span>
             <h3 class="home-card-title">Practice Nets</h3>
-            <p class="home-card-desc">Master your shot timing and bowling variations in net practice.</p>
-            <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;">Practice Mode</button>
+            <p class="home-card-desc">Master your shot timing bar & ball placement target in the nets.</p>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;">Nets Mode</button>
           </div>
 
           <div class="home-card" id="card-teams">
             <span class="home-card-icon">👥</span>
             <h3 class="home-card-title">Team Rosters</h3>
-            <p class="home-card-desc">Explore team squads, player roles, batting styles, and ratings.</p>
+            <p class="home-card-desc">Explore team squads, player stats, batting styles, and bowling types.</p>
             <button class="btn btn-outline" style="width: 100%; margin-top: 8px;">View Rosters</button>
           </div>
 
           <div class="home-card" id="card-settings">
             <span class="home-card-icon">⚙️</span>
             <h3 class="home-card-title">Match Settings</h3>
-            <p class="home-card-desc">Configure match overs (5, 10, 20), difficulty, and sound FX.</p>
+            <p class="home-card-desc">Configure match overs (5, 10, 20), difficulty, and audio FX.</p>
             <button class="btn btn-outline" style="width: 100%; margin-top: 8px;">Settings</button>
           </div>
         </div>
@@ -71,7 +71,7 @@
     <section id="screen-team-select" class="screen">
       <div class="section-title-box">
         <h2 class="section-title">Team Selection</h2>
-        <p class="section-subtitle">Choose your team and your opponent for the T20 match</p>
+        <p class="section-subtitle">Select your franchise and your rival for the match</p>
       </div>
 
       <div class="team-select-grid">
@@ -112,14 +112,24 @@
         </div>
       </div>
 
-      <!-- PITCH CONDITIONS -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; max-width: 600px; margin: 0 auto 24px auto; text-align: center;">
-        <h4 style="margin-bottom: 8px;">🏟️ Pitch Condition</h4>
-        <select id="select-pitch" class="team-select-dropdown" style="max-width: 300px; margin: 0 auto;">
-          <option value="flat">Batting Paradise (Flat & High-Scoring)</option>
-          <option value="green">Green Track (Pace & Bounce Friendly)</option>
-          <option value="dry">Dry Pitch (Spin & Turn Friendly)</option>
-        </select>
+      <!-- PITCH & FIELD PRESET -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; max-width: 650px; margin: 0 auto 24px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: center;">
+        <div>
+          <h4 style="margin-bottom: 8px;">🏟️ Pitch Type</h4>
+          <select id="select-pitch" class="team-select-dropdown">
+            <option value="flat">Batting Paradise (Flat Pitch)</option>
+            <option value="green">Green Track (Pace & Bounce)</option>
+            <option value="dry">Dry Pitch (Spin & Turn)</option>
+          </select>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 8px;">🛡️ Field Placement</h4>
+          <select id="select-field-preset" class="team-select-dropdown">
+            <option value="balanced">Balanced Field (Standard T20)</option>
+            <option value="attacking">Attacking Field (Slips & Ring)</option>
+            <option value="defensive">Defensive Field (Boundary Protection)</option>
+          </select>
+        </div>
       </div>
 
       <div style="text-align: center;">
@@ -133,18 +143,18 @@
     <section id="screen-playing-xi" class="screen">
       <div class="section-title-box">
         <h2 class="section-title">Select Playing XI</h2>
-        <p class="section-subtitle">Pick 11 players, assign Captain (👑) and Wicketkeeper (🧤)</p>
+        <p class="section-subtitle">Select 11 squad members, assign Captain (👑) and Wicketkeeper (🧤)</p>
       </div>
 
       <div class="xi-container">
         <div class="xi-header">
           <div>
             <h3 id="xi-team-name">India Strikers Squad</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Ensure at least 1 Wicketkeeper and 4 Bowlers are selected.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Ensure at least 1 Wicketkeeper and 4 Bowlers are in your XI.</p>
           </div>
           <div style="display: flex; gap: 12px; align-items: center;">
             <span class="xi-badge-count" id="xi-count-badge">Selected: 11 / 11</span>
-            <button id="btn-auto-xi" class="btn btn-outline btn-sm">⚡ Auto-Select XI</button>
+            <button id="btn-auto-xi" class="btn btn-outline btn-sm">⚡ Auto-Select Best XI</button>
           </div>
         </div>
 
@@ -223,6 +233,10 @@
               <div class="metric-lbl">Target</div>
               <div class="metric-val" id="match-target" style="color: var(--accent-gold);">—</div>
             </div>
+            <div class="metric-box">
+              <div class="metric-lbl">Ball Speed</div>
+              <div class="metric-val" id="ball-speed-val" style="color: var(--primary);">142.5 km/h</div>
+            </div>
           </div>
         </div>
 
@@ -237,16 +251,27 @@
         </div>
       </div>
 
-      <!-- STADIUM ANIMATION STAGE -->
+      <!-- 🏏 HTML5 CANVAS STADIUM & PITCH GRAPHICS -->
       <div class="stadium-stage" id="stadium-pitch">
-        <div class="pitch-graphic">
-          <div class="crease-line"></div>
-          <div class="stumps"></div>
-          <div class="crease-line"></div>
-          <div class="stumps"></div>
-        </div>
-        <div class="animated-ball" id="animated-ball"></div>
+        <canvas id="cricket-canvas" width="800" height="320"></canvas>
         <div class="event-overlay" id="event-overlay-text">6️⃣ SIX!</div>
+      </div>
+
+      <!-- INTERACTIVE SHOT TIMING METER / BOWLING TARGET AREA -->
+      <div class="interactive-mechanics-box" id="mechanics-container">
+        <!-- BATTING TIMING METER -->
+        <div id="batting-timing-meter-box">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
+            <span>⏱️ SHOT TIMING METER</span>
+            <span id="timing-result-text" style="color: var(--primary);">SWING WHEN MARKER IS IN GREEN ZONE!</span>
+          </div>
+          <div class="timing-bar-track">
+            <div class="timing-zone-early">EARLY</div>
+            <div class="timing-zone-perfect">PERFECT</div>
+            <div class="timing-zone-late">LATE</div>
+            <div class="timing-pointer" id="timing-pointer"></div>
+          </div>
+        </div>
       </div>
 
       <!-- MATCH DETAILS GRID -->
@@ -284,7 +309,7 @@
       <!-- GAMEPLAY CONTROLS PANEL -->
       <div class="controls-panel">
         <div class="controls-header">
-          <span id="control-panel-title">Choose Shot Type:</span>
+          <span id="control-panel-title">Select Shot Type:</span>
           <div style="display: flex; gap: 8px;">
             <button id="btn-auto-ball" class="btn btn-outline btn-sm">⏩ Next Ball</button>
             <button id="btn-auto-over" class="btn btn-outline btn-sm">⏩ Next Over</button>
@@ -303,7 +328,7 @@
             <div class="shot-risk">Low Risk (1-2 Runs)</div>
           </div>
           <div class="shot-btn" data-shot="lofted">
-            <div class="shot-title">🚀 Lofted Shot</div>
+            <div class="shot-title">🚀 Lofted Drive</div>
             <div class="shot-risk">Medium Risk (2-4 Runs)</div>
           </div>
           <div class="shot-btn" data-shot="power">
@@ -345,7 +370,7 @@
       <div class="commentary-box" id="commentary-container">
         <div class="commentary-item">
           <span class="commentary-ball">0.0</span>
-          <span class="commentary-text">Match ready! Players take the field.</span>
+          <span class="commentary-text">Match ready! Fielders take positions, batsmen take guard.</span>
         </div>
       </div>
     </section>
@@ -422,7 +447,6 @@
         <button id="btn-close-scorecard" class="btn btn-outline btn-icon-only">✕</button>
       </div>
 
-      <!-- INNINGS 1 TAB CONTENT -->
       <h3 id="modal-i1-title" style="color: var(--primary); margin-bottom: 12px;">Innings 1 Scorecard</h3>
       <table class="scorecard-table">
         <thead>
@@ -454,7 +478,6 @@
 
       <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 24px 0;">
 
-      <!-- INNINGS 2 TAB CONTENT -->
       <h3 id="modal-i2-title" style="color: var(--secondary); margin-bottom: 12px;">Innings 2 Scorecard</h3>
       <table class="scorecard-table">
         <thead>
@@ -490,14 +513,14 @@
   <div class="modal-backdrop" id="modal-rules">
     <div class="modal-card" style="max-width: 600px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>📖 How to Play & Rules</h2>
+        <h2>📖 How to Play & Mechanics</h2>
         <button id="btn-close-rules" class="btn btn-outline btn-icon-only">✕</button>
       </div>
       <div style="line-height: 1.6; color: var(--text-muted);">
-        <p style="margin-bottom: 12px;"><strong style="color: white;">1. Match Setup:</strong> Choose your squad and team strategy. Perform the coin toss to decide Batting or Bowling first.</p>
-        <p style="margin-bottom: 12px;"><strong style="color: white;">2. Batting Mechanics:</strong> Select shots based on risk vs reward. Defend (Safe 0-1 run), Single (Placement), Lofted Shot (2-4 runs), Power Six (6 runs / Wicket risk), Scoop (High variance).</p>
-        <p style="margin-bottom: 12px;"><strong style="color: white;">3. Bowling Mechanics:</strong> When bowling, choose deliveries like Yorker, Fast Pace, Bouncer, Spin, or Slower Ball to trick the computer batsman.</p>
-        <p style="margin-bottom: 12px;"><strong style="color: white;">4. Victory Condition:</strong> In the 2nd innings, score more runs than the target to win by wickets, or restrict the opponent before 20 overs run out!</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">1. Shot Timing Bar:</strong> When batting, watch the timing marker slide back and forth. Pick your shot button when the pointer aligns with the GREEN zone for maximum power!</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">2. Interactive Field Canvas:</strong> Watch real 2D fielders, bowler runup animation, ball physics trajectory, and boundary flashes live on the pitch canvas.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">3. Bowling Variation:</strong> Choose pace, yorker, bouncer, spin, or slower ball to trick the computer batsman.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">4. Victory Goal:</strong> Chase down the target in 2nd innings or restrict the opponent before 20 overs run out!</p>
       </div>
     </div>
   </div>
