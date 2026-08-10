@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T20 Cricket Championship | Complete Cricket Game</title>
+  <meta name="description" content="An immersive HTML5 T20 Cricket web game featuring teams, 3D toss, realistic batting/bowling mechanics, full scorecard, commentary, and sound effects.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- TOP NAVIGATION BAR -->
+    <header class="header-nav">
+      <div class="brand-title">
+        <span class="brand-icon">🏏</span>
+        <span>T20 CRICKET</span>
+      </div>
+      <div class="nav-controls">
+        <button id="btn-sound-toggle" class="btn btn-outline btn-icon-only" title="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-nav-rules" class="btn btn-outline">
+          <span>📖 Rules</span>
+        </button>
+        <button id="btn-nav-home" class="btn btn-outline">
+          <span>🏠 Home</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 🟢 SCREEN 1: HOME SCREEN -->
+    <section id="screen-home" class="screen active">
+      <div class="home-hero">
+        <span class="home-title-badge">Official T20 League</span>
+        <h1 class="home-heading">Cricket Championship</h1>
+        <p class="home-subheading">Experience realistic T20 match action, custom team selection, toss strategy, tactical bowling, and dynamic scorecards!</p>
+        
+        <div class="home-menu-grid">
+          <div class="home-card" id="card-play-match">
+            <span class="home-card-icon">🏆</span>
+            <h3 class="home-card-title">Play Match</h3>
+            <p class="home-card-desc">Select teams, choose XI, flip coin and play a full match.</p>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 8px;">Start Match</button>
+          </div>
+          
+          <div class="home-card" id="card-practice">
+            <span class="home-card-icon">🎯</span>
+            <h3 class="home-card-title">Practice Nets</h3>
+            <p class="home-card-desc">Master your shot timing and bowling variations in net practice.</p>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;">Practice Mode</button>
+          </div>
+
+          <div class="home-card" id="card-teams">
+            <span class="home-card-icon">👥</span>
+            <h3 class="home-card-title">Team Rosters</h3>
+            <p class="home-card-desc">Explore team squads, player roles, batting styles, and ratings.</p>
+            <button class="btn btn-outline" style="width: 100%; margin-top: 8px;">View Rosters</button>
+          </div>
+
+          <div class="home-card" id="card-settings">
+            <span class="home-card-icon">⚙️</span>
+            <h3 class="home-card-title">Match Settings</h3>
+            <p class="home-card-desc">Configure match overs (5, 10, 20), difficulty, and sound FX.</p>
+            <button class="btn btn-outline" style="width: 100%; margin-top: 8px;">Settings</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 SCREEN 2: TEAM SELECTION -->
+    <section id="screen-team-select" class="screen">
+      <div class="section-title-box">
+        <h2 class="section-title">Team Selection</h2>
+        <p class="section-subtitle">Choose your team and your opponent for the T20 match</p>
+      </div>
+
+      <div class="team-select-grid">
+        <!-- USER TEAM CARD -->
+        <div class="team-card-select selected" id="user-team-card">
+          <span class="team-title-label" style="color: var(--primary); font-size: 0.85rem; font-weight: 700;">YOUR TEAM</span>
+          <div class="team-flag-large" id="user-flag">🇮🇳</div>
+          <select id="select-user-team" class="team-select-dropdown"></select>
+          <div class="team-stats-preview">
+            <div class="stat-item">
+              <div class="stat-label">Batting</div>
+              <div class="stat-val" id="user-bat-stat">94</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Bowling</div>
+              <div class="stat-val" id="user-bowl-stat">92</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vs-badge">VS</div>
+
+        <!-- OPPONENT TEAM CARD -->
+        <div class="team-card-select" id="opp-team-card">
+          <span class="team-title-label" style="color: var(--secondary); font-size: 0.85rem; font-weight: 700;">OPPONENT</span>
+          <div class="team-flag-large" id="opp-flag">🇦🇺</div>
+          <select id="select-opp-team" class="team-select-dropdown"></select>
+          <div class="team-stats-preview">
+            <div class="stat-item">
+              <div class="stat-label">Batting</div>
+              <div class="stat-val" id="opp-bat-stat">93</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Bowling</div>
+              <div class="stat-val" id="opp-bowl-stat">93</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PITCH CONDITIONS -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; max-width: 600px; margin: 0 auto 24px auto; text-align: center;">
+        <h4 style="margin-bottom: 8px;">🏟️ Pitch Condition</h4>
+        <select id="select-pitch" class="team-select-dropdown" style="max-width: 300px; margin: 0 auto;">
+          <option value="flat">Batting Paradise (Flat & High-Scoring)</option>
+          <option value="green">Green Track (Pace & Bounce Friendly)</option>
+          <option value="dry">Dry Pitch (Spin & Turn Friendly)</option>
+        </select>
+      </div>
+
+      <div style="text-align: center;">
+        <button id="btn-proceed-xi" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 36px;">
+          Proceed to Playing XI ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- 🟢 SCREEN 3: PLAYING XI -->
+    <section id="screen-playing-xi" class="screen">
+      <div class="section-title-box">
+        <h2 class="section-title">Select Playing XI</h2>
+        <p class="section-subtitle">Pick 11 players, assign Captain (👑) and Wicketkeeper (🧤)</p>
+      </div>
+
+      <div class="xi-container">
+        <div class="xi-header">
+          <div>
+            <h3 id="xi-team-name">India Strikers Squad</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Ensure at least 1 Wicketkeeper and 4 Bowlers are selected.</p>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span class="xi-badge-count" id="xi-count-badge">Selected: 11 / 11</span>
+            <button id="btn-auto-xi" class="btn btn-outline btn-sm">⚡ Auto-Select XI</button>
+          </div>
+        </div>
+
+        <div class="squad-grid" id="squad-grid-container"></div>
+      </div>
+
+      <div style="text-align: center;">
+        <button id="btn-proceed-toss" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 36px;">
+          Proceed to Coin Toss 🪙
+        </button>
+      </div>
+    </section>
+
+    <!-- 🟢 SCREEN 4: TOSS SCREEN -->
+    <section id="screen-toss" class="screen">
+      <div class="section-title-box">
+        <h2 class="section-title">Match Toss</h2>
+        <p class="section-subtitle">Call Heads or Tails for the pitch decision</p>
+      </div>
+
+      <div class="toss-arena">
+        <div class="coin-container">
+          <div class="coin" id="coin-element">
+            <div class="coin-face coin-heads">HEADS</div>
+            <div class="coin-face coin-tails">TAILS</div>
+          </div>
+        </div>
+
+        <div id="toss-call-section">
+          <p style="margin-bottom: 16px; font-weight: 700; font-size: 1.1rem;">Choose Your Toss Call:</p>
+          <div class="toss-choice-btns">
+            <button id="btn-call-heads" class="btn btn-gold" style="min-width: 140px;">🪙 HEADS</button>
+            <button id="btn-call-tails" class="btn btn-secondary" style="min-width: 140px;">🪙 TAILS</button>
+          </div>
+        </div>
+
+        <div id="toss-result-section" class="toss-result-box">
+          <h3 id="toss-winner-title" style="font-size: 1.6rem; margin-bottom: 8px; color: var(--primary);">You Won the Toss!</h3>
+          <p id="toss-decision-prompt" style="margin-bottom: 20px; color: var(--text-muted);">Choose whether to bat or bowl first:</p>
+          <div class="toss-choice-btns" id="toss-decision-btns">
+            <button id="btn-choose-bat" class="btn btn-primary">🏏 BAT FIRST</button>
+            <button id="btn-choose-bowl" class="btn btn-secondary">🎯 BOWL FIRST</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 SCREEN 5: MATCH PLAYING VIEW -->
+    <section id="screen-match" class="screen">
+      <!-- TOP LIVE SCOREBOARD -->
+      <div class="scoreboard-top">
+        <div class="score-main-row">
+          <div class="team-score-block">
+            <span class="team-flag-score" id="match-batting-flag">🇮🇳</span>
+            <div>
+              <div class="team-name-score" id="match-batting-name">India Strikers</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" id="match-innings-label">Innings 1</div>
+            </div>
+          </div>
+
+          <div style="text-align: center;">
+            <div class="big-runs-text" id="match-score-runs">0 / 0</div>
+            <div class="overs-badge" id="match-overs-text">0.0 / 20.0 Overs</div>
+          </div>
+
+          <div class="match-metrics">
+            <div class="metric-box">
+              <div class="metric-lbl">CRR</div>
+              <div class="metric-val" id="match-crr">0.00</div>
+            </div>
+            <div class="metric-box" id="rrr-container" style="display: none;">
+              <div class="metric-lbl">RRR</div>
+              <div class="metric-val" id="match-rrr">0.00</div>
+            </div>
+            <div class="metric-box" id="target-container" style="display: none;">
+              <div class="metric-lbl">Target</div>
+              <div class="metric-val" id="match-target" style="color: var(--accent-gold);">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WIN PROBABILITY BAR -->
+        <div class="win-prob-container">
+          <div class="win-prob-team1" id="win-prob-bar1" style="width: 50%;"></div>
+          <div class="win-prob-team2" id="win-prob-bar2" style="width: 50%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+          <span id="win-prob-team1-txt">India 50%</span>
+          <span id="win-prob-team2-txt">Australia 50%</span>
+        </div>
+      </div>
+
+      <!-- STADIUM ANIMATION STAGE -->
+      <div class="stadium-stage" id="stadium-pitch">
+        <div class="pitch-graphic">
+          <div class="crease-line"></div>
+          <div class="stumps"></div>
+          <div class="crease-line"></div>
+          <div class="stumps"></div>
+        </div>
+        <div class="animated-ball" id="animated-ball"></div>
+        <div class="event-overlay" id="event-overlay-text">6️⃣ SIX!</div>
+      </div>
+
+      <!-- MATCH DETAILS GRID -->
+      <div class="match-grid-details">
+        <!-- BATSMEN CARD -->
+        <div class="card-player-live">
+          <div class="live-card-title">🏏 Current Batsmen</div>
+          <div class="player-row-live striker" id="striker-row">
+            <span><strong id="striker-name">Player 1</strong> <span class="striker-star">★</span></span>
+            <span id="striker-stats">0 (0)</span>
+          </div>
+          <div class="player-row-live" id="non-striker-row">
+            <span id="non-striker-name">Player 2</span>
+            <span id="non-striker-stats">0 (0)</span>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
+            Partnership: <strong id="partnership-runs" style="color: white;">0 runs (0b)</strong>
+          </div>
+        </div>
+
+        <!-- BOWLER CARD & OVER HISTORY -->
+        <div class="card-player-live">
+          <div class="live-card-title">🎯 Current Bowler</div>
+          <div class="player-row-live">
+            <strong id="bowler-name">Bowler 1</strong>
+            <span id="bowler-figures">0.0 - 0 - 0</span>
+          </div>
+          <div class="live-card-title" style="margin-top: 14px; margin-bottom: 6px;">This Over:</div>
+          <div class="recent-balls-bar" id="over-history-bar">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Over starting...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAMEPLAY CONTROLS PANEL -->
+      <div class="controls-panel">
+        <div class="controls-header">
+          <span id="control-panel-title">Choose Shot Type:</span>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-auto-ball" class="btn btn-outline btn-sm">⏩ Next Ball</button>
+            <button id="btn-auto-over" class="btn btn-outline btn-sm">⏩ Next Over</button>
+            <button id="btn-auto-innings" class="btn btn-secondary btn-sm">⚡ Sim Innings</button>
+          </div>
+        </div>
+
+        <!-- SHOT SELECTION GRID (User Batting) -->
+        <div class="shot-grid" id="batting-controls">
+          <div class="shot-btn" data-shot="defend">
+            <div class="shot-title">🛡️ Defend</div>
+            <div class="shot-risk">Very Low Risk (0-1 Runs)</div>
+          </div>
+          <div class="shot-btn" data-shot="single">
+            <div class="shot-title">🏃 Single / Placement</div>
+            <div class="shot-risk">Low Risk (1-2 Runs)</div>
+          </div>
+          <div class="shot-btn" data-shot="lofted">
+            <div class="shot-title">🚀 Lofted Shot</div>
+            <div class="shot-risk">Medium Risk (2-4 Runs)</div>
+          </div>
+          <div class="shot-btn" data-shot="power">
+            <div class="shot-title">💥 Power Six</div>
+            <div class="shot-risk">High Risk (6 Runs or Out)</div>
+          </div>
+          <div class="shot-btn" data-shot="scoop">
+            <div class="shot-title">🪄 Scoop / Upper Cut</div>
+            <div class="shot-risk">Risky Shot (Boundary or Wicket)</div>
+          </div>
+        </div>
+
+        <!-- DELIVERY SELECTION GRID (User Bowling) -->
+        <div class="shot-grid" id="bowling-controls" style="display: none;">
+          <div class="shot-btn" data-delivery="fast">
+            <div class="shot-title">⚡ Fast Pace</div>
+            <div class="shot-risk">Pace & Movement</div>
+          </div>
+          <div class="shot-btn" data-delivery="yorker">
+            <div class="shot-title">🎯 Toe-Crushing Yorker</div>
+            <div class="shot-risk">Stump Danger</div>
+          </div>
+          <div class="shot-btn" data-delivery="bouncer">
+            <div class="shot-title">🪨 Short Bouncer</div>
+            <div class="shot-risk">High Bounce / Mis-timing</div>
+          </div>
+          <div class="shot-btn" data-delivery="spin">
+            <div class="shot-title">🌀 Flight & Spin</div>
+            <div class="shot-risk">Turn & Trick</div>
+          </div>
+          <div class="shot-btn" data-delivery="slower">
+            <div class="shot-title">🐢 Slower Delivery</div>
+            <div class="shot-risk">Deceive Timing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMMENTARY BOX -->
+      <div class="commentary-box" id="commentary-container">
+        <div class="commentary-item">
+          <span class="commentary-ball">0.0</span>
+          <span class="commentary-text">Match ready! Players take the field.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 SCREEN 6: INNINGS BREAK -->
+    <section id="screen-innings-break" class="screen">
+      <div class="result-card-hero">
+        <span class="home-title-badge">INNINGS 1 COMPLETE</span>
+        <h2 id="break-team-score" style="font-size: 2.8rem; margin: 16px 0;">Team A scored 165/7 in 20.0 Overs</h2>
+        <div style="background: rgba(255, 215, 0, 0.15); border: 1px solid var(--accent-gold); padding: 16px; border-radius: 16px; max-width: 500px; margin: 0 auto 28px auto;">
+          <h3 id="break-target-text" style="color: var(--accent-gold); font-size: 1.5rem;">Target: 166 Runs to Win</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Required Run Rate: 8.30 runs per over</p>
+        </div>
+        <button id="btn-start-innings2" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 36px;">
+          Start 2nd Innings Chase 🚀
+        </button>
+      </div>
+    </section>
+
+    <!-- 🟢 SCREEN 7: MATCH RESULT -->
+    <section id="screen-result" class="screen">
+      <div class="result-card-hero">
+        <div class="trophy-icon">🏆</div>
+        <h1 class="winner-text" id="result-winner-title">India Strikers Win!</h1>
+        <p class="result-margin" id="result-margin-text">Won by 12 runs</p>
+
+        <!-- SCORE SUMMARY BOX -->
+        <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap;">
+          <div style="background: rgba(0,0,0,0.3); padding: 14px 24px; border-radius: 14px; border: 1px solid var(--border-glass);">
+            <div id="result-t1-name" style="font-weight: 700; font-size: 1rem;">India Strikers</div>
+            <div id="result-t1-score" style="font-family: var(--font-score); font-size: 2rem; color: var(--primary);">165/7 (20.0)</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 14px 24px; border-radius: 14px; border: 1px solid var(--border-glass);">
+            <div id="result-t2-name" style="font-weight: 700; font-size: 1rem;">Australia Thunder</div>
+            <div id="result-t2-score" style="font-family: var(--font-score); font-size: 2rem; color: var(--secondary);">153/8 (20.0)</div>
+          </div>
+        </div>
+
+        <!-- MATCH AWARDS -->
+        <div class="awards-grid">
+          <div class="award-card">
+            <div class="award-icon">⭐</div>
+            <div class="award-title">Player of the Match</div>
+            <div class="award-player" id="potm-name">Virat Kohli</div>
+            <div class="award-stat" id="potm-stat">72 (45b) & 1 Wicket</div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">🏏</div>
+            <div class="award-title">Top Scorer</div>
+            <div class="award-player" id="top-batsman-name">Virat Kohli</div>
+            <div class="award-stat" id="top-batsman-stat">72 Runs</div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">🎯</div>
+            <div class="award-title">Best Bowler</div>
+            <div class="award-player" id="best-bowler-name">Jasprit Bumrah</div>
+            <div class="award-stat" id="best-bowler-stat">3/18 (4.0 Overs)</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+          <button id="btn-view-scorecard" class="btn btn-secondary">📊 Full Scorecard</button>
+          <button id="btn-rematch" class="btn btn-primary">🔄 Play Again</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 🟢 SCORECARD MODAL -->
+  <div class="modal-backdrop" id="modal-scorecard">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>📊 Match Scorecard</h2>
+        <button id="btn-close-scorecard" class="btn btn-outline btn-icon-only">✕</button>
+      </div>
+
+      <!-- INNINGS 1 TAB CONTENT -->
+      <h3 id="modal-i1-title" style="color: var(--primary); margin-bottom: 12px;">Innings 1 Scorecard</h3>
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th>Batsman</th>
+            <th>R</th>
+            <th>B</th>
+            <th>4s</th>
+            <th>6s</th>
+            <th>SR</th>
+          </tr>
+        </thead>
+        <tbody id="scorecard-i1-batting"></tbody>
+      </table>
+
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th>Bowler</th>
+            <th>O</th>
+            <th>M</th>
+            <th>R</th>
+            <th>W</th>
+            <th>Econ</th>
+          </tr>
+        </thead>
+        <tbody id="scorecard-i1-bowling"></tbody>
+      </table>
+
+      <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 24px 0;">
+
+      <!-- INNINGS 2 TAB CONTENT -->
+      <h3 id="modal-i2-title" style="color: var(--secondary); margin-bottom: 12px;">Innings 2 Scorecard</h3>
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th>Batsman</th>
+            <th>R</th>
+            <th>B</th>
+            <th>4s</th>
+            <th>6s</th>
+            <th>SR</th>
+          </tr>
+        </thead>
+        <tbody id="scorecard-i2-batting"></tbody>
+      </table>
+
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th>Bowler</th>
+            <th>O</th>
+            <th>M</th>
+            <th>R</th>
+            <th>W</th>
+            <th>Econ</th>
+          </tr>
+        </thead>
+        <tbody id="scorecard-i2-bowling"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🟢 RULES MODAL -->
+  <div class="modal-backdrop" id="modal-rules">
+    <div class="modal-card" style="max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>📖 How to Play & Rules</h2>
+        <button id="btn-close-rules" class="btn btn-outline btn-icon-only">✕</button>
+      </div>
+      <div style="line-height: 1.6; color: var(--text-muted);">
+        <p style="margin-bottom: 12px;"><strong style="color: white;">1. Match Setup:</strong> Choose your squad and team strategy. Perform the coin toss to decide Batting or Bowling first.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">2. Batting Mechanics:</strong> Select shots based on risk vs reward. Defend (Safe 0-1 run), Single (Placement), Lofted Shot (2-4 runs), Power Six (6 runs / Wicket risk), Scoop (High variance).</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">3. Bowling Mechanics:</strong> When bowling, choose deliveries like Yorker, Fast Pace, Bouncer, Spin, or Slower Ball to trick the computer batsman.</p>
+        <p style="margin-bottom: 12px;"><strong style="color: white;">4. Victory Condition:</strong> In the 2nd innings, score more runs than the target to win by wickets, or restrict the opponent before 20 overs run out!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🟢 SETTINGS MODAL -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-card" style="max-width: 500px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>⚙️ Match Settings</h2>
+        <button id="btn-close-settings" class="btn btn-outline btn-icon-only">✕</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label style="display: block; margin-bottom: 6px; font-weight: 700;">Match Format (Overs Limit)</label>
+          <select id="setting-overs" class="team-select-dropdown">
+            <option value="5">5 Overs Match (Super Quick)</option>
+            <option value="10">10 Overs Match (Express)</option>
+            <option value="20" selected>20 Overs Match (Full T20)</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 6px; font-weight: 700;">AI Difficulty</label>
+          <select id="setting-difficulty" class="team-select-dropdown">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Normal</option>
+            <option value="hard">Hard (Legendary AI)</option>
+          </select>
+        </div>
+        <button id="btn-save-settings" class="btn btn-primary" style="margin-top: 12px;">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="data/teams.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
