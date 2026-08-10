@@ -2252,6 +2252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); togglePause(); });
     restartBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); startGame(); });
     restartPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); startGame(); });
+    gameOverOverlay.addEventListener('click', (e) => { if (document.activeElement) document.activeElement.blur(); startGame(); });
 
     // Initial Setup
     generateWorld();
