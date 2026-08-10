@@ -545,3 +545,105 @@ canvas {
     0% { transform: translateX(-50%) scale(0.95); opacity: 0.8; }
     100% { transform: translateX(-50%) scale(1.08); opacity: 1.0; }
 }
+
+/* Spider-Man Hero Profile Card */
+.hero-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid var(--spidey-red);
+    box-shadow: 0 0 15px rgba(255, 30, 67, 0.4);
+    padding: 6px 14px;
+    border-radius: 12px;
+}
+
+.hero-avatar {
+    font-size: 1.6rem;
+    background: rgba(255, 30, 67, 0.2);
+    border-radius: 50%;
+    padding: 4px 8px;
+    border: 1.5px solid var(--spidey-red);
+}
+
+.hero-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #ffffff;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.hero-status {
+    font-size: 0.65rem;
+    color: var(--spidey-cyan);
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* City Radar & Locator Display */
+.city-radar {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 170px;
+    height: 65px;
+    background: rgba(6, 8, 20, 0.85);
+    border: 1.5px solid var(--spidey-cyan);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    padding: 6px 10px;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.radar-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    color: var(--spidey-cyan);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.radar-screen {
+    position: relative;
+    width: 100%;
+    height: 32px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.radar-blip {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    transition: left 0.1s linear;
+}
+
+.blip-spidey {
+    left: 20px;
+    filter: drop-shadow(0 0 6px #00f0ff);
+}
+
+.blip-boss {
+    right: 15px;
+    display: none;
+    filter: drop-shadow(0 0 8px #ff1e43);
+}
+
+.blip-boss.active {
+    display: block;
+    animation: bossBlipAnim 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes bossBlipAnim {
+    0% { transform: translateY(-50%) scale(0.9); }
+    100% { transform: translateY(-50%) scale(1.25); }
+}

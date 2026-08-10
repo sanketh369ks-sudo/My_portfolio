@@ -543,6 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this.attackTimer = 60;
             this.pulse = 0;
 
+            const radarBoss = document.getElementById('radarBoss');
+            if (radarBoss) radarBoss.classList.add('active');
+
             if (bossHudBar) bossHudBar.classList.add('active');
             if (bossAlertBanner) {
                 bossAlertBanner.classList.remove('active');
@@ -555,6 +558,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dismiss() {
             this.active = false;
+            const radarBoss = document.getElementById('radarBoss');
+            if (radarBoss) radarBoss.classList.remove('active');
             if (bossHudBar) bossHudBar.classList.remove('active');
         }
     };
