@@ -236,16 +236,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mouse targeting for Web Shooting
     let mousePos = { x: 480, y: 270 };
 
-    canvas.addEventListener('mousemove', (e) => {
+    function updateMousePos(e) {
+        if (!e) return;
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        mousePos.x = (e.clientX - rect.left) * scaleX;
-        mousePos.y = (e.clientY - rect.top) * scaleY;
-    });
+        if (rect.width > 0 && rect.height > 0) {
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            mousePos.x = (e.clientX - rect.left) * scaleX;
+            mousePos.y = (e.clientY - rect.top) * scaleY;
+        }
+    }
+
+    canvas.addEventListener('mousemove', updateMousePos);
+    canvas.addEventListener('pointermove', updateMousePos);
 
     canvas.addEventListener('mousedown', (e) => {
         getAudioContext();
+        updateMousePos(e);
+        if (document.activeElement && document.activeElement.blur) {
+            document.activeElement.blur();
+        }
         if (gameState === 'start' || gameState === 'gameover') {
             startGame();
             return;
@@ -258,22 +268,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    canvas.addEventListener('mouseup', (e) => {
+    // Attach mouseup and pointerup to window so dragging off-canvas never leaves swing stuck on laptop
+    window.addEventListener('mouseup', (e) => {
         if (e.button === 0) {
             isSwingingInput = false;
         }
     });
 
-    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('pointerup', () => {
+        isSwingingInput = false;
+    });
 
-    // Keyboard Listeners
+    // Reset controls if browser window loses focus
+    window.addEventListener('blur', () => {
+        isSwingingInput = false;
+        keys.space = false;
+        keys.up = false;
+        keys.blast = false;
+    });
+
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    const canvasWrapper = document.querySelector('.canvas-wrapper');
+    if (canvasWrapper) {
+        canvasWrapper.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    // Keyboard Listeners (Prevent default scrolling on laptop)
+    const gameKeys = ['Space', 'ArrowUp', 'ArrowDown', 'KeyW', 'KeyS', 'KeyE', 'KeyQ', 'KeyR', 'KeyF', 'KeyP', 'ShiftLeft', 'ShiftRight'];
+
     window.addEventListener('keydown', (e) => {
+        if (gameKeys.includes(e.code)) {
+            e.preventDefault();
+        }
+
         getAudioContext();
         if (gameState === 'start' && (e.code === 'Space' || e.code === 'Enter')) {
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
             startGame();
             return;
         }
         if (gameState === 'gameover' && (e.code === 'Space' || e.code === 'Enter')) {
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
             startGame();
             return;
         }
@@ -319,17 +354,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('keyup', (e) => {
+        if (gameKeys.includes(e.code)) {
+            e.preventDefault();
+        }
         if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
             keys.space = false;
             isSwingingInput = false;
         }
     });
 
-    // Mobile Control Listeners
-    mobileSwingBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isSwingingInput = true; });
-    mobileSwingBtn.addEventListener('touchend', (e) => { e.preventDefault(); isSwingingInput = false; });
-    mobileBlastBtn.addEventListener('click', () => triggerWebBlast());
-    mobileJumpBtn.addEventListener('click', () => spideyJump());
+    // Mobile & Touchpad/Mouse On-Screen Controls
+    const addHoldListener = (element, onStart, onEnd) => {
+        if (!element) return;
+        const start = (e) => {
+            if (e) e.preventDefault();
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            onStart();
+        };
+        const end = (e) => {
+            if (e) e.preventDefault();
+            onEnd();
+        };
+        element.addEventListener('pointerdown', start);
+        element.addEventListener('pointerup', end);
+        element.addEventListener('pointercancel', end);
+        element.addEventListener('mousedown', start);
+        element.addEventListener('mouseup', end);
+        element.addEventListener('touchstart', start);
+        element.addEventListener('touchend', end);
+    };
+
+    addHoldListener(mobileSwingBtn, () => { isSwingingInput = true; }, () => { isSwingingInput = false; });
+    
+    if (mobileBlastBtn) {
+        const handleBlast = (e) => {
+            if (e) e.preventDefault();
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            triggerWebBlast();
+        };
+        mobileBlastBtn.addEventListener('click', handleBlast);
+    }
+    if (mobileJumpBtn) {
+        const handleJump = (e) => {
+            if (e) e.preventDefault();
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            spideyJump();
+        };
+        mobileJumpBtn.addEventListener('click', handleJump);
+    }
 
     // --- Player (Spider-Man) ---
     const player = {
@@ -2040,12 +2112,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Button Click & Overlay Listeners
-    startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
-    startOverlay.addEventListener('click', startGame);
-    resumeBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePause(); });
-    pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePause(); });
-    restartBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
-    restartPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+    startBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); startGame(); });
+    startOverlay.addEventListener('click', (e) => { if (document.activeElement) document.activeElement.blur(); startGame(); });
+    resumeBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); togglePause(); });
+    pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); togglePause(); });
+    restartBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); startGame(); });
+    restartPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); if (document.activeElement) document.activeElement.blur(); startGame(); });
 
     // Initial Setup
     generateWorld();
