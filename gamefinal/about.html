@@ -1,99 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Gaming Website</title>
+    <title>About Us - Arcade Hub</title>
+    <meta name="description"
+        content="Learn about Arcade Hub - the ultimate next-generation browser gaming platform bringing high quality free web games to players worldwide.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 42, 66, 0.9);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #00ffcc;
+            --accent-pink: #ff007f;
+            --accent-purple: #7928ca;
+            --accent-gold: #ffb703;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --font-main: 'Outfit', sans-serif;
+            --font-heading: 'Orbitron', sans-serif;
+        }
+
+        * {
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #1a1a1a;
-            color: #ffffff;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(121, 40, 202, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 65%, rgba(0, 255, 204, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(255, 0, 127, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
         }
-        .container {
-            max-width: 1000px;
-            margin: 50px auto;
-            padding: 20px;
-            text-align: center;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
         }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            position: relative;
-            animation: slideIn 1.5s ease-out;
+        ::-webkit-scrollbar-track {
+            background: #090d16;
         }
-        p {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            opacity: 0;
-            animation: fadeIn 2s forwards;
-        }
-        .glow {
-            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc, 0 0 40px #00ffcc;
-        }
-        .animated-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            background: #00ffcc;
-            color: #1a1a1a;
-            border: none;
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
             border-radius: 5px;
+            border: 2px solid #090d16;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Header Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            background: rgba(9, 13, 22, 0.85);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        .logo-text {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 6px 0;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-cyan);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 8px var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        /* Hero */
+        .page-hero {
+            padding: 70px 5% 40px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            color: var(--accent-cyan);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .page-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .page-title span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 750px;
+            margin: 0 auto 40px;
+        }
+
+        /* Content Container */
+        .content-container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .about-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.3s ease;
+        }
+
+        .about-card:hover {
+            border-color: rgba(0, 255, 204, 0.3);
+        }
+
+        .section-heading {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-text {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        /* Grid Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            background: rgba(22, 30, 46, 0.9);
+            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .feature-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--accent-cyan), #3b82f6);
+            color: #000000;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 16px 32px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
             cursor: pointer;
-            transition: transform 0.3s ease;
-            animation: bounce 2s infinite;
         }
-        .animated-button:hover {
-            transform: scale(1.1);
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
         }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+
+        /* Footer */
+        footer {
+            background: rgba(9, 13, 22, 0.95);
+            border-top: 1px solid var(--border-color);
+            padding: 50px 5% 30px;
+            margin-top: auto;
         }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
         }
-        
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 14px;
+        }
+
+        .footer-col h4 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-col a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+            100% { box-shadow: 0 0 30px rgba(121, 40, 202, 0.7); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 16px 20px;
             }
-            50% {
-                transform: translateY(-10px);
+            .about-card {
+                padding: 24px;
             }
         }
     </style>
 </head>
+
 <body>
-    <header style="padding: 20px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center;">
-        <a href="final.html" style="color: #00ffcc; font-size: 1.5rem; font-weight: bold; text-decoration: none;">🎮 Game Store</a>
-        <nav style="display: flex; gap: 20px;">
-            <a href="final.html" style="color: #fff; text-decoration: none; font-weight: 600;">Games</a>
-            <a href="about.html" style="color: #00ffcc; text-decoration: none; font-weight: 600;">About</a>
-            <a href="services.html" style="color: #fff; text-decoration: none; font-weight: 600;">Services</a>
-            <a href="contact.html" style="color: #fff; text-decoration: none; font-weight: 600;">Contact</a>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="final.html" class="logo">
+            <div class="logo-icon">🎮</div>
+            <div class="logo-text">ARCADE HUB</div>
+        </a>
+
+        <nav>
+            <a href="final.html">Games</a>
+            <a href="about.html" class="active">About</a>
+            <a href="services.html">Services</a>
+            <a href="contact.html">Contact</a>
         </nav>
     </header>
-    <div class="container">
-        <h1 class="glow">About Our Gaming World</h1>
-        <p>Welcome to our gaming website! Here, we bring together passionate players and developers to celebrate the magic of gaming. Our platform offers the latest news, in-depth reviews, and a vibrant community dedicated to gamers of all types. Dive into a world where imagination meets reality!</p>
-        <button class="animated-button" onclick="alert('Thank you for visiting!')">Learn More</button>
-    </div>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="page-badge">
+            <span>✨ OUR VISION & COMMUNITY</span>
+        </div>
+        <h1 class="page-title">ABOUT <span>ARCADE HUB</span></h1>
+        <p class="page-subtitle">
+            Arcade Hub brings together gamers and creators. We build seamless, zero-friction web games that run instantly on any device — from laptops to smartphones.
+        </p>
+    </section>
+
+    <!-- Content Sections -->
+    <main class="content-container">
+        <!-- Mission Card -->
+        <article class="about-card">
+            <h2 class="section-heading"><span>🚀</span> Our Mission</h2>
+            <p class="section-text">
+                Gaming should be instant, accessible, and thrilling. Arcade Hub was founded to remove barriers between players and quality entertainment. Whether you want to swing through Manhattan as Spider-Man, smash 3D cricket sixes, solve puzzle cascades, or design multimedia projects, our library offers instant gratification without bloated app store downloads or payload friction.
+            </p>
+            <a href="final.html" class="action-btn">EXPLORE ALL GAMES 🎮</a>
+        </article>
+
+        <!-- Features Card -->
+        <article class="about-card">
+            <h2 class="section-heading"><span>⚡</span> Why Choose Arcade Hub?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <h3 class="feature-title">Instant Web Play</h3>
+                    <p class="feature-desc">No installations, launcher clients, or updates required. Click and start playing instantly in any browser.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🎮</span>
+                    <h3 class="feature-title">Diverse Game Library</h3>
+                    <p class="feature-desc">Action web-slingers, 3D sports simulations, retro neon classics, brain teasers, and web multimedia apps.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📱</span>
+                    <h3 class="feature-title">Cross-Device Optimized</h3>
+                    <p class="feature-desc">Seamless controls designed for touch screens, keyboard & mouse, or desktop windowing setups.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <h3 class="feature-title">Safe & Free</h3>
+                    <p class="feature-desc">100% free gaming experience without hidden sign-ups, trackable malware, or unexpected paywalls.</p>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="final.html" class="logo">
+                    <div class="logo-icon">🎮</div>
+                    <div class="logo-text">ARCADE HUB</div>
+                </a>
+                <p>Your ultimate destination for interactive browser gaming. Endless fun, crisp graphics, and thrilling gameplay experience.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="final.html">Home / Games</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="services.html">Services & Guides</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Top Games</h4>
+                <ul>
+                    <li><a href="game1/index.html">Spider-Man Web-Slinger</a></li>
+                    <li><a href="game2/index.html">T20 Cricket 3D</a></li>
+                    <li><a href="game4/index.html">Flower Crush</a></li>
+                    <li><a href="game5/editapp.html">Multimedia Studio</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Arcade Hub. All rights reserved.</p>
+            <p>Made with ⚡ for Gamers worldwide</p>
+        </div>
+    </footer>
+
 </body>
+
 </html>

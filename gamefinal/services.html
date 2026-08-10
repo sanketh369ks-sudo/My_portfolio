@@ -1,104 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Services - Gaming Website</title>
+    <title>Services - Arcade Hub</title>
+    <meta name="description"
+        content="Explore Arcade Hub services: Game reviews, player guides, tournaments, developer integration, and multimedia web tools.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 42, 66, 0.9);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #00ffcc;
+            --accent-pink: #ff007f;
+            --accent-purple: #7928ca;
+            --accent-gold: #ffb703;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --font-main: 'Outfit', sans-serif;
+            --font-heading: 'Orbitron', sans-serif;
+        }
+
+        * {
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #101820;
-            color: #f0f0f0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(121, 40, 202, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 65%, rgba(0, 255, 204, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(255, 0, 127, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
         }
-        .container {
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 20px;
-            text-align: center;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
         }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 30px;
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 5px;
+            border: 2px solid #090d16;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Header Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            background: rgba(9, 13, 22, 0.85);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        .logo-text {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
             position: relative;
-            color: #00e6e6;
-            animation: titleFadeIn 1.5s ease-in-out;
+            padding: 6px 0;
         }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-cyan);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 8px var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        /* Hero */
+        .page-hero {
+            padding: 70px 5% 40px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            color: var(--accent-cyan);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .page-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .page-title span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 750px;
+            margin: 0 auto 40px;
+        }
+
+        /* Services Grid */
+        .services-container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
         .service-card {
-            display: inline-block;
-            background: #1e2a38;
-            margin: 15px;
-            padding: 20px;
-            width: 280px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+
         .service-card:hover {
-            transform: scale(1.05);
+            transform: translateY(-8px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 12px 30px rgba(0, 255, 204, 0.2);
+            background: var(--bg-card-hover);
         }
-        .service-card h3 {
-            color: #00e6e6;
-            margin-bottom: 10px;
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
         }
-        .service-card p {
-            font-size: 1rem;
-            opacity: 0;
-            animation: cardFadeIn 2s forwards;
+
+        .service-title {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 12px;
         }
-        
-        @keyframes titleFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+
+        .service-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
         }
-        
-        @keyframes cardFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
+
+        .service-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: gap 0.3s ease;
+        }
+
+        .service-btn:hover {
+            gap: 12px;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(9, 13, 22, 0.95);
+            border-top: 1px solid var(--border-color);
+            padding: 50px 5% 30px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 14px;
+        }
+
+        .footer-col h4 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-col a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+            100% { box-shadow: 0 0 30px rgba(121, 40, 202, 0.7); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 16px 20px;
             }
         }
     </style>
 </head>
+
 <body>
-    <header style="padding: 20px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center;">
-        <a href="final.html" style="color: #00e6e6; font-size: 1.5rem; font-weight: bold; text-decoration: none;">🎮 Game Store</a>
-        <nav style="display: flex; gap: 20px;">
-            <a href="final.html" style="color: #fff; text-decoration: none; font-weight: 600;">Games</a>
-            <a href="about.html" style="color: #fff; text-decoration: none; font-weight: 600;">About</a>
-            <a href="services.html" style="color: #00e6e6; text-decoration: none; font-weight: 600;">Services</a>
-            <a href="contact.html" style="color: #fff; text-decoration: none; font-weight: 600;">Contact</a>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="final.html" class="logo">
+            <div class="logo-icon">🎮</div>
+            <div class="logo-text">ARCADE HUB</div>
+        </a>
+
+        <nav>
+            <a href="final.html">Games</a>
+            <a href="about.html">About</a>
+            <a href="services.html" class="active">Services</a>
+            <a href="contact.html">Contact</a>
         </nav>
     </header>
-    <div class="container">
-        <h1>Our Services</h1>
-        <div class="service-card">
-            <h3>Game Reviews</h3>
-            <p>Get in-depth reviews of the latest games, helping you make informed choices on your next adventure.</p>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="page-badge">
+            <span>⚙️ GAMING ECOSYSTEM & PLATFORM SERVICES</span>
         </div>
+        <h1 class="page-title">OUR <span>SERVICES</span></h1>
+        <p class="page-subtitle">
+            From player guides and competitive leaderboards to web game hosting and custom multimedia tools, we deliver an end-to-end browser arcade experience.
+        </p>
+    </section>
+
+    <!-- Services Grid -->
+    <main class="services-container">
+        <!-- Service 1 -->
         <div class="service-card">
-            <h3>Tutorials & Guides</h3>
-            <p>Step-by-step tutorials and gameplay guides to improve your skills and gameplay strategies.</p>
+            <div>
+                <div class="service-icon">⭐</div>
+                <h3 class="service-title">In-Depth Game Reviews</h3>
+                <p class="service-desc">Comprehensive walkthroughs, mechanic breakdowns, and player ratings for all action, sports, and puzzle games in our catalog.</p>
+            </div>
+            <a href="final.html" class="service-btn">BROWSE REVIEWS &rarr;</a>
         </div>
+
+        <!-- Service 2 -->
         <div class="service-card">
-            <h3>Community Events</h3>
-            <p>Join exclusive events and tournaments that bring together gamers from around the world.</p>
+            <div>
+                <div class="service-icon">📚</div>
+                <h3 class="service-title">Tutorials & Strategy Guides</h3>
+                <p class="service-desc">Master Spider-Man web combos, cricket timing windows, and high-score strategies with our step-by-step pro player guides.</p>
+            </div>
+            <a href="game1/index.html" class="service-btn">VIEW SPIDER-MAN GUIDE &rarr;</a>
         </div>
+
+        <!-- Service 3 -->
         <div class="service-card">
-            <h3>Live Streams</h3>
-            <p>Watch live streams of popular games and learn from the best players in the industry.</p>
+            <div>
+                <div class="service-icon">🏆</div>
+                <h3 class="service-title">Tournaments & Leaderboards</h3>
+                <p class="service-desc">Compete with players worldwide! Track your high scores in Flappy Eagle, Snake, and T20 Cricket 3D rankings.</p>
+            </div>
+            <a href="final.html" class="service-btn">CHECK LEADERBOARDS &rarr;</a>
         </div>
-    </div>
+
+        <!-- Service 4 -->
+        <div class="service-card">
+            <div>
+                <div class="service-icon">🎬</div>
+                <h3 class="service-title">Web Multimedia Studio</h3>
+                <p class="service-desc">Create custom clips, edit game highlights, apply visual filters, and export video media directly inside your web browser.</p>
+            </div>
+            <a href="game5/editapp.html" class="service-btn">LAUNCH STUDIO APP &rarr;</a>
+        </div>
+
+        <!-- Service 5 -->
+        <div class="service-card">
+            <div>
+                <div class="service-icon">🎮</div>
+                <h3 class="service-title">Developer Integration</h3>
+                <p class="service-desc">Indie game developer? Partner with Arcade Hub to showcase your HTML5 / WebGL games to thousands of active daily gamers.</p>
+            </div>
+            <a href="contact.html" class="service-btn">SUBMIT YOUR GAME &rarr;</a>
+        </div>
+
+        <!-- Service 6 -->
+        <div class="service-card">
+            <div>
+                <div class="service-icon">⚡</div>
+                <h3 class="service-title">Cross-Platform Optimization</h3>
+                <p class="service-desc">We optimize web games for 60 FPS performance, low memory footprint, zero download delays, and mobile touch compatibility.</p>
+            </div>
+            <a href="about.html" class="service-btn">LEARN MORE &rarr;</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="final.html" class="logo">
+                    <div class="logo-icon">🎮</div>
+                    <div class="logo-text">ARCADE HUB</div>
+                </a>
+                <p>Your ultimate destination for interactive browser gaming. Endless fun, crisp graphics, and thrilling gameplay experience.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="final.html">Home / Games</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="services.html">Services & Guides</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Featured Services</h4>
+                <ul>
+                    <li><a href="game5/editapp.html">Multimedia Studio</a></li>
+                    <li><a href="game1/index.html">Spider-Man Web-Slinger</a></li>
+                    <li><a href="game2/index.html">T20 Cricket 3D</a></li>
+                    <li><a href="contact.html">Developer Submissions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Arcade Hub. All rights reserved.</p>
+            <p>Made with ⚡ for Gamers worldwide</p>
+        </div>
+    </footer>
+
 </body>
+
 </html>
