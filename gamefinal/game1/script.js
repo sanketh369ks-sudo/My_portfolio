@@ -48,6 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let spiderSenseActive = false;
     let spiderSenseTimer = 0;
     let timeDilation = 1.0;
+    let webShieldActive = false;
+    let webShieldTimer = 0;
+    let empShockwaves = [];
 
     // --- Audio Engine (Web Audio API Synthesizer) ---
     let soundMuted = false;
@@ -284,8 +287,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'KeyQ') {
             triggerWebTsunami();
         }
+        if (e.code === 'KeyR') {
+            triggerWebShield();
+        }
+        if (e.code === 'KeyF') {
+            triggerElectricShockwave();
+        }
         if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-            triggerSpiderSense();
+            if (keys.space || e.code === 'KeyW') {
+                triggerRocketSlam();
+            } else {
+                triggerSpiderSense();
+            }
         }
         if (e.code === 'KeyK') {
             if (boss.active) {
@@ -431,6 +444,41 @@ document.addEventListener('DOMContentLoaded', () => {
         if (spiderSenseBadge) spiderSenseBadge.classList.add('active');
         playSFX('boss_spawn');
         spawnExplosion(player.x, player.y, '#ffcb05', 30);
+    }
+
+    function triggerWebShield() {
+        if (gameState !== 'playing' || webFluid < 12) return;
+        webFluid -= 12;
+        webShieldActive = true;
+        webShieldTimer = 240; // 4 seconds of invincibility shield dome
+        playSFX('super_blast');
+        spawnExplosion(player.x, player.y, '#00f0ff', 24);
+        updateHUD();
+    }
+
+    function triggerElectricShockwave() {
+        if (gameState !== 'playing' || webFluid < 18) return;
+        webFluid -= 18;
+        playSFX('explosion');
+        empShockwaves.push({
+            x: player.x,
+            y: player.y,
+            radius: 15,
+            maxRadius: 280,
+            speed: 14
+        });
+        spawnExplosion(player.x, player.y, '#ffcb05', 36);
+        updateHUD();
+    }
+
+    function triggerRocketSlam() {
+        if (gameState !== 'playing' || webFluid < 8) return;
+        webFluid -= 8;
+        player.vx = 13.5;
+        player.vy = -6;
+        playSFX('thwip');
+        spawnExplosion(player.x - 15, player.y, '#00f0ff', 20);
+        updateHUD();
     }
 
     // --- Game World Entities ---
@@ -911,6 +959,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Web Shield Timer
+        if (webShieldActive) {
+            webShieldTimer--;
+            if (webShieldTimer <= 0) {
+                webShieldActive = false;
+            }
+        }
+
+        // Update Electric EMP Shockwaves
+        for (let i = empShockwaves.length - 1; i >= 0; i--) {
+            const sw = empShockwaves[i];
+            sw.radius += sw.speed;
+
+            // Clear Glider Villains in shockwave radius
+            for (let j = pumpkinBombs.length - 1; j >= 0; j--) {
+                const bomb = pumpkinBombs[j];
+                const dist = Math.hypot(sw.x - bomb.x, sw.y - bomb.y);
+                if (dist <= sw.radius) {
+                    spawnExplosion(bomb.x, bomb.y, '#ff6600', 25);
+                    playSFX('explosion');
+                    pumpkinBombs.splice(j, 1);
+                    score += 200;
+                    comboCount++;
+                    comboTimer = 180;
+                }
+            }
+
+            // Clear Boss Projectiles in shockwave radius
+            for (let k = bossProjectiles.length - 1; k >= 0; k--) {
+                const bp = bossProjectiles[k];
+                const dist = Math.hypot(sw.x - bp.x, sw.y - bp.y);
+                if (dist <= sw.radius) {
+                    spawnExplosion(bp.x, bp.y, '#00f0ff', 16);
+                    bossProjectiles.splice(k, 1);
+                }
+            }
+
+            if (sw.radius >= sw.maxRadius) {
+                empShockwaves.splice(i, 1);
+            }
+        }
+
         // Combo decay timer
         if (comboTimer > 0) {
             comboTimer--;
@@ -932,6 +1022,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function takeDamage(fatal = false) {
+        if (webShieldActive && !fatal) {
+            // Web Shield Dome absorbs and reflects damage!
+            spawnExplosion(player.x, player.y, '#00f0ff', 24);
+            playSFX('super_blast');
+            return;
+        }
+
         if (fatal) {
             lives = 0;
         } else {
@@ -1705,8 +1802,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         ctx.globalAlpha = 1.0;
 
-        // 11. Draw Muscular Hero Spider-Man Character
+        // 11. Draw Muscular Hero Spider-Man Character & Web Shield Dome
         drawHeroicSpiderMan(ctx, player);
+
+        // Draw Web Shield Dome if active
+        if (webShieldActive) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.85)';
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y - 10, 42, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+
+        // Draw EMP Shockwaves
+        empShockwaves.forEach(sw => {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 203, 5, 0.9)';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = '#ffcb05';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        });
 
         ctx.restore(); // Restore camera translation
     }
