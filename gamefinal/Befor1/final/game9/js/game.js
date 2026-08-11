@@ -156,12 +156,13 @@ class BattleRoyaleGame {
         this.botManager.spawnBots(6, this.player);
         this.zoneManager = new SafeZoneManager(this.scene, this.world.mapSize);
 
-        try {
-            if (this.canvas && this.canvas.requestPointerLock) {
-                this.canvas.requestPointerLock();
-            }
-        } catch (e) {
-            // Mobile touch fallback
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        if (!isTouch) {
+            try {
+                if (this.canvas && this.canvas.requestPointerLock) {
+                    this.canvas.requestPointerLock();
+                }
+            } catch (e) { /* ignore */ }
         }
     }
 
