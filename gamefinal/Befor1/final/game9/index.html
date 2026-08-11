@@ -53,8 +53,8 @@
 
         <!-- In-Game HUD -->
         <div id="hud" class="hidden">
-            <!-- Click to Lock Aim Banner -->
-            <div id="lock-prompt" class="hidden" onclick="document.getElementById('webgl-canvas').requestPointerLock()">
+            <!-- Click to Lock Aim Banner (desktop only) -->
+            <div id="lock-prompt" class="hidden" onclick="if(!('ontouchstart' in window) && !navigator.maxTouchPoints) document.getElementById('webgl-canvas').requestPointerLock()">
                 🎯 CLICK TO RESUME AIM / MOUSE LOCK
             </div>
 
