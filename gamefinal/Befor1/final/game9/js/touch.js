@@ -202,18 +202,6 @@ class TouchController {
             }
         });
 
-        // Crouch Button
-        bindBtn('touch-btn-crouch', () => {
-            this.player.isCrouching = !this.player.isCrouching;
-            this.player.isProne = false;
-        });
-
-        // Prone / "Sleep" Button
-        bindBtn('touch-btn-prone', () => {
-            this.player.isProne = !this.player.isProne;
-            this.player.isCrouching = false;
-        });
-
         // Gloo Wall Defense Button
         bindBtn('touch-btn-gloo', () => {
             this.player.deployGlooWall();

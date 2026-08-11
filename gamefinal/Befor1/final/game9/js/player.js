@@ -448,14 +448,6 @@ class PlayerController {
                 }
             }
             if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') this.keys.sprint = true;
-            if (code === 'KeyC' || key === 'c') {
-                this.isCrouching = !this.isCrouching;
-                this.isProne = false;
-            }
-            if (code === 'KeyZ' || key === 'z') {
-                this.isProne = !this.isProne;
-                this.isCrouching = false;
-            }
             if (code === 'KeyF' || key === 'f') {
                 this.activateAbility();
             }
