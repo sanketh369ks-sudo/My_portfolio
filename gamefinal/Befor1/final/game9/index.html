@@ -165,10 +165,6 @@
                             <span>🩹 MEDKIT (H)</span>
                             <span id="medkit-count">x2</span>
                         </div>
-                        <div class="tactical-btn emote-btn"
-                            onclick="if(window.gameInstance) window.gameInstance.ui.toggleEmoteWheel(true)">
-                            <span>🕺 EMOTE (E)</span>
-                        </div>
                         <div class="tactical-btn"
                             onclick="if(window.gameInstance) window.gameInstance.ui.toggleInventory(true, window.gameInstance.player, window.gameInstance.weaponSys)">
                             <span>🎒 BAG (TAB)</span>
@@ -226,7 +222,6 @@
                     <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
                     <div id="touch-btn-gloo" class="touch-btn gloo-btn">🛡️</div>
                     <div id="touch-btn-medkit" class="touch-btn medkit-btn">🩹</div>
-                    <div id="touch-btn-emote" class="touch-btn emote-btn">🕺</div>
                     <div id="touch-btn-reload" class="touch-btn">🔄</div>
                     <div id="touch-btn-switch" class="touch-btn">⚔️</div>
                 </div>
@@ -235,43 +230,6 @@
                     <div id="touch-btn-crouch" class="touch-btn">🧘</div>
                     <div id="touch-btn-jump" class="touch-btn">🦘</div>
                     <div id="touch-btn-fire" class="touch-btn fire-btn">🔫</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Free Fire Circular Emote Wheel Modal Overlay -->
-        <div id="emote-wheel-overlay" class="overlay-screen hidden" onclick="if(event.target === this && window.gameInstance) window.gameInstance.ui.toggleEmoteWheel(false)">
-            <div id="emote-wheel-container">
-                <div class="emote-wheel-title">🕺 FREE FIRE EMOTE WHEEL</div>
-                <div class="emote-wheel-ring">
-                    <div class="emote-slot slot-1" onclick="if(window.gameInstance) { window.gameInstance.player.performEmote('booyah'); window.gameInstance.ui.toggleEmoteWheel(false); }">
-                        <span class="emote-icon">🔥</span>
-                        <span class="emote-label">BOOYAH!</span>
-                    </div>
-                    <div class="emote-slot slot-2" onclick="if(window.gameInstance) { window.gameInstance.player.performEmote('lol'); window.gameInstance.ui.toggleEmoteWheel(false); }">
-                        <span class="emote-icon">😂</span>
-                        <span class="emote-label">LOL TAUNT</span>
-                    </div>
-                    <div class="emote-slot slot-3" onclick="if(window.gameInstance) { window.gameInstance.player.performEmote('heart'); window.gameInstance.ui.toggleEmoteWheel(false); }">
-                        <span class="emote-icon">💖</span>
-                        <span class="emote-label">LOVE HEART</span>
-                    </div>
-                    <div class="emote-slot slot-4" onclick="if(window.gameInstance) { window.gameInstance.player.performEmote('pushup'); window.gameInstance.ui.toggleEmoteWheel(false); }">
-                        <span class="emote-icon">💪</span>
-                        <span class="emote-label">PUSH-UP</span>
-                    </div>
-                    <div class="emote-slot slot-5" onclick="if(window.gameInstance) { window.gameInstance.player.performEmote('throne'); window.gameInstance.ui.toggleEmoteWheel(false); }">
-                        <span class="emote-icon">👑</span>
-                        <span class="emote-label">THRONE</span>
-                    </div>
-                    <div class="emote-slot slot-6" onclick="if(window.gameInstance) { window.gameInstance.player.performEmote('clap'); window.gameInstance.ui.toggleEmoteWheel(false); }">
-                        <span class="emote-icon">👏</span>
-                        <span class="emote-label">VICTORY CLAP</span>
-                    </div>
-                    <div class="emote-center-hub" onclick="if(window.gameInstance) window.gameInstance.ui.toggleEmoteWheel(false)">
-                        <span>✕</span>
-                        <span style="font-size: 10px;">CLOSE</span>
-                    </div>
                 </div>
             </div>
         </div>
