@@ -24,10 +24,15 @@
 }
 
 .touch-left-tactical-row {
+    position: absolute;
+    top: 10px;
+    left: 10px;
     display: flex;
     flex-direction: row;
     gap: 6px;
     align-items: center;
+    pointer-events: auto;
+    z-index: 60;
 }
 
 /* Virtual Joystick */
