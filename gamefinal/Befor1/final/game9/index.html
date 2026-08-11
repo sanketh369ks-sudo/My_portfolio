@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Battle Royale | Cyber Free Fire Edition</title>
+    <meta name="description"
+        content="Browser-based 3D Battle Royale prototype game built with HTML5, CSS3, JavaScript, and Three.js. Features Gloo Walls, Prone Sleep, Jump, 3D island map, weapons, bots AI, loot, and safe zone mechanics.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Rajdhani:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/touch.css">
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- WebGL 3D Canvas -->
+        <canvas id="webgl-canvas"></canvas>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-title">INITIALIZING 3D WORLD</div>
+            <div style="color: #8b949e; font-size: 13px; letter-spacing: 1px;">Loading terrain, Gloo Walls, weapons,
+                sound engine & AI bots...</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- In-Game HUD -->
+        <div id="hud" class="hidden">
+            <!-- Click to Lock Aim Banner -->
+            <div id="lock-prompt" class="hidden" onclick="document.getElementById('webgl-canvas').requestPointerLock()">
+                🎯 CLICK TO RESUME AIM / MOUSE LOCK
+            </div>
+
+            <!-- Crosshair -->
+            <div id="crosshair">
+                <div class="cross-line cross-top"></div>
+                <div class="cross-line cross-bottom"></div>
+                <div class="cross-line cross-left"></div>
+                <div class="cross-line cross-right"></div>
+                <div class="cross-dot"></div>
+            </div>
+
+            <!-- Real Tactical Optical Scope Overlay -->
+            <div id="scope-overlay" class="hidden">
+                <div class="scope-lens">
+                    <div class="scope-reticle">
+                        <div class="scope-cross-h"></div>
+                        <div class="scope-cross-v"></div>
+                        <div class="scope-center-dot"></div>
+                        <div id="scope-range-finder" class="scope-range-finder">8x OPTICAL TACTICAL SCOPE</div>
+                    </div>
+                    <div class="scope-glass-glare"></div>
+                </div>
+            </div>
+
+            <!-- Hit Marker Flash -->
+            <div id="hit-marker">
+                <div class="hit-line hit-line-1"></div>
+                <div class="hit-line hit-line-2"></div>
+                <div class="hit-line hit-line-3"></div>
+                <div class="hit-line hit-line-4"></div>
+            </div>
+
+            <!-- Gold Glowing Headshot Banner -->
+            <div id="headshot-banner">🎯 HEADSHOT! (+2.5x DAMAGE)</div>
+
+            <!-- Damage Vignette Red Flash -->
+            <div id="damage-flash"></div>
+
+            <!-- Top Center Status Bar -->
+            <div class="top-center-bar">
+                <div class="match-info-item">
+                    <span class="match-info-label">SAFE ZONE</span>
+                    <span id="zone-timer" class="match-info-value zone-timer">00:35</span>
+                </div>
+                <div class="match-info-item">
+                    <span class="match-info-label">ALIVE</span>
+                    <span id="alive-count" class="match-info-value alive-count">7</span>
+                </div>
+                <div class="match-info-item">
+                    <span class="match-info-label">KILLS</span>
+                    <span id="kill-count" class="match-info-value kill-count">0</span>
+                </div>
+            </div>
+
+            <!-- Out of Safe Zone Alert -->
+            <div id="zone-warning" class="hidden">
+                ⚠️ WARNING: OUTSIDE SAFE ZONE! TAKE COVER!
+            </div>
+
+            <!-- Real-time Kill Feed -->
+            <div id="kill-feed"></div>
+
+            <!-- Canvas Minimap Radar -->
+            <div id="minimap-container">
+                <canvas id="minimap"></canvas>
+            </div>
+
+            <!-- Loot Proximity Prompt -->
+            <div id="loot-prompt" class="hidden">
+                <span class="key-badge">E / TAP</span>
+                <span id="loot-text">Pick Up Plasma Rifle</span>
+            </div>
+
+            <!-- Bottom Player Status & Tactical Bar -->
+            <div class="bottom-hud">
+                <!-- Vitals & Tactical Equipment -->
+                <div class="vitals-container">
+                    <div class="vital-bar-row">
+                        <div class="vital-label-group">
+                            <span>HEALTH</span>
+                            <span id="hp-val">100</span>
+                        </div>
+                        <div class="vital-bar-track">
+                            <div id="hp-bar" class="vital-bar-fill hp-fill"></div>
+                        </div>
+                    </div>
+
+                    <div class="vital-bar-row">
+                        <div class="vital-label-group">
+                            <span>ARMOR</span>
+                            <span id="armor-val">0</span>
+                        </div>
+                        <div class="vital-bar-track">
+                            <div id="armor-bar" class="vital-bar-fill armor-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="tactical-actions-row">
+                        <div class="tactical-btn gloo-btn"
+                            onclick="if(window.gameInstance) window.gameInstance.player.deployGlooWall()">
+                            <span>🛡️ GLOO (G)</span>
+                            <span id="gloo-count">x3</span>
+                        </div>
+                        <div class="tactical-btn"
+                            onclick="if(window.gameInstance) window.gameInstance.player.useMedkit()">
+                            <span>🩹 MEDKIT (H)</span>
+                            <span id="medkit-count">x2</span>
+                        </div>
+                        <div class="tactical-btn"
+                            onclick="if(window.gameInstance) window.gameInstance.ui.toggleInventory(true, window.gameInstance.player, window.gameInstance.weaponSys)">
+                            <span>🎒 BAG (TAB)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weapon Bar -->
+                <div class="weapon-hud-container">
+                    <div class="weapon-slots">
+                        <div class="weapon-slot active" data-weapon="ak47"
+                            onclick="if(window.gameInstance) window.gameInstance.weaponSys.switchWeapon('ak47')">1
+                        </div>
+                        <div class="weapon-slot" data-weapon="awm"
+                            onclick="if(window.gameInstance) window.gameInstance.weaponSys.switchWeapon('awm')">2
+                        </div>
+                        <div class="weapon-slot" data-weapon="mp40"
+                            onclick="if(window.gameInstance) window.gameInstance.weaponSys.switchWeapon('mp40')">3
+                        </div>
+                        <div class="weapon-slot" data-weapon="m1887"
+                            onclick="if(window.gameInstance) window.gameInstance.weaponSys.switchWeapon('m1887')">4
+                        </div>
+                        <div class="weapon-slot" data-weapon="plasma"
+                            onclick="if(window.gameInstance) window.gameInstance.weaponSys.switchWeapon('plasma')">5
+                        </div>
+                        <div class="weapon-slot" data-weapon="deagle"
+                            onclick="if(window.gameInstance) window.gameInstance.weaponSys.switchWeapon('deagle')">6
+                        </div>
+                    </div>
+                    <div class="active-weapon-info">
+                        <span id="weapon-name" class="weapon-name">PLASMA RIFLE</span>
+                        <div>
+                            <span id="ammo-count" class="ammo-counter">30</span>
+                            <span id="ammo-reserve" class="ammo-reserve">/ 120</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Touch Controls Overlay -->
+        <div id="touch-controls">
+            <!-- Left Virtual Joystick -->
+            <div id="joystick-container">
+                <div id="joystick-knob"></div>
+            </div>
+
+            <!-- Right Action Buttons -->
+            <div class="touch-btn-cluster">
+                <div class="touch-row">
+                    <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
+                    <div id="touch-btn-gloo" class="touch-btn gloo-btn">🛡️</div>
+                    <div id="touch-btn-reload" class="touch-btn">🔄</div>
+                    <div id="touch-btn-switch" class="touch-btn">⚔️</div>
+                </div>
+                <div class="touch-row">
+                    <div id="touch-btn-prone" class="touch-btn">🛌</div>
+                    <div id="touch-btn-crouch" class="touch-btn">🧘</div>
+                    <div id="touch-btn-jump" class="touch-btn">🦘</div>
+                    <div id="touch-btn-fire" class="touch-btn fire-btn">🔫</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Backpack Inventory Screen Overlay -->
+        <div id="inventory-overlay" class="overlay-screen hidden">
+            <div id="inventory-modal">
+                <div class="inv-header">
+                    <div class="inv-title">🎒 BATTLE ROYALE BACKPACK INVENTORY</div>
+                    <button class="inv-close-btn" onclick="if(window.gameInstance) window.gameInstance.ui.toggleInventory(false)">✕</button>
+                </div>
+
+                <div class="inv-section-title">⚔️ WEAPON LOCKER & EQUIPPED GEAR (CLICK TO EQUIP)</div>
+                <div id="inv-weapons-grid" class="inv-weapons-grid"></div>
+
+                <div class="inv-section-title">📦 BACKPACK SUPPLIES & TACTICAL EQUIPMENT</div>
+                <div class="inv-supplies-grid">
+                    <div class="inv-supply-card">
+                        <div>
+                            <div style="font-weight: 800; color: #20e2a3;">🩹 MEDKITS</div>
+                            <div style="font-size: 12px; color: #8b949e;">Restores +50 HP</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span id="inv-medkit-val" style="font-weight: 900; font-size: 18px; color: #20e2a3;">2</span>
+                            <button class="inv-action-btn" onclick="if(window.gameInstance) { window.gameInstance.player.useMedkit(); window.gameInstance.ui.populateInventoryModal(window.gameInstance.player, window.gameInstance.weaponSys); }">USE</button>
+                        </div>
+                    </div>
+
+                    <div class="inv-supply-card">
+                        <div>
+                            <div style="font-weight: 800; color: #00f0ff;">🛡️ GLOO WALL SHIELDS</div>
+                            <div style="font-size: 12px; color: #8b949e;">Tactical Defense Wall</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span id="inv-gloo-val" style="font-weight: 900; font-size: 18px; color: #00f0ff;">3</span>
+                            <button class="inv-action-btn" onclick="if(window.gameInstance) { window.gameInstance.player.deployGlooWall(); window.gameInstance.ui.toggleInventory(false); }">DEPLOY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Start Screen -->
+        <div id="start-screen" class="overlay-screen">
+            <div class="menu-card">
+                <div class="game-logo">CYBER BATTLE ROYALE</div>
+                <div class="game-subtitle">3D Browser Prototype | HTML5 + Three.js</div>
+
+                <button id="start-btn" class="menu-btn">🚀 ENTER MATCH</button>
+
+                <div class="controls-guide">
+                    <div class="control-item"><span>Move</span><span class="control-key">WASD / Arrows</span></div>
+                    <div class="control-item"><span>Look / Aim</span><span class="control-key">Mouse / Touch</span>
+                    </div>
+                    <div class="control-item"><span>Fire</span><span class="control-key">Left Click / 🔫</span></div>
+                    <div class="control-item"><span>Scope (ADS)</span><span class="control-key">Right Click / 🎯</span>
+                    </div>
+                    <div class="control-item"><span>Jump</span><span class="control-key">Space / 🦘</span></div>
+                    <div class="control-item"><span>Crouch</span><span class="control-key">C / 🧘</span></div>
+                    <div class="control-item"><span>Prone / Lie Down</span><span class="control-key">Z / 🛌</span></div>
+                    <div class="control-item"><span>Gloo Defense Wall</span><span class="control-key">G / 🛡️</span>
+                    </div>
+                    <div class="control-item"><span>Sprint</span><span class="control-key">Shift</span></div>
+                    <div class="control-item"><span>Switch Weapon</span><span class="control-key">1 / 2 / 3</span></div>
+                    <div class="control-item"><span>Reload</span><span class="control-key">R</span></div>
+                    <div class="control-item"><span>Pick Up Loot</span><span class="control-key">E</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Game Over / Victory Screen -->
+        <div id="end-screen" class="overlay-screen hidden">
+            <div class="menu-card">
+                <div id="end-title" class="end-title victory">#1 BOOYAH!</div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div id="stat-kills" class="stat-val">0</div>
+                        <div class="stat-lbl">KILLS</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="stat-damage" class="stat-val">0</div>
+                        <div class="stat-lbl">DAMAGE DEALT</div>
+                    </div>
+                    <div class="stat-box" style="grid-column: span 2;">
+                        <div id="stat-placement" class="stat-val">#1 / 7</div>
+                        <div class="stat-lbl">PLACEMENT</div>
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="menu-btn">PLAY AGAIN 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/weapons.js"></script>
+    <script src="js/loot.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/bots.js"></script>
+    <script src="js/zone.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/touch.js"></script>
+    <script src="js/game.js"></script>
+</body>
+
+</html>

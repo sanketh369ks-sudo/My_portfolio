@@ -1,0 +1,547 @@
+/* Premium Esports In-Game HUD & Overlay Styling */
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    font-family: 'Rajdhani', 'Inter', sans-serif;
+}
+
+/* Pointer Lock Pause Prompt */
+#lock-prompt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10, 14, 23, 0.95);
+    border: 2px solid #ffaa00;
+    box-shadow: 0 0 35px rgba(255, 170, 0, 0.6), inset 0 0 15px rgba(255, 170, 0, 0.2);
+    padding: 24px 48px;
+    border-radius: 16px;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 90;
+    backdrop-filter: blur(10px);
+    animation: pulseBorder 1.5s infinite alternate;
+}
+
+@keyframes pulseBorder {
+    0% { border-color: #ffaa00; box-shadow: 0 0 20px rgba(255, 170, 0, 0.4); }
+    100% { border-color: #ff5500; box-shadow: 0 0 40px rgba(255, 85, 0, 0.8); }
+}
+
+/* Dynamic Crosshair */
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    transition: transform 0.05s ease, opacity 0.15s ease;
+}
+
+.cross-line {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+}
+
+.cross-top { top: 0; left: 13px; width: 2px; height: 8px; }
+.cross-bottom { bottom: 0; left: 13px; width: 2px; height: 8px; }
+.cross-left { left: 0; top: 13px; width: 8px; height: 2px; }
+.cross-right { right: 0; top: 13px; width: 8px; height: 2px; }
+.cross-dot {
+    top: 13px;
+    left: 13px;
+    width: 2px;
+    height: 2px;
+    background-color: #ffaa00;
+    box-shadow: 0 0 8px #ffaa00;
+}
+
+/* Real Tactical Optical Gun Scope View */
+#scope-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 80;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.92);
+}
+
+.scope-lens {
+    position: relative;
+    width: min(520px, 80vh);
+    height: min(520px, 80vh);
+    border-radius: 50%;
+    border: 14px solid #0d1117;
+    box-shadow: 0 0 0 2000px #000000, inset 0 0 40px rgba(0, 240, 255, 0.3);
+    overflow: hidden;
+    background: transparent;
+}
+
+.scope-reticle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scope-cross-h {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 240, 255, 0.85);
+    box-shadow: 0 0 6px #00f0ff;
+}
+
+.scope-cross-v {
+    position: absolute;
+    height: 100%;
+    width: 2px;
+    background: rgba(0, 240, 255, 0.85);
+    box-shadow: 0 0 6px #00f0ff;
+}
+
+.scope-center-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #ff0055;
+    box-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+}
+
+.scope-range-finder {
+    position: absolute;
+    bottom: 40px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #00f0ff;
+    text-shadow: 0 0 8px #00f0ff;
+    text-transform: uppercase;
+}
+
+.scope-glass-glare {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(0,240,255,0.05) 100%);
+    pointer-events: none;
+}
+
+/* Hit Marker */
+#hit-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    transition: opacity 0.05s ease-out;
+}
+#hit-marker.active {
+    opacity: 1;
+}
+.hit-line {
+    position: absolute;
+    background: #ff3333;
+    box-shadow: 0 0 8px #ff0000;
+}
+.hit-line-1 { top: 0; left: 11px; width: 2px; height: 7px; }
+.hit-line-2 { bottom: 0; left: 11px; width: 2px; height: 7px; }
+.hit-line-3 { left: 0; top: 11px; width: 7px; height: 2px; }
+.hit-line-4 { right: 0; top: 11px; width: 7px; height: 2px; }
+
+/* Gold Glowing Headshot Banner */
+#headshot-banner {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #ffaa00;
+    text-shadow: 0 0 25px #ffaa00, 0 0 50px #ff0055;
+    background: rgba(10, 14, 23, 0.85);
+    border: 2px solid #ffaa00;
+    border-radius: 12px;
+    padding: 12px 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 95;
+}
+#headshot-banner.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Top Status Bar */
+.top-center-bar {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    background: rgba(10, 14, 24, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 14px;
+    padding: 10px 28px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 170, 0, 0.15);
+}
+
+.match-info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.match-info-label {
+    font-size: 11px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.match-info-value {
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.match-info-value.zone-timer {
+    color: #ffaa00;
+    font-family: monospace;
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+}
+
+.match-info-value.alive-count {
+    color: #20e2a3;
+    text-shadow: 0 0 10px rgba(32, 226, 163, 0.5);
+}
+
+.match-info-value.kill-count {
+    color: #ff4757;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+}
+
+/* Minimap */
+#minimap-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255, 170, 0, 0.5);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 170, 0, 0.2);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+#minimap {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Kill Feed */
+#kill-feed {
+    position: absolute;
+    top: 85px;
+    left: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 320px;
+}
+
+.kill-feed-item {
+    background: rgba(15, 20, 30, 0.9);
+    border-left: 4px solid #ff4757;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #e6edf3;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.kill-feed-item.player-kill {
+    border-left-color: #20e2a3;
+    background: rgba(18, 45, 32, 0.95);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Zone Warning */
+#zone-warning {
+    position: absolute;
+    top: 115px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 71, 87, 0.3);
+    border: 1px solid #ff4757;
+    color: #ff4757;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.4);
+    animation: pulseWarning 1s infinite alternate;
+}
+
+@keyframes pulseWarning {
+    0% { opacity: 0.7; transform: translateX(-50%) scale(0.98); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1.02); }
+}
+
+/* Loot Pickup Prompt */
+#loot-prompt {
+    position: absolute;
+    bottom: 185px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 14, 23, 0.95);
+    border: 1.5px solid #ffaa00;
+    padding: 10px 22px;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 6px 25px rgba(255, 170, 0, 0.4);
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.key-badge {
+    background: linear-gradient(135deg, #ffaa00, #ff5500);
+    color: #000000;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 900;
+    font-size: 12px;
+}
+
+/* Bottom Player HUD & Tactical Defense Bar */
+.bottom-hud {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+/* Vitals (HP & Armor) */
+.vitals-container {
+    background: rgba(10, 14, 23, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 16px 22px;
+    border-radius: 14px;
+    width: 290px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+}
+
+.vital-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vital-label-group {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 800;
+    color: #8b949e;
+}
+
+.vital-bar-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.vital-bar-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 5px;
+    transition: width 0.2s ease;
+}
+
+.hp-fill {
+    background: linear-gradient(90deg, #ff4757, #ff6b81);
+    box-shadow: 0 0 12px rgba(255, 71, 87, 0.6);
+}
+
+.armor-fill {
+    background: linear-gradient(90deg, #1e90ff, #70a1ff);
+    box-shadow: 0 0 12px rgba(30, 144, 255, 0.6);
+}
+
+/* Tactical Actions (Gloo Wall & Medkit) */
+.tactical-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.tactical-btn {
+    flex: 1;
+    pointer-events: auto;
+    background: rgba(255, 170, 0, 0.12);
+    border: 1px solid #ffaa00;
+    color: #ffaa00;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+.tactical-btn:hover {
+    background: rgba(255, 170, 0, 0.25);
+    box-shadow: 0 0 12px rgba(255, 170, 0, 0.3);
+}
+
+.tactical-btn.gloo-btn {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: #00f0ff;
+    color: #00f0ff;
+}
+.tactical-btn.gloo-btn:hover {
+    background: rgba(0, 240, 255, 0.25);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+/* Weapon HUD Display */
+.weapon-hud-container {
+    background: rgba(10, 14, 23, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 16px 22px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+}
+
+.active-weapon-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.weapon-name {
+    font-size: 19px;
+    font-weight: 900;
+    color: #ffaa00;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.ammo-counter {
+    font-size: 28px;
+    font-weight: 900;
+    color: #ffffff;
+    font-family: monospace;
+}
+
+.ammo-reserve {
+    font-size: 16px;
+    color: #8b949e;
+}
+
+.weapon-slots {
+    display: flex;
+    gap: 8px;
+}
+
+.weapon-slot {
+    width: 46px;
+    height: 46px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 900;
+    font-size: 15px;
+    color: #8b949e;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s ease;
+}
+
+.weapon-slot.active {
+    border-color: #ffaa00;
+    color: #ffaa00;
+    background: rgba(255, 170, 0, 0.18);
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.4);
+}
+
+/* Damage Flash Red Glow */
+#damage-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 90px rgba(255, 0, 0, 0.75);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s ease-out;
+}
+#damage-flash.active {
+    opacity: 1;
+}

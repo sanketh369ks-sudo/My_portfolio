@@ -1,0 +1,105 @@
+/* Mobile Virtual Touch Controls Overlay */
+#touch-controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+}
+
+/* Virtual Joystick */
+#joystick-container {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    width: 135px;
+    height: 135px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+#joystick-knob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    background: radial-gradient(circle, #ffaa00 0%, #ff5500 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 18px rgba(255, 170, 0, 0.6);
+}
+
+/* Right Hand Touch Action Buttons Cluster */
+.touch-btn-cluster {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.touch-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.touch-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(10, 14, 23, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.05s ease, background 0.15s ease;
+}
+
+.touch-btn:active, .touch-btn.pressed {
+    transform: scale(0.9);
+    background: rgba(255, 170, 0, 0.4);
+    border-color: #ffaa00;
+}
+
+.touch-btn.fire-btn {
+    width: 75px;
+    height: 75px;
+    background: rgba(255, 71, 87, 0.45);
+    border-color: #ff4757;
+    font-size: 28px;
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+}
+
+.touch-btn.aim-btn {
+    background: rgba(32, 226, 163, 0.3);
+    border-color: #20e2a3;
+}
+
+.touch-btn.gloo-btn {
+    background: rgba(0, 240, 255, 0.3);
+    border-color: #00f0ff;
+    font-size: 22px;
+}
+
+/* Show touch controls on touch-enabled devices or mobile screens */
+@media (pointer: coarse), (max-width: 900px) {
+    #touch-controls {
+        display: block;
+    }
+}
