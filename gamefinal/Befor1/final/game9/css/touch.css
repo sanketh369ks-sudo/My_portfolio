@@ -116,6 +116,7 @@
     justify-content: center;
     align-items: center;
     touch-action: none;
+    pointer-events: auto;          /* ← critical: override parent none */
     user-select: none;
     -webkit-user-select: none;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
