@@ -772,7 +772,7 @@
 }
 
 /* Mobile Responsive HUD Layout */
-@media (max-width: 900px), (pointer: coarse) {
+@media (max-width: 1024px), (pointer: coarse) {
     .top-center-bar {
         top: 10px;
         left: 12px;
@@ -803,10 +803,10 @@
 
     .bottom-hud {
         position: absolute;
-        top: 55px;
+        top: 55px !important;
         left: 12px;
         right: 12px;
-        bottom: auto;
+        bottom: auto !important;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -892,8 +892,17 @@ body.is-touch #minimap-container {
 }
 
 body.is-touch .bottom-hud {
-    top: 55px;
-    bottom: auto;
+    position: absolute;
+    top: 55px !important;
+    bottom: auto !important;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 60;
 }
 
 body.is-touch .tactical-actions-row {

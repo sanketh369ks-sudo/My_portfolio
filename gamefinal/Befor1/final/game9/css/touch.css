@@ -13,8 +13,8 @@
 /* Left Side Controls (Quick Tactical Actions + Joystick) */
 .touch-left-side {
     position: absolute;
-    bottom: 20px;
-    left: 15px;
+    bottom: 15px;
+    left: 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -24,8 +24,9 @@
 
 .touch-left-tactical-row {
     display: flex;
-    gap: 6px;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
 }
 
 /* Virtual Joystick */
@@ -150,7 +151,7 @@
 }
 
 /* Show touch controls on touch-enabled devices or mobile screens */
-@media (pointer: coarse), (max-width: 900px) {
+@media (pointer: coarse), (max-width: 1024px) {
     #touch-controls {
         display: block !important;
     }

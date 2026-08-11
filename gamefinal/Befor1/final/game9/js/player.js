@@ -953,8 +953,9 @@ class PlayerController {
             this.rightLeg.rotation.x = 0;
         }
 
-        const baseCamHeight = this.isProne ? 0.8 : (this.isCrouching ? 1.4 : 2.2);
-        const camOffset = this.isAiming ? this.aimCameraOffset : new THREE.Vector3(0, baseCamHeight, 3.8);
+        const baseCamHeight = this.isProne ? 1.0 : (this.isCrouching ? 1.6 : 2.5);
+        const camDistance = this.isProne ? 4.2 : 4.8;
+        const camOffset = this.isAiming ? this.aimCameraOffset : new THREE.Vector3(0, baseCamHeight, camDistance);
         const rotatedOffset = camOffset.clone()
             .applyAxisAngle(new THREE.Vector3(1, 0, 0), this.pitch)
             .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.rotationY);
@@ -962,7 +963,7 @@ class PlayerController {
         const camTargetPos = this.position.clone().add(rotatedOffset);
         this.camera.position.lerp(camTargetPos, 0.3);
         
-        const lookAtPoint = this.position.clone().add(
+        const lookAtPoint = this.position.clone().add(new THREE.Vector3(0, 0.6, 0)).add(
             new THREE.Vector3(0, 0, -10)
                 .applyAxisAngle(new THREE.Vector3(1, 0, 0), this.pitch)
                 .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.rotationY)
