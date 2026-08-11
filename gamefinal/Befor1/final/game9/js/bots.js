@@ -9,6 +9,7 @@ class BotManager {
         this.weaponSys = weaponSys;
         this.bots = [];
 
+
         this.botNames = [
             'CyberBot_Alpha', 'Viper_X', 'Shadow_Hunter', 'Apex_Predator', 'Phantom_Zero',
             'Neon_Stalker', 'Ghost_Rider', 'Titan_Mech', 'Blaze_Runner'

@@ -1116,7 +1116,7 @@ class PlayerController {
 
         const camTargetPos = this.position.clone().add(rotatedOffset);
         this.camera.position.lerp(camTargetPos, 0.3);
-        
+
         const lookAtPoint = this.position.clone().add(new THREE.Vector3(0, 0.6, 0)).add(
             new THREE.Vector3(0, 0, -10)
                 .applyAxisAngle(new THREE.Vector3(1, 0, 0), this.pitch)
