@@ -120,6 +120,11 @@ class TouchController {
             }
         });
 
+        // Character Skill Ability Button
+        bindBtn('touch-btn-ability', () => {
+            this.player.activateAbility();
+        });
+
         // Aim Scope Button
         bindBtn('touch-btn-aim', () => {
             this.player.isAiming = !this.player.isAiming;
@@ -131,6 +136,8 @@ class TouchController {
         // Jump Button
         bindBtn('touch-btn-jump', () => {
             if (this.player.isGrounded) {
+                const terrainY = this.player.world ? this.player.world.getTerrainHeight(this.player.position.x, this.player.position.z) : 0;
+                this.player.position.y = terrainY + 1.5;
                 this.player.velocity.y = this.player.jumpForce;
                 this.player.isGrounded = false;
                 this.player.isCrouching = false;

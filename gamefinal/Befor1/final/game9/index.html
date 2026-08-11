@@ -81,6 +81,12 @@
             <!-- Gold Glowing Headshot Banner -->
             <div id="headshot-banner">🎯 HEADSHOT! (+2.5x DAMAGE)</div>
 
+            <!-- Free Fire Kill Streak Banner -->
+            <div id="streak-banner" class="hidden">DOUBLE KILL!</div>
+
+            <!-- Floating 3D Damage Numbers Overlay -->
+            <div id="damage-numbers-container"></div>
+
             <!-- Damage Vignette Red Flash -->
             <div id="damage-flash"></div>
 
@@ -144,6 +150,11 @@
                     </div>
 
                     <div class="tactical-actions-row">
+                        <div class="tactical-btn skill-btn"
+                            onclick="if(window.gameInstance) window.gameInstance.player.activateAbility()">
+                            <span>✨ SKILL (F)</span>
+                            <span id="skill-cd">READY</span>
+                        </div>
                         <div class="tactical-btn gloo-btn"
                             onclick="if(window.gameInstance) window.gameInstance.player.deployGlooWall()">
                             <span>🛡️ GLOO (G)</span>
@@ -204,6 +215,7 @@
             <!-- Right Action Buttons -->
             <div class="touch-btn-cluster">
                 <div class="touch-row">
+                    <div id="touch-btn-ability" class="touch-btn skill-btn">✨</div>
                     <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
                     <div id="touch-btn-gloo" class="touch-btn gloo-btn">🛡️</div>
                     <div id="touch-btn-reload" class="touch-btn">🔄</div>

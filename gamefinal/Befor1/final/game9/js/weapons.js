@@ -157,6 +157,10 @@ class WeaponSystem {
 
         this.createMuzzleFlash(shooter.position.clone().add(new THREE.Vector3(0, 1.2, 0)), w.color);
 
+        if (window.gameInstance && window.gameInstance.ui && shooter.position) {
+            window.gameInstance.ui.addGunfireBlip(shooter.position.x, shooter.position.z);
+        }
+
         const hits = [];
         const pelletCount = w.pellets || 1;
 
@@ -243,6 +247,7 @@ class WeaponSystem {
 
                     if (window.gameInstance && window.gameInstance.ui) {
                         window.gameInstance.ui.triggerHitMarker(isHeadshot);
+                        window.gameInstance.ui.showDamageNumber(closestEnemyHit.hit.point, finalDamage, isHeadshot, this.camera);
                         if (isHeadshot) {
                             window.gameInstance.ui.triggerHeadshotBanner();
                         }
@@ -250,6 +255,19 @@ class WeaponSystem {
                 }
 
                 if (!hitTarget.isAlive && window.gameInstance && window.gameInstance.ui) {
+                    if (shooter.isPlayer) {
+                        const now = performance.now() * 0.001;
+                        if (now - (shooter.lastKillTime || 0) < 6.0) {
+                            shooter.streakCount = (shooter.streakCount || 1) + 1;
+                        } else {
+                            shooter.streakCount = 1;
+                        }
+                        shooter.lastKillTime = now;
+                        if (shooter.streakCount >= 2) {
+                            window.gameInstance.ui.triggerKillStreak(shooter.streakCount);
+                        }
+                    }
+
                     const killMethod = isHeadshot ? `${w.name} (🎯 HEADSHOT)` : w.name;
                     window.gameInstance.ui.addKillFeed(
                         shooter.isPlayer ? 'Player' : shooter.name,

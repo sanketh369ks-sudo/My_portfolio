@@ -130,8 +130,12 @@ class BattleRoyaleGame {
         this.botManager.spawnBots(6, this.player);
         this.zoneManager = new SafeZoneManager(this.scene, this.world.mapSize);
 
-        if (!this.touchController.isTouchDevice) {
-            this.canvas.requestPointerLock();
+        try {
+            if (this.canvas && this.canvas.requestPointerLock) {
+                this.canvas.requestPointerLock();
+            }
+        } catch (e) {
+            // Mobile touch fallback
         }
     }
 
@@ -218,7 +222,15 @@ class BattleRoyaleGame {
                 this.camera.updateProjectionMatrix();
             }
 
-            // Single-tap per click firing control (No unintended automatic fire)
+            // Periodic Air Drop Supply Crate Spawner (Every 40 seconds)
+            if (typeof this.airdropTimer !== 'number') this.airdropTimer = 35;
+            this.airdropTimer -= delta;
+            if (this.airdropTimer <= 0) {
+                this.airdropTimer = 40;
+                const dropX = (Math.random() - 0.5) * 280;
+                const dropZ = (Math.random() - 0.5) * 280;
+                this.lootManager.spawnAirdrop(dropX, dropZ);
+            }
 
             this.player.update(delta);
             this.weaponSys.update();
@@ -240,5 +252,19 @@ class BattleRoyaleGame {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    new BattleRoyaleGame();
+    if (typeof THREE === 'undefined') {
+        console.warn('Three.js loading delay detected...');
+        const checkThree = setInterval(() => {
+            if (typeof THREE !== 'undefined') {
+                clearInterval(checkThree);
+                new BattleRoyaleGame();
+            }
+        }, 100);
+        return;
+    }
+    try {
+        new BattleRoyaleGame();
+    } catch (err) {
+        console.error('Game initialization error:', err);
+    }
 });

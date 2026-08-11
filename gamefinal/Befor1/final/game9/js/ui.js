@@ -4,6 +4,7 @@
  */
 class UIManager {
     constructor() {
+        this.gunfireBlips = [];
         this.cacheDOMElements();
         this.setupMinimapCanvas();
     }
@@ -59,6 +60,21 @@ class UIManager {
 
         if (this.medkitCount) this.medkitCount.textContent = `x${player.medkits}`;
         if (this.glooCount) this.glooCount.textContent = `x${player.glooWalls}`;
+
+        // Skill Cooldown Badge
+        const skillCd = document.getElementById('skill-cd');
+        if (skillCd) {
+            if (player.abilityActive) {
+                skillCd.textContent = `ACTIVE (${Math.ceil(player.abilityTimer)}s)`;
+                skillCd.style.color = '#2ed573';
+            } else if (player.abilityCooldown > 0) {
+                skillCd.textContent = `${Math.ceil(player.abilityCooldown)}s`;
+                skillCd.style.color = '#ffaa00';
+            } else {
+                skillCd.textContent = 'READY';
+                skillCd.style.color = '#20e2a3';
+            }
+        }
 
         // Active Weapon & Ammo
         const w = weaponSys.currentWeapon;
@@ -131,6 +147,50 @@ class UIManager {
         }
     }
 
+    triggerKillStreak(count) {
+        const banner = document.getElementById('streak-banner');
+        if (!banner) return;
+
+        let text = 'DOUBLE KILL!';
+        if (count === 3) text = 'TRIPLE KILL!';
+        else if (count === 4) text = 'QUAD KILL!';
+        else if (count >= 5) text = '🔥 BOOYAH MASTER!';
+
+        banner.textContent = text;
+        banner.classList.add('active');
+        setTimeout(() => banner.classList.remove('active'), 1400);
+    }
+
+    showDamageNumber(worldPos, damage, isHeadshot, camera) {
+        const container = document.getElementById('damage-numbers-container');
+        if (!container || !camera) return;
+
+        const vec = worldPos.clone();
+        vec.project(camera);
+
+        if (vec.z > 1) return; // Behind camera
+
+        const x = (vec.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (-(vec.y * 0.5) + 0.5) * window.innerHeight;
+
+        const num = document.createElement('div');
+        num.className = `damage-number ${isHeadshot ? 'headshot' : ''}`;
+        num.textContent = isHeadshot ? `🎯 ${damage}` : damage;
+        num.style.left = `${x}px`;
+        num.style.top = `${y}px`;
+
+        container.appendChild(num);
+
+        requestAnimationFrame(() => {
+            num.style.transform = `translate(-50%, -100px) scale(${isHeadshot ? 1.3 : 1.1})`;
+            num.style.opacity = '0';
+        });
+
+        setTimeout(() => {
+            if (num.parentNode) num.parentNode.removeChild(num);
+        }, 600);
+    }
+
     triggerDamageFlash() {
         this.damageFlash.classList.add('active');
         setTimeout(() => this.damageFlash.classList.remove('active'), 200);
@@ -149,13 +209,17 @@ class UIManager {
         }, 4000);
     }
 
+    addGunfireBlip(x, z) {
+        this.gunfireBlips.push({ x: x, z: z, createdAt: performance.now() });
+    }
+
     renderMinimap(player, zone) {
         if (!this.minimapCtx) return;
 
         const ctx = this.minimapCtx;
         const width = 150;
         const height = 150;
-        const scale = 0.35; // Map scale factor
+        const scale = 0.35;
 
         // Clear canvas
         ctx.fillStyle = '#1b2735';
@@ -171,10 +235,6 @@ class UIManager {
         ctx.fillStyle = '#2f6637';
         ctx.fill();
 
-        // Offset position relative to player
-        const playerOffsetX = player.position.x * scale;
-        const playerOffsetZ = player.position.z * scale;
-
         // Draw Safe Zone Circle on Minimap
         const zoneX = (zone.currentCenter.x - player.position.x) * scale;
         const zoneZ = (zone.currentCenter.z - player.position.z) * scale;
@@ -185,6 +245,27 @@ class UIManager {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
+
+        // Draw Enemy Gunfire Danger Red Dots on Minimap (Free Fire Radar)
+        const now = performance.now();
+        for (let i = this.gunfireBlips.length - 1; i >= 0; i--) {
+            const blip = this.gunfireBlips[i];
+            const age = (now - blip.createdAt) * 0.001;
+
+            if (age > 1.8) {
+                this.gunfireBlips.splice(i, 1);
+                continue;
+            }
+
+            const bx = (blip.x - player.position.x) * scale;
+            const bz = (blip.z - player.position.z) * scale;
+            const alpha = 1.0 - (age / 1.8);
+
+            ctx.beginPath();
+            ctx.arc(bx, bz, 4 + Math.sin(age * 12) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 45, 85, ${alpha})`;
+            ctx.fill();
+        }
 
         // Draw Player Marker (Green arrow pointing facing direction)
         ctx.save();

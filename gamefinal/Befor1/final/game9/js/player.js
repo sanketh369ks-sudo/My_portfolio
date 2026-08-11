@@ -53,6 +53,13 @@ class PlayerController {
         };
 
         this.isLocked = false;
+
+        // Free Fire Character Ability (Alok "Drop the Beat" Healing Aura Ring)
+        this.abilityCooldown = 0;
+        this.abilityActive = false;
+        this.abilityTimer = 0;
+        this.abilityRingMesh = null;
+
         this.createMesh();
         this.setupCamera();
         this.setupControls();
@@ -61,113 +68,88 @@ class PlayerController {
     createMesh() {
         this.meshGroup = new THREE.Group();
 
-        // High-Detail Realistic Human Materials
-        const skinMat = new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.7 });
-        const jacketMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.5 });
-        const vestMat = new THREE.MeshStandardMaterial({ color: 0x1e272e, roughness: 0.3, metalness: 0.6 });
-        const camoMat = new THREE.MeshStandardMaterial({ color: 0x34495e, roughness: 0.6 });
-        const bootMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4, metalness: 0.7 });
-        const visorMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 0.8 });
-        const helmetMat = new THREE.MeshStandardMaterial({ color: 0x576574, roughness: 0.3, metalness: 0.5 });
+        // White Sci-Fi Mannequin Materials (Matching Reference Image)
+        const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf5f6fa, roughness: 0.2, metalness: 0.15 });
+        const blackMat = new THREE.MeshStandardMaterial({ color: 0x1e272e, roughness: 0.4, metalness: 0.7 });
+        const visorMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 0.9 });
 
-        // 1. Human Torso, Tactical Armor Rig & Shoulder Pads
-        const chest = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.7, 0.45), jacketMat);
+        // 1. Mannequin Torso & White Tactical Armor Rig
+        const chest = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.7, 0.45), whiteMat);
         chest.position.y = 1.35;
         chest.castShadow = true;
         this.meshGroup.add(chest);
 
-        const tacticalVest = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.75, 0.5), vestMat);
+        const tacticalVest = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.75, 0.5), whiteMat);
         tacticalVest.position.y = 1.35;
         tacticalVest.castShadow = true;
         this.meshGroup.add(tacticalVest);
 
+        // Black Accent Joint Belt & Harness
+        const harness = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.15, 0.52), blackMat);
+        harness.position.y = 1.05;
+        this.meshGroup.add(harness);
+
         // Shoulder Armor Pads
-        const shoulderL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.25, 0.35), vestMat);
+        const shoulderL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.25, 0.35), whiteMat);
         shoulderL.position.set(-0.45, 1.55, 0);
         this.meshGroup.add(shoulderL);
 
-        const shoulderR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.25, 0.35), vestMat);
+        const shoulderR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.25, 0.35), whiteMat);
         shoulderR.position.set(0.45, 1.55, 0);
         this.meshGroup.add(shoulderR);
 
-        // Tactical Ammo Pouches & Comms Radio
-        const pouch1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.15), vestMat);
-        pouch1.position.set(-0.2, 1.25, -0.28);
-        this.meshGroup.add(pouch1);
-
-        const pouch2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.15), vestMat);
-        pouch2.position.set(0.2, 1.25, -0.28);
-        this.meshGroup.add(pouch2);
-
-        const radio = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.12), vestMat);
-        radio.position.set(0.32, 1.45, 0.22);
-        this.meshGroup.add(radio);
-
-        // 2. Human Head, Nose, Ears, Visor & Earcomm Headset
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 16), skinMat);
+        // 2. White Smooth Mannequin Head & Visor
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 20, 20), whiteMat);
         head.position.y = 1.95;
         head.castShadow = true;
         this.meshGroup.add(head);
-
-        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.1), skinMat);
-        nose.position.set(0, 1.92, -0.28);
-        this.meshGroup.add(nose);
-
-        const earL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.08), skinMat);
-        earL.position.set(-0.28, 1.95, -0.04);
-        this.meshGroup.add(earL);
-
-        const earR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.08), skinMat);
-        earR.position.set(0.28, 1.95, -0.04);
-        this.meshGroup.add(earR);
 
         const visor = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.12, 0.22), visorMat);
         visor.position.set(0, 1.98, -0.18);
         this.meshGroup.add(visor);
 
-        const headsetLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.1), vestMat);
+        const headsetLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.1), blackMat);
         headsetLeft.rotateZ(Math.PI / 2);
         headsetLeft.position.set(-0.3, 1.96, 0);
         this.meshGroup.add(headsetLeft);
 
-        const headsetRight = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.1), vestMat);
+        const headsetRight = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.1), blackMat);
         headsetRight.rotateZ(Math.PI / 2);
         headsetRight.position.set(0.3, 1.96, 0);
         this.meshGroup.add(headsetRight);
 
-        const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), helmetMat);
-        helmet.position.y = 2.0;
-        helmet.castShadow = true;
-        this.meshGroup.add(helmet);
-
-        // 3. Human Jointed Legs & Combat Boots
+        // 3. White Jointed Legs & Black Knee Joints
         this.leftLeg = new THREE.Group();
-        const thighL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), camoMat);
+        const thighL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), whiteMat);
         thighL.position.y = -0.25;
-        const shinL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), camoMat);
+        const kneeL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.32), blackMat);
+        kneeL.position.y = -0.55;
+        const shinL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), whiteMat);
         shinL.position.y = -0.7;
-        const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), bootMat);
+        const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), blackMat);
         bootL.position.set(0, -0.95, -0.06);
-        this.leftLeg.add(thighL); this.leftLeg.add(shinL); this.leftLeg.add(bootL);
+        this.leftLeg.add(thighL); this.leftLeg.add(kneeL); this.leftLeg.add(shinL); this.leftLeg.add(bootL);
         this.leftLeg.position.set(-0.24, 0.9, 0);
         this.meshGroup.add(this.leftLeg);
 
         this.rightLeg = new THREE.Group();
-        const thighR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), camoMat);
+        const thighR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), whiteMat);
         thighR.position.y = -0.25;
-        const shinR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), camoMat);
+        const kneeR = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.32), blackMat);
+        kneeR.position.y = -0.55;
+        const shinR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), whiteMat);
         shinR.position.y = -0.7;
-        const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), bootMat);
+        const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), blackMat);
         bootR.position.set(0, -0.95, -0.06);
-        this.rightLeg.add(thighR); this.rightLeg.add(shinR); this.rightLeg.add(bootR);
+        this.rightLeg.add(thighR); this.rightLeg.add(kneeR); this.rightLeg.add(shinR); this.rightLeg.add(bootR);
         this.rightLeg.position.set(0.24, 0.9, 0);
         this.meshGroup.add(this.rightLeg);
 
-        // 4. Human Arms & Gloved Hand Weapon Socket
+        // 4. White Arms & Black Elbow Joints
         this.armGroup = new THREE.Group();
         this.armGroup.position.set(0, 1.5, 0);
 
-        const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.85, 0.24), skinMat);
+        const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.85, 0.24), whiteMat);
         rightArm.position.set(0.52, -0.15, -0.3);
         rightArm.rotation.x = -Math.PI / 3;
         this.armGroup.add(rightArm);
@@ -364,32 +346,62 @@ class PlayerController {
         if (code === 'KeyD' || code === 'ArrowRight' || key === 'd') this.keys.right = isPressed;
 
         if (isPressed) {
-            if (code === 'Space') {
+            if (code === 'Space' || key === ' ' || key === 'space') {
                 if (this.isGrounded) {
+                    const terrainY = this.world ? this.world.getTerrainHeight(this.position.x, this.position.z) : 0;
+                    this.position.y = terrainY + 1.5;
                     this.velocity.y = this.jumpForce;
                     this.isGrounded = false;
                     this.isCrouching = false;
                     this.isProne = false;
                 }
             }
-            if (code === 'ShiftLeft' || code === 'ShiftRight') this.keys.sprint = true;
-            if (code === 'KeyC') {
+            if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') this.keys.sprint = true;
+            if (code === 'KeyC' || key === 'c') {
                 this.isCrouching = !this.isCrouching;
                 this.isProne = false;
             }
-            if (code === 'KeyZ') {
+            if (code === 'KeyZ' || key === 'z') {
                 this.isProne = !this.isProne;
                 this.isCrouching = false;
             }
-            if (code === 'KeyG') {
+            if (code === 'KeyF' || key === 'f') {
+                this.activateAbility();
+            }
+            if (code === 'KeyG' || key === 'g') {
                 this.deployGlooWall();
             }
-            if (code === 'KeyH') {
+            if (code === 'KeyH' || key === 'h') {
                 this.useMedkit();
             }
         } else {
-            if (code === 'ShiftLeft' || code === 'ShiftRight') this.keys.sprint = false;
+            if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') this.keys.sprint = false;
         }
+    }
+
+    activateAbility() {
+        if (!this.isAlive || this.abilityCooldown > 0 || this.abilityActive) return;
+
+        this.abilityActive = true;
+        this.abilityTimer = 10;
+        this.abilityCooldown = 30;
+        audioManager.playHeal();
+
+        // Spawn 3D Glowing Green Healing Aura Ring around Player
+        if (!this.abilityRingMesh) {
+            const ringGeo = new THREE.CylinderGeometry(4.5, 4.5, 0.4, 32, 1, true);
+            const ringMat = new THREE.MeshStandardMaterial({
+                color: 0x2ed573,
+                emissive: 0x00ff88,
+                emissiveIntensity: 0.85,
+                transparent: true,
+                opacity: 0.45,
+                side: THREE.DoubleSide
+            });
+            this.abilityRingMesh = new THREE.Mesh(ringGeo, ringMat);
+            this.scene.add(this.abilityRingMesh);
+        }
+        this.abilityRingMesh.visible = true;
     }
 
     deployGlooWall() {
@@ -497,7 +509,32 @@ class PlayerController {
             moveDir.normalize();
         }
 
+        // Ability Timers & Healing Aura Tick
+        if (this.abilityCooldown > 0) {
+            this.abilityCooldown = Math.max(0, this.abilityCooldown - delta);
+        }
+
+        if (this.abilityActive) {
+            this.abilityTimer -= delta;
+            this.hp = Math.min(this.maxHp, this.hp + 5 * delta); // Heal +5 HP/sec
+
+            if (this.abilityRingMesh) {
+                const terrainY = this.world ? this.world.getTerrainHeight(this.position.x, this.position.z) : 0;
+                this.abilityRingMesh.position.set(this.position.x, terrainY + 0.2, this.position.z);
+                this.abilityRingMesh.material.opacity = 0.35 + Math.sin(performance.now() * 0.008) * 0.15;
+            }
+
+            if (this.abilityTimer <= 0) {
+                this.abilityActive = false;
+                if (this.abilityRingMesh) this.abilityRingMesh.visible = false;
+            }
+        }
+
         let currentSpeed = this.speed;
+        if (this.abilityActive) {
+            currentSpeed *= 1.25; // Alok +25% Speed Boost!
+        }
+
         if (this.keys.sprint && this.keys.forward && !this.isCrouching && !this.isProne && !this.isAiming) {
             currentSpeed *= this.sprintMultiplier;
             this.isSprinting = true;
@@ -515,48 +552,65 @@ class PlayerController {
         this.velocity.z = moveDir.z * currentSpeed;
         this.velocity.y -= this.gravity * delta;
 
-        const stepX = this.velocity.x * delta;
-        const stepZ = this.velocity.z * delta;
-
-        let nextX = this.position.x + stepX;
-        let nextZ = this.position.z + stepZ;
-        let nextY = this.position.y + this.velocity.y * delta;
-
-        const playerRadius = 0.5;
-
-        for (let col of this.world.colliders) {
-            const minX = col.box.min.x - playerRadius;
-            const maxX = col.box.max.x + playerRadius;
-            const minZ = col.box.min.z - playerRadius;
-            const maxZ = col.box.max.z + playerRadius;
-
-            if (nextX >= minX && nextX <= maxX && this.position.z >= minZ && this.position.z <= maxZ) {
-                nextX = this.position.x;
-                break;
-            }
-        }
-
-        for (let col of this.world.colliders) {
-            const minX = col.box.min.x - playerRadius;
-            const maxX = col.box.max.x + playerRadius;
-            const minZ = col.box.min.z - playerRadius;
-            const maxZ = col.box.max.z + playerRadius;
-
-            if (nextX >= minX && nextX <= maxX && nextZ >= minZ && nextZ <= maxZ) {
-                nextZ = this.position.z;
-                break;
-            }
-        }
-
         let eyeOffset = 1.5;
         if (this.isProne) eyeOffset = 0.35;
         else if (this.isCrouching) eyeOffset = 0.9;
 
-        const groundY = this.world.getTerrainHeight(nextX, nextZ) + eyeOffset;
+        const stepX = this.velocity.x * delta;
+        const stepZ = this.velocity.z * delta;
+        const stepY = this.velocity.y * delta;
+
+        let nextX = this.position.x + stepX;
+        let nextZ = this.position.z + stepZ;
+        let nextY = this.position.y + stepY;
+
+        const playerRadius = 0.45;
+        const feetY = nextY - eyeOffset;
+        const headY = feetY + 2.0;
+
+        // X-axis collision slide test
+        if (this.world && this.world.colliders) {
+            for (let col of this.world.colliders) {
+                if (feetY < col.box.max.y && headY > col.box.min.y) {
+                    const minX = col.box.min.x - playerRadius;
+                    const maxX = col.box.max.x + playerRadius;
+                    const minZ = col.box.min.z - playerRadius;
+                    const maxZ = col.box.max.z + playerRadius;
+
+                    if (nextX >= minX && nextX <= maxX && this.position.z >= minZ && this.position.z <= maxZ) {
+                        nextX = this.position.x;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Z-axis collision slide test
+        if (this.world && this.world.colliders) {
+            for (let col of this.world.colliders) {
+                if (feetY < col.box.max.y && headY > col.box.min.y) {
+                    const minX = col.box.min.x - playerRadius;
+                    const maxX = col.box.max.x + playerRadius;
+                    const minZ = col.box.min.z - playerRadius;
+                    const maxZ = col.box.max.z + playerRadius;
+
+                    if (nextX >= minX && nextX <= maxX && nextZ >= minZ && nextZ <= maxZ) {
+                        nextZ = this.position.z;
+                        break;
+                    }
+                }
+            }
+        }
+
+        const groundHeight = this.world ? this.world.getTerrainHeight(nextX, nextZ) : 0;
+        const groundY = groundHeight + eyeOffset;
+
         if (nextY <= groundY) {
             nextY = groundY;
             this.velocity.y = 0;
             this.isGrounded = true;
+        } else {
+            this.isGrounded = false;
         }
 
         this.position.set(nextX, nextY, nextZ);

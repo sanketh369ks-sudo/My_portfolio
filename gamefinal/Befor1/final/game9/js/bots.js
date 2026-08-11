@@ -80,100 +80,77 @@ class AIBot {
     createMesh() {
         this.meshGroup = new THREE.Group();
 
-        // 3 Randomized Enemy Human Military Skins
+        // Sci-Fi Enemy Guard Skins (Red Enemy Guards & Green Guards matching reference image)
         const skins = [
-            { jacket: 0x900c3f, vest: 0x1c2833, camo: 0x581845, visor: 0xff4757 }, // Crimson Mercenary
-            { jacket: 0x2c3e50, vest: 0x111111, camo: 0x34495e, visor: 0x00f0ff }, // Urban Phantom
-            { jacket: 0xd35400, vest: 0x34495e, camo: 0x7f8c8d, visor: 0xffaa00 }  // Desert Operator
+            { main: 0xff1e43, accent: 0x900c3f, visor: 0xff0033 }, // Crimson Red Enemy Guard
+            { main: 0xd63031, accent: 0x2d3436, visor: 0xff4757 }, // Dark Red Enemy Operator
+            { main: 0x2ed573, accent: 0x10ac84, visor: 0x00ff88 }, // Vibrant Green Guard
+            { main: 0xee5253, accent: 0x1e272e, visor: 0xff0033 }  // Glossy Red Guard
         ];
         const selectedSkin = skins[Math.floor(Math.random() * skins.length)];
 
-        const skinMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c, roughness: 0.7 });
-        const jacketMat = new THREE.MeshStandardMaterial({ color: selectedSkin.jacket, roughness: 0.5 });
-        const vestMat = new THREE.MeshStandardMaterial({ color: selectedSkin.vest, roughness: 0.3, metalness: 0.6 });
-        const camoMat = new THREE.MeshStandardMaterial({ color: selectedSkin.camo, roughness: 0.6 });
-        const bootMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4 });
-        const visorMat = new THREE.MeshStandardMaterial({ color: selectedSkin.visor, emissive: selectedSkin.visor, emissiveIntensity: 0.85 });
-        const helmetMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.3, metalness: 0.5 });
+        const bodyMat = new THREE.MeshStandardMaterial({ color: selectedSkin.main, roughness: 0.25, metalness: 0.3 });
+        const accentMat = new THREE.MeshStandardMaterial({ color: selectedSkin.accent, roughness: 0.4, metalness: 0.7 });
+        const visorMat = new THREE.MeshStandardMaterial({ color: selectedSkin.visor, emissive: selectedSkin.visor, emissiveIntensity: 0.95 });
         const gunMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 });
 
-        // 1. Human Torso & Tactical Armor Rig
-        const chest = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.7, 0.45), jacketMat);
+        // 1. Enemy Guard Torso & Chest Armor
+        const chest = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.7, 0.45), bodyMat);
         chest.position.y = 1.35;
         chest.castShadow = true;
         this.meshGroup.add(chest);
 
-        const tacticalVest = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.75, 0.5), vestMat);
+        const tacticalVest = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.75, 0.5), bodyMat);
         tacticalVest.position.y = 1.35;
         tacticalVest.castShadow = true;
         this.meshGroup.add(tacticalVest);
 
-        // Tactical Pouches on Vest
-        const pouch1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.15), vestMat);
-        pouch1.position.set(-0.2, 1.25, -0.28);
-        this.meshGroup.add(pouch1);
+        const harness = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.15, 0.52), accentMat);
+        harness.position.y = 1.05;
+        this.meshGroup.add(harness);
 
-        const pouch2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.15), vestMat);
-        pouch2.position.set(0.2, 1.25, -0.28);
-        this.meshGroup.add(pouch2);
-
-        // 2. Human Head, Nose Contour, Tactical Visor & Earcomm Headset
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 14, 14), skinMat);
+        // 2. Enemy Guard Head & Glowing Visor
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 18, 18), bodyMat);
         head.position.y = 1.95;
         head.castShadow = true;
         this.meshGroup.add(head);
-
-        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.1), skinMat);
-        nose.position.set(0, 1.92, -0.28);
-        this.meshGroup.add(nose);
 
         const visor = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.12, 0.22), visorMat);
         visor.position.set(0, 1.98, -0.18);
         this.meshGroup.add(visor);
 
-        const headsetLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.1), vestMat);
-        headsetLeft.rotateZ(Math.PI / 2);
-        headsetLeft.position.set(-0.28, 1.96, 0);
-        this.meshGroup.add(headsetLeft);
-
-        const headsetRight = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.1), vestMat);
-        headsetRight.rotateZ(Math.PI / 2);
-        headsetRight.position.set(0.28, 1.96, 0);
-        this.meshGroup.add(headsetRight);
-
-        const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.32, 14, 14, 0, Math.PI * 2, 0, Math.PI * 0.5), helmetMat);
-        helmet.position.y = 2.0;
-        helmet.castShadow = true;
-        this.meshGroup.add(helmet);
-
-        // 3. Human Jointed Legs & Boots
+        // 3. Enemy Jointed Legs
         this.leftLeg = new THREE.Group();
-        const thighL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), camoMat);
+        const thighL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), bodyMat);
         thighL.position.y = -0.25;
-        const shinL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), camoMat);
+        const kneeL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.32), accentMat);
+        kneeL.position.y = -0.55;
+        const shinL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), bodyMat);
         shinL.position.y = -0.7;
-        const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), bootMat);
+        const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), accentMat);
         bootL.position.set(0, -0.95, -0.06);
-        this.leftLeg.add(thighL); this.leftLeg.add(shinL); this.leftLeg.add(bootL);
+        this.leftLeg.add(thighL); this.leftLeg.add(kneeL); this.leftLeg.add(shinL); this.leftLeg.add(bootL);
         this.leftLeg.position.set(-0.24, 0.9, 0);
         this.meshGroup.add(this.leftLeg);
 
         this.rightLeg = new THREE.Group();
-        const thighR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), camoMat);
+        const thighR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.55, 0.3), bodyMat);
         thighR.position.y = -0.25;
-        const shinR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), camoMat);
+        const kneeR = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.32), accentMat);
+        kneeR.position.y = -0.55;
+        const shinR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.5, 0.26), bodyMat);
         shinR.position.y = -0.7;
-        const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), bootMat);
+        const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.42), accentMat);
         bootR.position.set(0, -0.95, -0.06);
-        this.rightLeg.add(thighR); this.rightLeg.add(shinR); this.rightLeg.add(bootR);
+        this.rightLeg.add(thighR); this.rightLeg.add(kneeR); this.rightLeg.add(shinR); this.rightLeg.add(bootR);
         this.rightLeg.position.set(0.24, 0.9, 0);
         this.meshGroup.add(this.rightLeg);
 
-        // 4. Human Arm & Prominent Gun Model
+        // 4. Enemy Arm & Weapon Model
         const armGroup = new THREE.Group();
         armGroup.position.set(0, 1.5, 0);
 
-        const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.85, 0.24), skinMat);
+        const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.85, 0.24), bodyMat);
         rightArm.position.set(0.52, -0.15, -0.3);
         rightArm.rotation.x = -Math.PI / 3;
         armGroup.add(rightArm);
@@ -318,16 +295,33 @@ class AIBot {
             let nextZ = this.position.z + stepZ;
             let nextY = this.world.getTerrainHeight(nextX, nextZ) + 1.5;
 
-            // Collision check with world colliders
-            const botRadius = 0.5;
-            for (let col of this.world.colliders) {
-                const minX = col.box.min.x - botRadius; const maxX = col.box.max.x + botRadius;
-                const minZ = col.box.min.z - botRadius; const maxZ = col.box.max.z + botRadius;
+            const botRadius = 0.45;
+            const feetY = nextY - 1.5;
+            const headY = feetY + 2.0;
 
-                if (nextX >= minX && nextX <= maxX && nextZ >= minZ && nextZ <= maxZ) {
-                    nextX = this.position.x;
-                    nextZ = this.position.z;
-                    break;
+            if (this.world && this.world.colliders) {
+                for (let col of this.world.colliders) {
+                    if (feetY < col.box.max.y && headY > col.box.min.y) {
+                        const minX = col.box.min.x - botRadius; const maxX = col.box.max.x + botRadius;
+                        const minZ = col.box.min.z - botRadius; const maxZ = col.box.max.z + botRadius;
+
+                        if (nextX >= minX && nextX <= maxX && this.position.z >= minZ && this.position.z <= maxZ) {
+                            nextX = this.position.x;
+                            break;
+                        }
+                    }
+                }
+
+                for (let col of this.world.colliders) {
+                    if (feetY < col.box.max.y && headY > col.box.min.y) {
+                        const minX = col.box.min.x - botRadius; const maxX = col.box.max.x + botRadius;
+                        const minZ = col.box.min.z - botRadius; const maxZ = col.box.max.z + botRadius;
+
+                        if (nextX >= minX && nextX <= maxX && nextZ >= minZ && nextZ <= maxZ) {
+                            nextZ = this.position.z;
+                            break;
+                        }
+                    }
                 }
             }
 
