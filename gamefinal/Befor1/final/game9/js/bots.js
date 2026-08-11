@@ -62,12 +62,12 @@ class AIBot {
 
         this.position = spawnPos.clone();
         this.velocity = new THREE.Vector3();
-        this.speed = 9.0;
+        this.speed = 4.8;
         this.rotationY = Math.random() * Math.PI * 2;
 
         this.target = null;
         this.lastFireTime = 0;
-        this.fireInterval = 0.4 + Math.random() * 0.4;
+        this.fireInterval = 0.85 + Math.random() * 0.5;
         this.patrolTarget = this.getRandomPatrolPoint();
 
         // Tactical Strafe Timer & Direction
@@ -250,11 +250,15 @@ class AIBot {
                 toTarget.y = 0;
                 toTarget.normalize();
 
-                // Face the target
-                this.rotationY = Math.atan2(toTarget.x, toTarget.z);
+                // Smoothly face the target
+                const targetAngle = Math.atan2(toTarget.x, toTarget.z);
+                let diff = targetAngle - this.rotationY;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                this.rotationY += diff * Math.min(1, delta * 5.0);
 
-                // Change strafe direction every 1.8 seconds
-                if (now - this.lastStrafeChange > 1.8) {
+                // Change strafe direction every 2.4 seconds
+                if (now - this.lastStrafeChange > 2.4) {
                     this.lastStrafeChange = now;
                     this.strafeDir = Math.random() > 0.5 ? 1 : -1;
                 }
@@ -265,11 +269,11 @@ class AIBot {
                     // Approach target
                     moveVector.copy(toTarget);
                 } else if (targetDist < 8) {
-                    // Too close! Retreat backward to maintain gunfight distance
-                    moveVector.copy(toTarget.clone().negate());
+                    // Retreat backward slowly to maintain gunfight distance
+                    moveVector.copy(toTarget.clone().negate().multiplyScalar(0.6));
                 } else {
-                    // Tactical Standoff (8m - 22m): Strafe left or right!
-                    moveVector.copy(rightVec.multiplyScalar(this.strafeDir * 0.8));
+                    // Tactical Standoff (8m - 22m): Strafe left or right smoothly!
+                    moveVector.copy(rightVec.multiplyScalar(this.strafeDir * 0.6));
                 }
             } else {
                 // Patrol mode
@@ -280,7 +284,11 @@ class AIBot {
                 toPatrol.y = 0;
                 if (toPatrol.lengthSq() > 0.1) {
                     moveVector.copy(toPatrol.normalize());
-                    this.rotationY = Math.atan2(moveVector.x, moveVector.z);
+                    const patrolAngle = Math.atan2(moveVector.x, moveVector.z);
+                    let pDiff = patrolAngle - this.rotationY;
+                    while (pDiff < -Math.PI) pDiff += Math.PI * 2;
+                    while (pDiff > Math.PI) pDiff -= Math.PI * 2;
+                    this.rotationY += pDiff * Math.min(1, delta * 4.0);
                 }
             }
         }
