@@ -97,6 +97,18 @@
     font-size: 22px;
 }
 
+.touch-btn.medkit-btn {
+    background: rgba(32, 226, 163, 0.3);
+    border-color: #20e2a3;
+    font-size: 22px;
+}
+
+.touch-btn.emote-btn {
+    background: rgba(168, 85, 247, 0.3);
+    border-color: #c084fc;
+    font-size: 22px;
+}
+
 /* Show touch controls on touch-enabled devices or mobile screens */
 @media (pointer: coarse), (max-width: 900px) {
     #touch-controls {

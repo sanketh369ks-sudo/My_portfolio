@@ -328,4 +328,46 @@ class UIManager {
         const glooVal = document.getElementById('inv-gloo-val');
         if (glooVal) glooVal.textContent = player.glooWalls;
     }
+
+    toggleEmoteWheel(show) {
+        const emoteOverlay = document.getElementById('emote-wheel-overlay');
+        if (!emoteOverlay) return;
+
+        if (show) {
+            emoteOverlay.classList.remove('hidden');
+            if (document.pointerLockElement) document.exitPointerLock();
+        } else {
+            emoteOverlay.classList.add('hidden');
+            if (window.gameInstance && window.gameInstance.player && window.gameInstance.player.isAlive && !window.gameInstance.touchController.isTouchDevice) {
+                document.getElementById('webgl-canvas').requestPointerLock();
+            }
+        }
+    }
+
+    showEmoteBanner(text) {
+        let banner = document.getElementById('emote-banner-pop');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'emote-banner-pop';
+            banner.className = 'emote-banner-pop';
+            document.getElementById('hud').appendChild(banner);
+        }
+        banner.textContent = text;
+        banner.classList.add('show');
+        setTimeout(() => {
+            banner.classList.remove('show');
+        }, 3000);
+    }
+
+    showHealText(text) {
+        const container = document.getElementById('hud');
+        if (!container) return;
+        const textEl = document.createElement('div');
+        textEl.className = 'heal-floating-text';
+        textEl.textContent = text;
+        container.appendChild(textEl);
+        setTimeout(() => {
+            if (textEl.parentNode) textEl.parentNode.removeChild(textEl);
+        }, 1500);
+    }
 }

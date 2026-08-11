@@ -162,6 +162,20 @@ class TouchController {
             this.player.deployGlooWall();
         });
 
+        // Medkit Healing Button
+        bindBtn('touch-btn-medkit', () => {
+            this.player.useMedkit();
+        });
+
+        // Emote Wheel Button
+        bindBtn('touch-btn-emote', () => {
+            if (window.gameInstance && window.gameInstance.ui) {
+                const emoteOverlay = document.getElementById('emote-wheel-overlay');
+                const isHidden = emoteOverlay ? emoteOverlay.classList.contains('hidden') : true;
+                window.gameInstance.ui.toggleEmoteWheel(isHidden);
+            }
+        });
+
         // Reload Button
         bindBtn('touch-btn-reload', () => {
             this.weaponSys.reload();

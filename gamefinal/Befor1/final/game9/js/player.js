@@ -60,6 +60,13 @@ class PlayerController {
         this.abilityTimer = 0;
         this.abilityRingMesh = null;
 
+        // Free Fire Emotes System
+        this.isEmoting = false;
+        this.currentEmote = null;
+        this.emoteTime = 0;
+        this.emoteHologram = null;
+        this.throneMesh = null;
+
         this.createMesh();
         this.setupCamera();
         this.setupControls();
@@ -500,7 +507,7 @@ class PlayerController {
         const wallMat = new THREE.MeshStandardMaterial({
             color: 0x00f0ff,
             emissive: 0x00f0ff,
-            emissiveIntensity: 0.5,
+            emissiveIntensity: 0.6,
             roughness: 0.1,
             metalness: 0.9,
             transparent: true,
@@ -514,6 +521,25 @@ class PlayerController {
         glooMesh.receiveShadow = true;
 
         this.scene.add(glooMesh);
+
+        // Spawn Gloo Shockwave Ring FX
+        const ringGeo = new THREE.RingGeometry(0.2, 3.5, 32);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.copy(wallPos);
+        ring.position.y = groundY + 0.1;
+        this.scene.add(ring);
+        let ringTime = 0;
+        const ringAnim = setInterval(() => {
+            ringTime += 0.05;
+            ring.scale.addScalar(0.2);
+            ringMat.opacity = Math.max(0, 0.9 - ringTime * 2);
+            if (ringTime > 0.45) {
+                clearInterval(ringAnim);
+                this.scene.remove(ring);
+            }
+        }, 30);
 
         this.world.solidMeshes.push(glooMesh);
         const bbox = new THREE.Box3().setFromObject(glooMesh);
@@ -539,10 +565,12 @@ class PlayerController {
         this.velocity.set(0, 0, 0);
         this.isCrouching = false;
         this.isProne = false;
+        this.stopEmote();
     }
 
     takeDamage(amount, attacker) {
         if (!this.isAlive) return;
+        this.stopEmote();
 
         let remaining = amount;
         if (this.armor > 0) {
@@ -572,6 +600,203 @@ class PlayerController {
         this.medkits--;
         this.hp = Math.min(this.maxHp, this.hp + 50);
         audioManager.playHeal();
+
+        this.spawnHealParticles();
+
+        if (window.gameInstance && window.gameInstance.ui) {
+            window.gameInstance.ui.showHealText('+50 HP HEALED');
+        }
+    }
+
+    spawnHealParticles() {
+        const pGeo = new THREE.SphereGeometry(0.12, 8, 8);
+        const pMat = new THREE.MeshStandardMaterial({ color: 0x20e2a3, emissive: 0x20e2a3, emissiveIntensity: 0.9 });
+        for (let i = 0; i < 14; i++) {
+            const particle = new THREE.Mesh(pGeo, pMat);
+            particle.position.copy(this.position).add(new THREE.Vector3(
+                (Math.random() - 0.5) * 1.5,
+                Math.random() * 2,
+                (Math.random() - 0.5) * 1.5
+            ));
+            this.scene.add(particle);
+            let age = 0;
+            const anim = setInterval(() => {
+                age += 0.05;
+                particle.position.y += 0.08;
+                particle.scale.multiplyScalar(0.92);
+                if (age > 0.6) {
+                    clearInterval(anim);
+                    this.scene.remove(particle);
+                }
+            }, 30);
+        }
+    }
+
+    performEmote(emoteId) {
+        if (!this.isAlive) return;
+        this.isEmoting = true;
+        this.currentEmote = emoteId;
+        this.emoteTime = 0;
+
+        audioManager.playEmoteSound(emoteId);
+        this.createEmoteHologram(emoteId);
+
+        if (emoteId === 'throne') {
+            this.createThroneMesh();
+        } else if (this.throneMesh) {
+            this.scene.remove(this.throneMesh);
+            this.throneMesh = null;
+        }
+
+        if (window.gameInstance && window.gameInstance.ui) {
+            const emoteNames = {
+                booyah: '🔥 BOOYAH! DANCE',
+                lol: '😂 LOL TAUNT',
+                heart: '💖 LOVE HEART',
+                pushup: '💪 POWER PUSH-UP',
+                throne: '👑 ROYAL THRONE',
+                clap: '👏 VICTORY CLAP'
+            };
+            window.gameInstance.ui.showEmoteBanner(emoteNames[emoteId] || 'EMOTE');
+        }
+    }
+
+    stopEmote() {
+        this.isEmoting = false;
+        this.currentEmote = null;
+        if (this.emoteHologram) {
+            this.scene.remove(this.emoteHologram);
+            this.emoteHologram = null;
+        }
+        if (this.throneMesh) {
+            this.scene.remove(this.throneMesh);
+            this.throneMesh = null;
+        }
+        if (this.armGroup) {
+            this.armGroup.position.set(0, 1.5, 0);
+            this.armGroup.rotation.set(0, 0, 0);
+        }
+        if (this.leftLeg) this.leftLeg.rotation.set(0, 0, 0);
+        if (this.rightLeg) this.rightLeg.rotation.set(0, 0, 0);
+    }
+
+    createEmoteHologram(emoteId) {
+        if (this.emoteHologram) {
+            this.scene.remove(this.emoteHologram);
+            this.emoteHologram = null;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.beginPath();
+        ctx.roundRect(10, 10, 236, 108, 16);
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#00f0ff';
+        ctx.stroke();
+
+        const emojis = {
+            booyah: '🔥 BOOYAH!',
+            lol: '😂 LOL!',
+            heart: '💖 LOVE!',
+            pushup: '💪 POWER!',
+            throne: '👑 KING!',
+            clap: '👏 BRAVO!'
+        };
+
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffaa00';
+        ctx.fillText(emojis[emoteId] || '✨ EMOTE', 128, 64);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+        this.emoteHologram = new THREE.Sprite(spriteMat);
+        this.emoteHologram.scale.set(3.2, 1.6, 1);
+        this.scene.add(this.emoteHologram);
+    }
+
+    createThroneMesh() {
+        if (this.throneMesh) {
+            this.scene.remove(this.throneMesh);
+        }
+        this.throneMesh = new THREE.Group();
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2, emissive: 0xffaa00, emissiveIntensity: 0.3 });
+        const redMat = new THREE.MeshStandardMaterial({ color: 0xd63031, roughness: 0.5 });
+
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.25, 1.1), redMat);
+        seat.position.y = 0.5;
+        this.throneMesh.add(seat);
+
+        const back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.8, 0.2), goldMat);
+        back.position.set(0, 1.4, 0.45);
+        this.throneMesh.add(back);
+
+        const crown = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.4, 4), goldMat);
+        crown.position.set(0, 2.5, 0.45);
+        crown.rotation.y = Math.PI / 4;
+        this.throneMesh.add(crown);
+
+        const armL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.4, 1.0), goldMat);
+        armL.position.set(-0.6, 0.75, 0);
+        const armR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.4, 1.0), goldMat);
+        armR.position.set(0.6, 0.75, 0);
+        this.throneMesh.add(armL);
+        this.throneMesh.add(armR);
+
+        const backward = new THREE.Vector3(0, 0, 0.15).applyAxisAngle(new THREE.Vector3(0, 1, 0), this.rotationY);
+        this.throneMesh.position.copy(this.position).add(backward);
+        this.throneMesh.position.y = this.world.getTerrainHeight(this.position.x, this.position.z);
+        this.throneMesh.rotation.y = this.rotationY;
+
+        this.scene.add(this.throneMesh);
+    }
+
+    updateEmoteAnimation(delta) {
+        this.emoteTime += delta;
+        const time = this.emoteTime;
+
+        if (this.emoteHologram) {
+            this.emoteHologram.position.copy(this.position);
+            this.emoteHologram.position.y += 2.8 + Math.sin(time * 6) * 0.15;
+        }
+
+        if (this.currentEmote === 'booyah') {
+            // Hands wave in victory
+            this.armGroup.rotation.x = -Math.PI / 1.2 + Math.sin(time * 8) * 0.3;
+            this.leftLeg.rotation.x = Math.sin(time * 10) * 0.2;
+            this.rightLeg.rotation.x = -Math.sin(time * 10) * 0.2;
+        } else if (this.currentEmote === 'lol') {
+            // Laughing forward-backward shake
+            this.armGroup.rotation.x = -Math.PI / 3 + Math.sin(time * 12) * 0.25;
+            this.meshGroup.rotation.x = Math.sin(time * 12) * 0.15;
+        } else if (this.currentEmote === 'heart') {
+            // Hands forming heart pose
+            this.armGroup.rotation.x = -Math.PI / 2.2;
+            this.armGroup.rotation.z = Math.sin(time * 4) * 0.1;
+        } else if (this.currentEmote === 'pushup') {
+            // Push-up on floor
+            this.meshGroup.rotation.x = Math.PI / 2.2;
+            this.meshGroup.position.y = this.position.y - 1.2 + Math.sin(time * 6) * 0.15;
+        } else if (this.currentEmote === 'throne') {
+            // Sit on throne pose
+            this.leftLeg.rotation.x = Math.PI / 2.5;
+            this.rightLeg.rotation.x = Math.PI / 2.5;
+            this.armGroup.rotation.x = -Math.PI / 4;
+            this.meshGroup.position.y = this.position.y - 0.7;
+        } else if (this.currentEmote === 'clap') {
+            // Rapid clapping animation
+            this.armGroup.rotation.x = -Math.PI / 2 + Math.sin(time * 14) * 0.15;
+        }
+
+        if (this.emoteTime > 4.5) {
+            this.stopEmote();
+        }
     }
 
     update(delta) {
@@ -585,6 +810,14 @@ class PlayerController {
         if (this.keys.backward) moveDir.sub(forward);
         if (this.keys.right) moveDir.add(right);
         if (this.keys.left) moveDir.sub(right);
+
+        if (moveDir.lengthSq() > 0 || this.keys.jump) {
+            if (this.isEmoting) this.stopEmote();
+        }
+
+        if (this.isEmoting) {
+            this.updateEmoteAnimation(delta);
+        }
 
         if (moveDir.lengthSq() > 0) {
             moveDir.normalize();

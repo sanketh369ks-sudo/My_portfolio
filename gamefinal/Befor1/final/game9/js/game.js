@@ -103,7 +103,21 @@ class BattleRoyaleGame {
             if (e.code === 'Digit6') this.weaponSys.switchWeapon('deagle');
             if (e.code === 'Digit7') this.weaponSys.switchWeapon('m60');
             if (e.code === 'KeyR') this.weaponSys.reload();
-            if (e.code === 'KeyE') this.attemptLootPickup();
+            if (e.code === 'KeyF' || e.code === 'KeyE') {
+                const loot = this.lootManager.checkPlayerProximity(this.player.position);
+                if (loot) {
+                    this.attemptLootPickup();
+                } else if (e.code === 'KeyE' || e.code === 'KeyT' || e.code === 'KeyB') {
+                    const emoteOverlay = document.getElementById('emote-wheel-overlay');
+                    const isHidden = emoteOverlay ? emoteOverlay.classList.contains('hidden') : true;
+                    this.ui.toggleEmoteWheel(isHidden);
+                }
+            }
+            if (e.code === 'KeyT' || e.code === 'KeyB') {
+                const emoteOverlay = document.getElementById('emote-wheel-overlay');
+                const isHidden = emoteOverlay ? emoteOverlay.classList.contains('hidden') : true;
+                this.ui.toggleEmoteWheel(isHidden);
+            }
             if (e.code === 'Tab' || e.code === 'KeyI') {
                 e.preventDefault();
                 const invOverlay = document.getElementById('inventory-overlay');
