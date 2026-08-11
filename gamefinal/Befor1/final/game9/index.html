@@ -223,10 +223,15 @@
             </div>
         </div>
 
-        <!-- Mobile Touch Controls Overlay (Free Fire Pro 2-Thumb HUD) -->
+        <!-- Mobile Touch Controls Overlay -->
         <div id="touch-controls">
 
-            <!-- Skill Buttons Row — Top Left -->
+            <!-- Joystick — Bottom Left -->
+            <div id="joystick-container">
+                <div id="joystick-knob"></div>
+            </div>
+
+            <!-- Skill Buttons — Left Side (2×3 grid above joystick) -->
             <div class="touch-left-tactical-row">
                 <div id="touch-btn-ability" class="touch-btn skill-btn">
                     <span>✨</span>
@@ -249,28 +254,23 @@
                 </div>
             </div>
 
-            <!-- Joystick — Bottom Left -->
-            <div class="touch-left-side">
-                <div id="joystick-container">
-                    <div id="joystick-knob"></div>
-                </div>
-            </div>
+            <!-- Fire Button — Bottom Right (standalone big) -->
+            <div id="touch-btn-fire" class="touch-btn fire-btn">🔫</div>
 
-            <!-- Right Side Controls — Bottom Right -->
+            <!-- Right Combat Buttons — Above Fire -->
             <div class="touch-btn-cluster">
                 <div class="touch-row">
-                    <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
                     <div id="touch-btn-reload" class="touch-btn">🔄</div>
                     <div id="touch-btn-switch" class="touch-btn">⚔️</div>
                 </div>
                 <div class="touch-row">
                     <div id="touch-btn-jump" class="touch-btn">🦘</div>
-                </div>
-                <div class="touch-row">
-                    <div id="touch-btn-fire" class="touch-btn fire-btn">🔫</div>
+                    <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
                 </div>
             </div>
+
         </div>
+
 
 
         <!-- Interactive Backpack Inventory Screen Overlay -->
