@@ -62,7 +62,7 @@ class AIBot {
 
         this.position = spawnPos.clone();
         this.velocity = new THREE.Vector3();
-        this.speed = 9.0;
+        this.speed = 0; // Enemies don't move
         this.rotationY = Math.random() * Math.PI * 2;
 
         this.target = null;
