@@ -290,7 +290,7 @@
 /* Responsive Overlay & End Game Screen Layout for Mobile Landscape & Small Screens */
 @media (max-height: 520px), (max-width: 768px) {
     .overlay-screen {
-        padding: 10px !important;
+        padding: calc(65px + env(safe-area-inset-top, 0px)) 10px 10px 10px !important;
         justify-content: flex-start !important;
         overflow-y: auto !important;
     }
@@ -299,7 +299,7 @@
         padding: 16px 24px !important;
         border-radius: 14px !important;
         max-width: 480px !important;
-        margin: auto !important;
+        margin: 0 auto 20px auto !important;
     }
 
     .game-logo {

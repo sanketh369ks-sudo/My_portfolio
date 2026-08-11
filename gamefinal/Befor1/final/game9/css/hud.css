@@ -774,7 +774,7 @@
 /* Mobile Responsive HUD Layout */
 @media (max-width: 1024px), (pointer: coarse) {
     .top-center-bar {
-        top: 10px;
+        top: calc(65px + env(safe-area-inset-top, 0px)) !important;
         left: 12px;
         transform: none;
         padding: 6px 14px;
@@ -793,7 +793,7 @@
     }
 
     #minimap-container {
-        top: 10px;
+        top: calc(65px + env(safe-area-inset-top, 0px)) !important;
         right: 12px;
         width: 95px;
         height: 95px;
@@ -803,7 +803,7 @@
 
     .bottom-hud {
         position: absolute;
-        top: 55px !important;
+        top: calc(115px + env(safe-area-inset-top, 0px)) !important;
         left: 12px;
         right: 12px;
         bottom: auto !important;
@@ -865,7 +865,7 @@
     }
 
     #kill-feed {
-        top: 125px;
+        top: calc(175px + env(safe-area-inset-top, 0px)) !important;
         left: 12px;
         max-width: 210px;
     }
@@ -877,7 +877,7 @@
 }
 
 body.is-touch .top-center-bar {
-    top: 10px;
+    top: calc(65px + env(safe-area-inset-top, 0px)) !important;
     left: 12px;
     transform: none;
     padding: 6px 14px;
@@ -885,7 +885,7 @@ body.is-touch .top-center-bar {
 }
 
 body.is-touch #minimap-container {
-    top: 10px;
+    top: calc(65px + env(safe-area-inset-top, 0px)) !important;
     right: 12px;
     width: 95px;
     height: 95px;
@@ -893,7 +893,7 @@ body.is-touch #minimap-container {
 
 body.is-touch .bottom-hud {
     position: absolute;
-    top: 55px !important;
+    top: calc(115px + env(safe-area-inset-top, 0px)) !important;
     bottom: auto !important;
     left: 12px;
     right: 12px;
