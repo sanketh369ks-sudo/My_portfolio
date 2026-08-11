@@ -10,8 +10,8 @@ class PlayerController {
         this.world = world;
 
         // Player Stats
-        this.maxHp = 100;
-        this.hp = 100;
+        this.maxHp = 500;
+        this.hp = 500;
         this.maxArmor = 100;
         this.armor = 0;
         this.medkits = 2;

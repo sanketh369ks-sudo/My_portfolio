@@ -55,9 +55,9 @@ class AIBot {
         this.name = name;
         this.isBot = true;
 
-        this.maxHp = 100;
-        this.hp = 100;
-        this.armor = 25;
+        this.maxHp = 30;
+        this.hp = 30;
+        this.armor = 0;
         this.isAlive = true;
 
         this.position = spawnPos.clone();
