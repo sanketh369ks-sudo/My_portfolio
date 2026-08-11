@@ -208,16 +208,11 @@
             </div>
         </div>
 
-        <!-- Mobile Touch Controls Overlay -->
+        <!-- Mobile Touch Controls Overlay (Free Fire Pro 2-Thumb HUD) -->
         <div id="touch-controls">
-            <!-- Left Virtual Joystick -->
-            <div id="joystick-container">
-                <div id="joystick-knob"></div>
-            </div>
-
-            <!-- Right Action Buttons -->
-            <div class="touch-btn-cluster">
-                <div class="touch-row">
+            <!-- Left Side Controls (Quick Tactical Actions + Joystick) -->
+            <div class="touch-left-side">
+                <div class="touch-left-tactical-row">
                     <div id="touch-btn-ability" class="touch-btn skill-btn">
                         <span>✨</span>
                         <span id="touch-skill-cd" class="touch-badge">READY</span>
@@ -231,6 +226,14 @@
                         <span id="touch-medkit-count" class="touch-badge">x2</span>
                     </div>
                 </div>
+
+                <div id="joystick-container">
+                    <div id="joystick-knob"></div>
+                </div>
+            </div>
+
+            <!-- Right Side Controls (Combat & Movement Stances) -->
+            <div class="touch-btn-cluster">
                 <div class="touch-row">
                     <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
                     <div id="touch-btn-reload" class="touch-btn">🔄</div>
