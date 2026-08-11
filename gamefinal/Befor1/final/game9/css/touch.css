@@ -13,27 +13,27 @@
 /* Left Side Controls (Quick Tactical Actions + Joystick) */
 .touch-left-side {
     position: absolute;
-    bottom: 15px;
+    bottom: calc(45px + env(safe-area-inset-bottom, 0px));
     left: 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
     pointer-events: auto;
 }
 
 .touch-left-tactical-row {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     align-items: flex-start;
 }
 
 /* Virtual Joystick */
 #joystick-container {
     position: relative;
-    width: 115px;
-    height: 115px;
+    width: 105px;
+    height: 105px;
     background: rgba(255, 255, 255, 0.08);
     border: 2px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
@@ -46,8 +46,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     background: radial-gradient(circle, #ffaa00 0%, #ff5500 100%);
     border-radius: 50%;
     box-shadow: 0 0 18px rgba(255, 170, 0, 0.6);
@@ -56,8 +56,8 @@
 /* Right Hand Touch Action Buttons Cluster */
 .touch-btn-cluster {
     position: absolute;
-    bottom: 20px;
-    right: 15px;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    right: 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
