@@ -773,36 +773,142 @@
 
 /* Mobile Responsive HUD Layout */
 @media (max-width: 900px), (pointer: coarse) {
-    .bottom-hud-row {
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        flex-direction: column;
+    .top-center-bar {
+        top: 10px;
+        left: 12px;
+        transform: none;
+        padding: 6px 14px;
+        gap: 14px;
+        border-radius: 10px;
+        z-index: 60;
+    }
+
+    .match-info-label {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    .match-info-value {
+        font-size: 16px;
+    }
+
+    #minimap-container {
+        top: 10px;
+        right: 12px;
+        width: 95px;
+        height: 95px;
+        border-width: 2px;
+        z-index: 60;
+    }
+
+    .bottom-hud {
+        position: absolute;
+        top: 55px;
+        left: 12px;
+        right: 12px;
+        bottom: auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: flex-start;
-        gap: 10px;
         pointer-events: none;
+        z-index: 60;
     }
+
     .vitals-container {
-        width: 220px !important;
-        padding: 10px 14px !important;
+        width: 170px !important;
+        padding: 8px 12px !important;
+        background: rgba(10, 14, 23, 0.85);
+        border-radius: 10px;
+        gap: 5px;
+        pointer-events: auto;
     }
+
+    .vital-bar-track {
+        height: 8px;
+    }
+
+    .vital-label-group {
+        font-size: 10px;
+    }
+
     .tactical-actions-row {
         display: none !important;
     }
+
     .weapon-hud-container {
-        width: auto !important;
+        padding: 8px 14px !important;
+        background: rgba(10, 14, 23, 0.85);
+        border-radius: 10px;
+        gap: 10px;
+        pointer-events: auto;
     }
+
+    .weapon-name {
+        font-size: 13px;
+    }
+
+    .ammo-counter {
+        font-size: 18px;
+    }
+
+    .ammo-reserve {
+        font-size: 12px;
+    }
+
+    .weapon-slots {
+        display: none !important;
+    }
+
     #lock-prompt {
         display: none !important;
     }
+
+    #kill-feed {
+        top: 125px;
+        left: 12px;
+        max-width: 210px;
+    }
+
+    .kill-feed-item {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
 }
+
+body.is-touch .top-center-bar {
+    top: 10px;
+    left: 12px;
+    transform: none;
+    padding: 6px 14px;
+    gap: 14px;
+}
+
+body.is-touch #minimap-container {
+    top: 10px;
+    right: 12px;
+    width: 95px;
+    height: 95px;
+}
+
+body.is-touch .bottom-hud {
+    top: 55px;
+    bottom: auto;
+}
+
 body.is-touch .tactical-actions-row {
     display: none !important;
 }
+
 body.is-touch .vitals-container {
-    width: 220px !important;
-    padding: 10px 14px !important;
+    width: 170px !important;
+    padding: 8px 12px !important;
 }
+
+body.is-touch .weapon-slots {
+    display: none !important;
+}
+
 body.is-touch #lock-prompt {
     display: none !important;
 }

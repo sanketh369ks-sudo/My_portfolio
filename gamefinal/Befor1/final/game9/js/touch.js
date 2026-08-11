@@ -224,6 +224,15 @@ class TouchController {
             this.player.useMedkit();
         });
 
+        // Backpack Inventory Button
+        bindBtn('touch-btn-bag', () => {
+            if (window.gameInstance && window.gameInstance.ui) {
+                const invOverlay = document.getElementById('inventory-overlay');
+                const isHidden = invOverlay ? invOverlay.classList.contains('hidden') : true;
+                window.gameInstance.ui.toggleInventory(isHidden, this.player, this.weaponSys);
+            }
+        });
+
         // Emote Wheel Button
         bindBtn('touch-btn-emote', () => {
             if (window.gameInstance && window.gameInstance.ui) {

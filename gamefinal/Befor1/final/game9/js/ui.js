@@ -118,9 +118,11 @@ class UIManager {
         }
 
         // Top Status Bar
-        const mins = Math.floor(Math.max(0, zone.timer) / 60);
-        const secs = Math.floor(Math.max(0, zone.timer) % 60);
-        this.zoneTimer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        if (this.zoneTimer) {
+            const mins = Math.floor(Math.max(0, zone.timer) / 60);
+            const secs = Math.floor(Math.max(0, zone.timer) % 60);
+            this.zoneTimer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
 
         this.aliveCount.textContent = aliveCountTotal;
         this.killCount.textContent = player.kills;
@@ -243,8 +245,8 @@ class UIManager {
         if (!this.minimapCtx) return;
 
         const ctx = this.minimapCtx;
-        const width = 150;
-        const height = 150;
+        const width = this.minimapCanvas.width || 150;
+        const height = this.minimapCanvas.height || 150;
         const scale = 0.35;
 
         // Clear canvas
