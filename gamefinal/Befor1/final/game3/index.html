@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥊 HD 3D Boxing Champion - WebGL Arcade Fighter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js 3D WebGL Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- Header Controls -->
+        <header class="top-header">
+            <div class="logo">
+                <span class="glove-icon">🥊</span> HD BOXING CHAMPION
+            </div>
+            <div class="header-stats">
+                <div class="coin-badge" id="coinBadge">🪙 <span id="coinText">10,000</span></div>
+            </div>
+            <div class="header-actions">
+                <button id="camToggleBtn" class="icon-btn" title="Toggle Shockwave View">🎥</button>
+                <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound">🔊</button>
+                <button id="pauseBtn" class="icon-btn" title="Pause Game">⏸️</button>
+            </div>
+        </header>
+
+        <!-- MAIN MENU SCREEN -->
+        <section id="mainMenuScreen" class="screen active">
+            <div class="hero-banner">
+                <h1 class="glitch-title" data-text="HD BOXING CHAMPION">HD BOXING CHAMPION</h1>
+                <p class="subtitle">100+ CAMPAIGN LEVELS & INFINITY SURVIVAL</p>
+            </div>
+
+            <div class="menu-options">
+                <button class="btn btn-gold menu-btn" onclick="startInstantMatch()">
+                    <span class="btn-icon">🥊</span> PLAY NOW (INSTANT FIGHT)
+                </button>
+                <button class="btn btn-primary menu-btn" onclick="showScreen('levelSelectScreen', 'levels')">
+                    <span class="btn-icon">⭐</span> LEVEL MATCHES (100 CAMPAIGN LEVELS)
+                </button>
+                <button class="btn btn-gold menu-btn" onclick="startInfinityMode()">
+                    <span class="btn-icon">♾️</span> INFINITY SURVIVAL (ENDLESS LEVELS)
+                </button>
+                <button class="btn btn-primary menu-btn" onclick="openShopModal()">
+                    <span class="btn-icon">🛒</span> BOXER SHOP & STAT UPGRADES
+                </button>
+                <button class="btn btn-gold menu-btn" onclick="openTrophyModal()">
+                    <span class="btn-icon">🏆</span> HALL OF FAME & TROPHIES
+                </button>
+                <button class="btn btn-secondary menu-btn" onclick="showScreen('selectScreen', 'quick')">
+                    <span class="btn-icon">⚡</span> FIGHTER SELECT & DIFFICULTY
+                </button>
+                <button class="btn btn-gold menu-btn" onclick="showScreen('tournamentScreen', 'tournament')">
+                    <span class="btn-icon">👑</span> TOURNAMENT MODE
+                </button>
+                <button class="btn btn-secondary menu-btn" onclick="startPracticeMode()">
+                    <span class="btn-icon">🎯</span> PRACTICE RING
+                </button>
+            </div>
+
+            <!-- Controls Guide Card -->
+            <div class="guide-card">
+                <h3>🎮 BOXING CONTROLS</h3>
+                <div class="controls-grid">
+                    <div class="ctrl-item"><kbd>←</kbd> <kbd>→</kbd> / <kbd>A</kbd> <kbd>D</kbd> <span>Move Left / Right</span></div>
+                    <div class="ctrl-item"><kbd>J</kbd> / <kbd>Z</kbd> <span>Left Jab</span></div>
+                    <div class="ctrl-item"><kbd>K</kbd> / <kbd>X</kbd> <span>Right Hook / Heavy</span></div>
+                    <div class="ctrl-item"><kbd>L</kbd> / <kbd>C</kbd> <span>High Guard / Block</span></div>
+                    <div class="ctrl-item"><kbd>S</kbd> / <kbd>↓</kbd> <span>Duck / Slip Punch</span></div>
+                    <div class="ctrl-item"><kbd>Space</kbd> / <kbd>W</kbd> <span>Super Uppercut</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL SELECT SCREEN (100+ CAMPAIGN & INFINITY LEVELS) -->
+        <section id="levelSelectScreen" class="screen">
+            <h2>LEVEL MATCHES (100+ INFINITY)</h2>
+            <p class="select-subtitle">100 Progressively Tougher Levels + Endless ♾️ Infinity Mode!</p>
+
+            <div class="gender-filter level-tabs" id="levelTabs">
+                <button class="gender-btn level-tab active" data-range="1-20" onclick="filterLevelRange('1-20')">LEVELS 1-20</button>
+                <button class="gender-btn level-tab" data-range="21-40" onclick="filterLevelRange('21-40')">LEVELS 21-40</button>
+                <button class="gender-btn level-tab" data-range="41-60" onclick="filterLevelRange('41-60')">LEVELS 41-60</button>
+                <button class="gender-btn level-tab" data-range="61-80" onclick="filterLevelRange('61-80')">LEVELS 61-80</button>
+                <button class="gender-btn level-tab" data-range="81-100" onclick="filterLevelRange('81-100')">LEVELS 81-100 🔥</button>
+                <button class="gender-btn level-tab" data-range="infinity" onclick="filterLevelRange('infinity')">♾️ INFINITY (100+)</button>
+            </div>
+
+            <div class="level-grid" id="levelGrid">
+                <!-- Populated dynamically by game.js -->
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-secondary" onclick="showScreen('mainMenuScreen')">⬅️ BACK TO MENU</button>
+            </div>
+        </section>
+
+        <!-- FIGHTER SELECT SCREEN -->
+        <section id="selectScreen" class="screen">
+            <h2>SELECT YOUR BOXER</h2>
+            <p class="select-subtitle">Choose your Male or Female Champion to enter the ring</p>
+
+            <!-- Gender Selection Filter Tabs -->
+            <div class="gender-filter">
+                <button class="gender-btn active" data-gender="all" onclick="filterGender('all')">ALL BOXERS</button>
+                <button class="gender-btn" data-gender="male" onclick="filterGender('male')">♂ MALE BOXERS</button>
+                <button class="gender-btn" data-gender="female" onclick="filterGender('female')">♀ FEMALE BOXERS</button>
+            </div>
+
+            <div class="fighters-grid" id="fightersGrid"></div>
+
+            <div class="difficulty-select">
+                <label>AI DIFFICULTY:</label>
+                <div class="diff-buttons">
+                    <button class="diff-btn" data-diff="easy" onclick="setDifficulty('easy')">ROOKIE</button>
+                    <button class="diff-btn active" data-diff="medium" onclick="setDifficulty('medium')">PRO</button>
+                    <button class="diff-btn" data-diff="hard" onclick="setDifficulty('hard')">CONTENDER</button>
+                    <button class="diff-btn" data-diff="champ" onclick="setDifficulty('champ')">CHAMPION</button>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-secondary" onclick="showScreen('mainMenuScreen')">⬅ BACK</button>
+                <button class="btn btn-primary" id="confirmSelectBtn" onclick="confirmFighterSelection()">FIGHT! 🥊</button>
+            </div>
+        </section>
+
+        <!-- TOURNAMENT BRACKET SCREEN -->
+        <section id="tournamentScreen" class="screen">
+            <h2>🏆 CHAMPIONSHIP TOURNAMENT</h2>
+            <div class="bracket-container">
+                <div class="bracket-round">
+                    <h4>QUARTER FINAL</h4>
+                    <div class="bracket-match match-passed">
+                        <div class="b-player" id="t-p1">You</div>
+                        <div class="b-player" id="t-p2">Rival 1</div>
+                    </div>
+                </div>
+                <div class="bracket-round">
+                    <h4>SEMI FINAL</h4>
+                    <div class="bracket-match" id="t-match2">
+                        <div class="b-player">Winner QF</div>
+                        <div class="b-player" id="t-p3">Rival 2</div>
+                    </div>
+                </div>
+                <div class="bracket-round">
+                    <h4>FINALS</h4>
+                    <div class="bracket-match" id="t-match3">
+                        <div class="b-player">Winner SF</div>
+                        <div class="b-player" id="t-p4">THE TITAN</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-secondary" onclick="showScreen('mainMenuScreen')">EXIT TOURNAMENT</button>
+                <button class="btn btn-gold" id="nextTournamentBtn" onclick="startTournamentMatch()">START MATCH 🥊</button>
+            </div>
+        </section>
+
+        <!-- 3D GAMEPLAY SCREEN -->
+        <section id="gameScreen" class="screen">
+            
+            <!-- HUD Header Overlay -->
+            <div class="hud-container">
+                <!-- Player HUD -->
+                <div class="fighter-hud player-hud">
+                    <div class="hud-profile">
+                        <div class="hud-avatar" id="p1Avatar">🥊</div>
+                        <div class="hud-info">
+                            <span class="hud-name" id="p1Name">PLAYER</span>
+                            <span class="hud-title" id="p1Title">CHAMPION</span>
+                        </div>
+                    </div>
+                    <div class="bars-container">
+                        <div class="bar-wrap health-wrap">
+                            <div class="bar-label">HEALTH <span id="p1HealthText">100 HP</span></div>
+                            <div class="bar-bg">
+                                <div class="bar-fill health-fill" id="p1HealthBar"></div>
+                            </div>
+                        </div>
+                        <div class="bar-wrap stamina-wrap">
+                            <div class="bar-label">STAMINA</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill stamina-fill" id="p1StaminaBar"></div>
+                            </div>
+                        </div>
+                        <div class="bar-wrap super-wrap">
+                            <div class="bar-label">SUPER COMBO</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill super-fill" id="p1SuperBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Ring Info -->
+                <div class="center-hud">
+                    <div class="round-badge" id="roundBadge">ROUND 1</div>
+                    <div class="timer-box">
+                        <span id="timer">60</span>
+                    </div>
+                </div>
+
+                <!-- Enemy HUD -->
+                <div class="fighter-hud enemy-hud">
+                    <div class="hud-profile">
+                        <div class="hud-info text-right">
+                            <span class="hud-name" id="p2Name">OPPONENT</span>
+                            <span class="hud-title" id="p2Title">CONTENDER</span>
+                        </div>
+                        <div class="hud-avatar" id="p2Avatar">🤖</div>
+                    </div>
+                    <div class="bars-container">
+                        <div class="bar-wrap health-wrap">
+                            <div class="bar-label">HEALTH <span id="p2HealthText">100 HP</span></div>
+                            <div class="bar-bg">
+                                <div class="bar-fill health-fill" id="p2HealthBar"></div>
+                            </div>
+                        </div>
+                        <div class="bar-wrap stamina-wrap">
+                            <div class="bar-label">STAMINA</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill stamina-fill" id="p2StaminaBar"></div>
+                            </div>
+                        </div>
+                        <div class="bar-wrap super-wrap">
+                            <div class="bar-label">SUPER COMBO</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill super-fill" id="p2SuperBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HD Ring Viewport Container -->
+            <div class="ring-wrapper" id="ringWrapper">
+                <canvas id="gameCanvas" width="960" height="460"></canvas>
+                
+                <!-- Announcer Overlay Banner -->
+                <div class="announcement-overlay" id="announcerOverlay">
+                    <h2 id="announcerTitle" class="pulse-text">ROUND 1</h2>
+                    <p id="announcerSub">READY?</p>
+                </div>
+
+                <!-- Combo Hit Counter Floating Banner -->
+                <div id="comboBanner" class="combo-banner"></div>
+            </div>
+
+            <!-- Mobile & Touch Controls Bar -->
+            <div class="controls-panel">
+                <div class="control-group movement-group">
+                    <button class="ctrl-btn btn-move" id="btnLeft" title="Move Left">⬅️</button>
+                    <button class="ctrl-btn btn-move" id="btnDuck" title="Duck/Slip">👇 DUCK</button>
+                    <button class="ctrl-btn btn-move" id="btnRight" title="Move Right">➡️</button>
+                </div>
+                <div class="control-group action-group">
+                    <button class="ctrl-btn btn-action btn-jab" id="btnJab">👊 JAB</button>
+                    <button class="ctrl-btn btn-action btn-heavy" id="btnHeavy">💥 HOOK</button>
+                    <button class="ctrl-btn btn-action btn-block" id="btnBlock">🛡️ BLOCK</button>
+                    <button class="ctrl-btn btn-action btn-super" id="btnSuper">⭐ SUPER</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PAUSE MODAL -->
+        <div id="pauseModal" class="modal">
+            <div class="modal-content glass-card">
+                <h2>⏸️ GAME PAUSED</h2>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" onclick="togglePause()">RESUME</button>
+                    <button class="btn btn-secondary" onclick="restartMatch()">RESTART MATCH</button>
+                    <button class="btn btn-danger" onclick="exitToMenu()">MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULT MODAL -->
+        <div id="resultModal" class="modal">
+            <div class="modal-content glass-card">
+                <div class="trophy-header" id="resultIcon">🏆</div>
+                <h2 id="resultTitle">YOU WIN!</h2>
+                <p id="resultSubtitle">Knockout victory in Round 1!</p>
+
+                <div class="match-stats">
+                    <div class="stat-row"><span>Punches Thrown:</span> <strong id="statPunches">0</strong></div>
+                    <div class="stat-row"><span>Land Rate:</span> <strong id="statAccuracy">0%</strong></div>
+                    <div class="stat-row"><span>Max Combo:</span> <strong id="statMaxCombo">0x</strong></div>
+                    <div class="stat-row"><span>Damage Dealt:</span> <strong id="statDamage">0</strong></div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="btn btn-gold" id="btnNextTournament" onclick="handleResultContinue()">CONTINUE 🥊</button>
+                    <button class="btn btn-primary" onclick="restartMatch()">PLAY AGAIN 🔄</button>
+                    <button class="btn btn-secondary" onclick="exitToMenu()">MAIN MENU 🏠</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOXER SHOP & STAT UPGRADES MODAL -->
+        <div id="shopModal" class="modal">
+            <div class="modal-content glass-card" style="max-width: 600px;">
+                <h2>🛒 BOXER SHOP & STAT UPGRADES</h2>
+                <p class="select-subtitle">Use your accumulated coins to upgrade stats and equip elite gear!</p>
+
+                <div class="shop-grid">
+                    <div class="shop-item">
+                        <div class="shop-icon">🥊</div>
+                        <div class="shop-details">
+                            <div class="shop-name">PUNCH POWER (+2 Power)</div>
+                            <div class="shop-desc">Increases Jab and Hook knockout damage</div>
+                        </div>
+                        <button class="btn btn-gold btn-sm" onclick="buyUpgrade('power', 1000)">BUY (1,000 🪙)</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-icon">⚡</div>
+                        <div class="shop-details">
+                            <div class="shop-name">FIGHTER SPEED (+0.1 Speed)</div>
+                            <div class="shop-desc">Increases footwork and jab attack speed</div>
+                        </div>
+                        <button class="btn btn-gold btn-sm" onclick="buyUpgrade('speed', 1200)">BUY (1,200 🪙)</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-icon">🛡️</div>
+                        <div class="shop-details">
+                            <div class="shop-name">GUARD DEFENSE (+2 Defense)</div>
+                            <div class="shop-desc">Reduces incoming hit damage when blocking</div>
+                        </div>
+                        <button class="btn btn-gold btn-sm" onclick="buyUpgrade('defense', 1000)">BUY (1,000 🪙)</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-icon">❤️</div>
+                        <div class="shop-details">
+                            <div class="shop-name">MAX HEALTH BOOST (+15 HP)</div>
+                            <div class="shop-desc">Increases total health bar capacity</div>
+                        </div>
+                        <button class="btn btn-gold btn-sm" onclick="buyUpgrade('health', 1500)">BUY (1,500 🪙)</button>
+                    </div>
+                </div>
+
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeShopModal()">CLOSE SHOP ✖️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HALL OF FAME & TROPHIES MODAL -->
+        <div id="trophyModal" class="modal">
+            <div class="modal-content glass-card" style="max-width: 580px;">
+                <h2>🏆 HALL OF FAME & TROPHIES</h2>
+                <p class="select-subtitle">Your Lifetime Boxing Records & Championship Belts</p>
+
+                <div class="trophy-shelf">
+                    <div class="trophy-badge">
+                        <div class="trophy-icon">🏆</div>
+                        <div class="trophy-title">World Belt</div>
+                    </div>
+                    <div class="trophy-badge">
+                        <div class="trophy-icon">👑</div>
+                        <div class="trophy-title">God Crown</div>
+                    </div>
+                    <div class="trophy-badge">
+                        <div class="trophy-icon">⭐</div>
+                        <div class="trophy-title">100 Levels</div>
+                    </div>
+                    <div class="trophy-badge">
+                        <div class="trophy-icon">♾️</div>
+                        <div class="trophy-title">Infinity Streak</div>
+                    </div>
+                </div>
+
+                <div class="match-stats" style="margin-top: 16px;">
+                    <div class="stat-row"><span>Total Matches Played:</span> <strong id="hallMatches">0</strong></div>
+                    <div class="stat-row"><span>Total Knockouts (KOs):</span> <strong id="hallKOs">0</strong></div>
+                    <div class="stat-row"><span>Highest Infinity Level:</span> <strong id="hallInfinity">Level 100</strong></div>
+                    <div class="stat-row"><span>Career Coins Earned:</span> <strong id="hallCoins">15,000 🪙</strong></div>
+                </div>
+
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeTrophyModal()">CLOSE HALL OF FAME ✖️</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
