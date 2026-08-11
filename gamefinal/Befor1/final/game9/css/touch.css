@@ -112,6 +112,9 @@
 /* Show touch controls on touch-enabled devices or mobile screens */
 @media (pointer: coarse), (max-width: 900px) {
     #touch-controls {
-        display: block;
+        display: block !important;
     }
+}
+body.is-touch #touch-controls {
+    display: block !important;
 }

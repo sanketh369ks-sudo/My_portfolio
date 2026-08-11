@@ -103,20 +103,29 @@ class BattleRoyaleGame {
             if (e.code === 'Digit6') this.weaponSys.switchWeapon('deagle');
             if (e.code === 'Digit7') this.weaponSys.switchWeapon('m60');
             if (e.code === 'KeyR') this.weaponSys.reload();
-            if (e.code === 'KeyF' || e.code === 'KeyE') {
+            if (e.code === 'KeyF') {
                 const loot = this.lootManager.checkPlayerProximity(this.player.position);
                 if (loot) {
                     this.attemptLootPickup();
-                } else if (e.code === 'KeyE' || e.code === 'KeyT' || e.code === 'KeyB') {
+                } else {
+                    this.player.activateAbility();
+                }
+            }
+            if (e.code === 'KeyG') {
+                this.player.deployGlooWall();
+            }
+            if (e.code === 'KeyH') {
+                this.player.useMedkit();
+            }
+            if (e.code === 'KeyE' || e.code === 'KeyT' || e.code === 'KeyB') {
+                const loot = (e.code === 'KeyE') ? this.lootManager.checkPlayerProximity(this.player.position) : null;
+                if (loot) {
+                    this.attemptLootPickup();
+                } else {
                     const emoteOverlay = document.getElementById('emote-wheel-overlay');
                     const isHidden = emoteOverlay ? emoteOverlay.classList.contains('hidden') : true;
                     this.ui.toggleEmoteWheel(isHidden);
                 }
-            }
-            if (e.code === 'KeyT' || e.code === 'KeyB') {
-                const emoteOverlay = document.getElementById('emote-wheel-overlay');
-                const isHidden = emoteOverlay ? emoteOverlay.classList.contains('hidden') : true;
-                this.ui.toggleEmoteWheel(isHidden);
             }
             if (e.code === 'Tab' || e.code === 'KeyI') {
                 e.preventDefault();

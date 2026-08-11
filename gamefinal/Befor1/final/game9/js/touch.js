@@ -13,12 +13,21 @@ class TouchController {
 
         this.isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
         this.activeTouchId = null;
+        this.cameraTouchId = null;
+        this.lastCameraPos = { x: 0, y: 0 };
 
         this.joystickCenter = { x: 0, y: 0 };
         this.maxRadius = 45;
 
+        if (this.isTouchDevice) {
+            document.body.classList.add('is-touch');
+            const touchControls = document.getElementById('touch-controls');
+            if (touchControls) touchControls.style.display = 'block';
+        }
+
         if (this.joystickContainer) {
             this.setupJoystick();
+            this.setupCameraTouchLook();
             this.setupActionButtons();
         }
     }
@@ -26,25 +35,26 @@ class TouchController {
     setupJoystick() {
         const container = this.joystickContainer;
 
-        container.addEventListener('touchstart', (e) => {
-            e.preventDefault();
+        const handleStart = (clientX, clientY, id) => {
             if (this.activeTouchId !== null) return;
-
-            const touch = e.changedTouches[0];
-            this.activeTouchId = touch.identifier;
+            this.activeTouchId = id;
 
             const rect = container.getBoundingClientRect();
             this.joystickCenter = {
                 x: rect.left + rect.width / 2,
                 y: rect.top + rect.height / 2
             };
+            this.updateKnobPosition(clientX, clientY);
+        };
 
-            this.updateKnobPosition(touch.clientX, touch.clientY);
+        container.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            handleStart(touch.clientX, touch.clientY, touch.identifier);
         }, { passive: false });
 
         window.addEventListener('touchmove', (e) => {
             if (this.activeTouchId === null) return;
-
             for (let touch of e.changedTouches) {
                 if (touch.identifier === this.activeTouchId) {
                     this.updateKnobPosition(touch.clientX, touch.clientY);
@@ -55,10 +65,51 @@ class TouchController {
 
         window.addEventListener('touchend', (e) => {
             if (this.activeTouchId === null) return;
-
             for (let touch of e.changedTouches) {
                 if (touch.identifier === this.activeTouchId) {
                     this.resetJoystick();
+                    break;
+                }
+            }
+        });
+    }
+
+    setupCameraTouchLook() {
+        window.addEventListener('touchstart', (e) => {
+            for (let touch of e.changedTouches) {
+                if (touch.clientX > window.innerWidth * 0.35 && this.cameraTouchId === null) {
+                    const target = touch.target;
+                    if (target.classList.contains('touch-btn') || target.closest('#joystick-container')) {
+                        continue;
+                    }
+                    this.cameraTouchId = touch.identifier;
+                    this.lastCameraPos = { x: touch.clientX, y: touch.clientY };
+                }
+            }
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (this.cameraTouchId === null) return;
+            for (let touch of e.changedTouches) {
+                if (touch.identifier === this.cameraTouchId) {
+                    const dx = touch.clientX - this.lastCameraPos.x;
+                    const dy = touch.clientY - this.lastCameraPos.y;
+                    this.lastCameraPos = { x: touch.clientX, y: touch.clientY };
+
+                    const sensitivity = this.player.isAiming ? 0.003 : 0.005;
+                    this.player.rotationY -= dx * sensitivity;
+                    this.player.pitch -= dy * sensitivity;
+                    this.player.pitch = Math.max(-0.45, Math.min(0.55, this.player.pitch));
+                    break;
+                }
+            }
+        });
+
+        window.addEventListener('touchend', (e) => {
+            if (this.cameraTouchId === null) return;
+            for (let touch of e.changedTouches) {
+                if (touch.identifier === this.cameraTouchId) {
+                    this.cameraTouchId = null;
                     break;
                 }
             }
@@ -100,17 +151,23 @@ class TouchController {
             const btn = document.getElementById(id);
             if (!btn) return;
 
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
+            const triggerDown = (e) => {
+                if (e && e.cancelable) e.preventDefault();
                 btn.classList.add('pressed');
                 if (onDown) onDown();
-            }, { passive: false });
+            };
 
-            btn.addEventListener('touchend', (e) => {
-                e.preventDefault();
+            const triggerUp = (e) => {
+                if (e && e.cancelable) e.preventDefault();
                 btn.classList.remove('pressed');
                 if (onUp) onUp();
-            }, { passive: false });
+            };
+
+            btn.addEventListener('touchstart', triggerDown, { passive: false });
+            btn.addEventListener('touchend', triggerUp, { passive: false });
+
+            btn.addEventListener('mousedown', (e) => triggerDown(e));
+            btn.addEventListener('mouseup', (e) => triggerUp(e));
         };
 
         // Fire Button
