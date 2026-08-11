@@ -226,50 +226,49 @@
         <!-- Mobile Touch Controls Overlay -->
         <div id="touch-controls">
 
-            <!-- Joystick — Bottom Left -->
-            <div id="joystick-container">
-                <div id="joystick-knob"></div>
+            <!-- JOYSTICK — Bottom Left -->
+            <div id="joystick-container" style="position:fixed;bottom:16px;left:16px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.22);touch-action:none;z-index:200;">
+                <div id="joystick-knob" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,#ffaa00,#ff5500);box-shadow:0 0 16px rgba(255,170,0,.6);pointer-events:none;"></div>
             </div>
 
-            <!-- Skill Buttons — Left Side (2×3 grid above joystick) -->
-            <div class="touch-left-tactical-row">
-                <div id="touch-btn-ability" class="touch-btn skill-btn">
-                    <span>✨</span>
-                    <span id="touch-skill-cd" class="touch-badge">READY</span>
-                </div>
-                <div id="touch-btn-gloo" class="touch-btn gloo-btn">
-                    <span>🛡️</span>
-                    <span id="touch-gloo-count" class="touch-badge">x3</span>
-                </div>
-                <div id="touch-btn-bubble" class="touch-btn bubble-btn">
-                    <span>🔵</span>
-                    <span id="touch-bubble-cd" class="touch-badge">READY</span>
-                </div>
-                <div id="touch-btn-medkit" class="touch-btn medkit-btn">
-                    <span>🩹</span>
-                    <span id="touch-medkit-count" class="touch-badge">x2</span>
-                </div>
-                <div id="touch-btn-bag" class="touch-btn bag-btn">
-                    <span>🎒</span>
-                </div>
+            <!-- SKILL: Ability — above joystick col 1 row 1 -->
+            <div id="touch-btn-ability" class="touch-btn skill-btn" style="position:fixed;bottom:242px;left:16px;">
+                <span>✨</span><span id="touch-skill-cd" class="touch-badge">READY</span>
+            </div>
+            <!-- SKILL: Gloo — above joystick col 2 row 1 -->
+            <div id="touch-btn-gloo" class="touch-btn gloo-btn" style="position:fixed;bottom:242px;left:68px;">
+                <span>🛡️</span><span id="touch-gloo-count" class="touch-badge">x3</span>
+            </div>
+            <!-- SKILL: Bubble — col 1 row 2 -->
+            <div id="touch-btn-bubble" class="touch-btn bubble-btn" style="position:fixed;bottom:190px;left:16px;">
+                <span>🔵</span><span id="touch-bubble-cd" class="touch-badge">READY</span>
+            </div>
+            <!-- SKILL: Medkit — col 2 row 2 -->
+            <div id="touch-btn-medkit" class="touch-btn medkit-btn" style="position:fixed;bottom:190px;left:68px;">
+                <span>🩹</span><span id="touch-medkit-count" class="touch-badge">x2</span>
+            </div>
+            <!-- SKILL: Bag — col 1 row 3 -->
+            <div id="touch-btn-bag" class="touch-btn bag-btn" style="position:fixed;bottom:138px;left:16px;">
+                <span>🎒</span>
             </div>
 
-            <!-- Fire Button — Bottom Right (standalone big) -->
-            <div id="touch-btn-fire" class="touch-btn fire-btn">🔫</div>
+            <!-- FIRE — Bottom Right (big) -->
+            <div id="touch-btn-fire" class="touch-btn fire-btn" style="position:fixed;bottom:16px;right:16px;width:76px;height:76px;font-size:28px;">🔫</div>
 
-            <!-- Right Combat Buttons — Above Fire -->
-            <div class="touch-btn-cluster">
-                <div class="touch-row">
-                    <div id="touch-btn-reload" class="touch-btn">🔄</div>
-                    <div id="touch-btn-switch" class="touch-btn">⚔️</div>
-                </div>
-                <div class="touch-row">
-                    <div id="touch-btn-jump" class="touch-btn">🦘</div>
-                    <div id="touch-btn-aim" class="touch-btn aim-btn">🎯</div>
-                </div>
-            </div>
+            <!-- AIM — Right, above fire -->
+            <div id="touch-btn-aim" class="touch-btn aim-btn" style="position:fixed;bottom:106px;right:16px;">🎯</div>
+
+            <!-- JUMP — Right, above aim -->
+            <div id="touch-btn-jump" class="touch-btn" style="position:fixed;bottom:162px;right:16px;">🦘</div>
+
+            <!-- RELOAD — Right top cluster -->
+            <div id="touch-btn-reload" class="touch-btn" style="position:fixed;bottom:218px;right:68px;">🔄</div>
+
+            <!-- SWITCH — Right top cluster -->
+            <div id="touch-btn-switch" class="touch-btn" style="position:fixed;bottom:218px;right:16px;">⚔️</div>
 
         </div>
+
 
 
 
