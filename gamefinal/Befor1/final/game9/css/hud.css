@@ -774,62 +774,61 @@
 /* Mobile Responsive HUD Layout */
 @media (max-width: 1024px), (pointer: coarse) {
     .top-center-bar {
-        top: calc(65px + env(safe-area-inset-top, 0px)) !important;
-        left: 12px;
-        transform: none;
-        padding: 6px 14px;
-        gap: 14px;
+        top: 10px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        padding: 4px 12px !important;
+        gap: 10px !important;
         border-radius: 10px;
         z-index: 60;
     }
 
     .match-info-label {
-        font-size: 9px;
+        font-size: 8px;
         letter-spacing: 1px;
     }
 
     .match-info-value {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     #minimap-container {
-        top: calc(65px + env(safe-area-inset-top, 0px)) !important;
-        right: 12px;
-        width: 95px;
-        height: 95px;
+        top: 10px !important;
+        right: 10px !important;
+        width: 85px !important;
+        height: 85px !important;
         border-width: 2px;
         z-index: 60;
     }
 
     .bottom-hud {
         position: absolute;
-        top: calc(115px + env(safe-area-inset-top, 0px)) !important;
-        left: 12px;
-        right: 12px;
+        top: 10px !important;
+        left: 10px !important;
+        right: auto !important;
         bottom: auto !important;
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        flex-direction: column;
         align-items: flex-start;
         pointer-events: none;
         z-index: 60;
     }
 
     .vitals-container {
-        width: 170px !important;
-        padding: 8px 12px !important;
+        width: 140px !important;
+        padding: 6px 10px !important;
         background: rgba(10, 14, 23, 0.85);
         border-radius: 10px;
-        gap: 5px;
+        gap: 4px;
         pointer-events: auto;
     }
 
     .vital-bar-track {
-        height: 8px;
+        height: 7px;
     }
 
     .vital-label-group {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .tactical-actions-row {
@@ -837,23 +836,27 @@
     }
 
     .weapon-hud-container {
-        padding: 8px 14px !important;
+        position: absolute;
+        top: 42px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        padding: 3px 10px !important;
         background: rgba(10, 14, 23, 0.85);
-        border-radius: 10px;
-        gap: 10px;
+        border-radius: 8px;
+        gap: 8px;
         pointer-events: auto;
     }
 
     .weapon-name {
-        font-size: 13px;
+        font-size: 11px;
     }
 
     .ammo-counter {
-        font-size: 18px;
+        font-size: 15px;
     }
 
     .ammo-reserve {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .weapon-slots {
@@ -865,41 +868,40 @@
     }
 
     #kill-feed {
-        top: calc(175px + env(safe-area-inset-top, 0px)) !important;
-        left: 12px;
-        max-width: 210px;
+        top: 110px !important;
+        left: 10px;
+        max-width: 180px;
     }
 
     .kill-feed-item {
-        padding: 4px 8px;
-        font-size: 10px;
+        padding: 3px 6px;
+        font-size: 9px;
     }
 }
 
 body.is-touch .top-center-bar {
-    top: calc(65px + env(safe-area-inset-top, 0px)) !important;
-    left: 12px;
-    transform: none;
-    padding: 6px 14px;
-    gap: 14px;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding: 4px 12px !important;
+    gap: 10px !important;
 }
 
 body.is-touch #minimap-container {
-    top: calc(65px + env(safe-area-inset-top, 0px)) !important;
-    right: 12px;
-    width: 95px;
-    height: 95px;
+    top: 10px !important;
+    right: 10px !important;
+    width: 85px !important;
+    height: 85px !important;
 }
 
 body.is-touch .bottom-hud {
     position: absolute;
-    top: calc(115px + env(safe-area-inset-top, 0px)) !important;
+    top: 10px !important;
+    left: 10px !important;
     bottom: auto !important;
-    left: 12px;
-    right: 12px;
+    right: auto !important;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: flex-start;
     pointer-events: none;
     z-index: 60;
@@ -910,8 +912,8 @@ body.is-touch .tactical-actions-row {
 }
 
 body.is-touch .vitals-container {
-    width: 170px !important;
-    padding: 8px 12px !important;
+    width: 140px !important;
+    padding: 6px 10px !important;
 }
 
 body.is-touch .weapon-slots {

@@ -130,24 +130,11 @@ class BattleRoyaleGame {
             }
         });
 
-        // Menu Buttons with Direct Fullscreen User Gesture Triggers
-        const triggerFullscreen = () => {
-            try {
-                const doc = document.documentElement;
-                if (doc.requestFullscreen) {
-                    doc.requestFullscreen().catch(() => {});
-                } else if (doc.webkitRequestFullscreen) {
-                    doc.webkitRequestFullscreen();
-                }
-            } catch (e) {}
-        };
-
+        // Menu Buttons
         document.getElementById('start-btn').addEventListener('click', () => {
-            triggerFullscreen();
             this.startMatch();
         });
         document.getElementById('restart-btn').addEventListener('click', () => {
-            triggerFullscreen();
             this.startMatch();
         });
     }
@@ -168,15 +155,6 @@ class BattleRoyaleGame {
 
         const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth < 900);
         if (isTouch) {
-            try {
-                const docEl = document.documentElement;
-                if (docEl.requestFullscreen) {
-                    docEl.requestFullscreen().catch(() => {});
-                } else if (docEl.webkitRequestFullscreen) {
-                    docEl.webkitRequestFullscreen();
-                }
-            } catch (e) {}
-
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(() => {
                     // Orientation lock handled gracefully
