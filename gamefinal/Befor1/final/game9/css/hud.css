@@ -770,3 +770,33 @@
     80% { opacity: 1; transform: translate(-50%, -80%) scale(1); }
     100% { opacity: 0; transform: translate(-50%, -110%) scale(0.8); }
 }
+
+/* Mobile Responsive HUD Layout */
+@media (max-width: 900px), (pointer: coarse) {
+    .bottom-hud-row {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        pointer-events: none;
+    }
+    .vitals-container {
+        width: 220px !important;
+        padding: 10px 14px !important;
+    }
+    .tactical-actions-row {
+        display: none !important;
+    }
+    .weapon-hud-container {
+        width: auto !important;
+    }
+}
+body.is-touch .tactical-actions-row {
+    display: none !important;
+}
+body.is-touch .vitals-container {
+    width: 220px !important;
+    padding: 10px 14px !important;
+}

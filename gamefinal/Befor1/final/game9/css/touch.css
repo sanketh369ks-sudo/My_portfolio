@@ -39,18 +39,19 @@
 /* Right Hand Touch Action Buttons Cluster */
 .touch-btn-cluster {
     position: absolute;
-    bottom: 25px;
-    right: 25px;
+    bottom: 15px;
+    right: 15px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 12px;
+    gap: 8px;
     pointer-events: auto;
 }
 
 .touch-row {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    justify-content: flex-end;
     align-items: center;
 }
 
