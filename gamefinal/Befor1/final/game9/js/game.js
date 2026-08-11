@@ -150,7 +150,13 @@ class BattleRoyaleGame {
         this.zoneManager = new SafeZoneManager(this.scene, this.world.mapSize);
 
         const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth < 900);
-        if (!isTouch) {
+        if (isTouch) {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {
+                    // Orientation lock handled gracefully
+                });
+            }
+        } else {
             try {
                 if (this.canvas && this.canvas.requestPointerLock) {
                     this.canvas.requestPointerLock();
