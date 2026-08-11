@@ -101,6 +101,7 @@ class BattleRoyaleGame {
             if (e.code === 'Digit4') this.weaponSys.switchWeapon('m1887');
             if (e.code === 'Digit5') this.weaponSys.switchWeapon('plasma');
             if (e.code === 'Digit6') this.weaponSys.switchWeapon('deagle');
+            if (e.code === 'Digit7') this.weaponSys.switchWeapon('m60');
             if (e.code === 'KeyR') this.weaponSys.reload();
             if (e.code === 'KeyE') this.attemptLootPickup();
             if (e.code === 'Tab' || e.code === 'KeyI') {

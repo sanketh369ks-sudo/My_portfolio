@@ -93,6 +93,20 @@ class WeaponSystem {
                 spread: 0.012,
                 range: 250,
                 color: 0xffd700
+            },
+            m60: {
+                id: 'm60',
+                name: 'M60 Heavy LMG',
+                type: 'LMG',
+                damage: 42,
+                fireRate: 0.08,
+                magSize: 100,
+                currentAmmo: 100,
+                reserveAmmo: 300,
+                reloadTime: 3.5,
+                spread: 0.026,
+                range: 450,
+                color: 0xffaa00
             }
         };
 

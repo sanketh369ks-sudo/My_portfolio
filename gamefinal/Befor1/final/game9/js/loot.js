@@ -16,7 +16,8 @@ class LootManager {
             { id: 'mp40', name: 'MP40 SMG', category: 'weapon', color: 0x00f0ff, count: 1 },
             { id: 'm1887', name: 'M1887 Shotgun', category: 'weapon', color: 0xff5500, count: 1 },
             { id: 'plasma', name: 'Plasma Rifle', category: 'weapon', color: 0x00ffff, count: 1 },
-            { id: 'deagle', name: 'Desert Eagle', category: 'weapon', color: 0xffd700, count: 1 }
+            { id: 'deagle', name: 'Desert Eagle', category: 'weapon', color: 0xffd700, count: 1 },
+            { id: 'm60', name: 'M60 Heavy LMG', category: 'weapon', color: 0xffaa00, count: 1 }
         ];
 
         const supplyTypes = [
@@ -156,6 +157,25 @@ class LootManager {
             const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.4), barrelMat);
             barrel.rotateX(Math.PI / 2); barrel.position.set(0, 0.04, -1.0);
             weaponGroup.add(body); weaponGroup.add(barrel);
+        } else if (weaponId === 'm60') {
+            const steelMat = new THREE.MeshStandardMaterial({ color: 0x636e72, metalness: 0.85 });
+            const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e272e, metalness: 0.9 });
+            const brassMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f, metalness: 0.95 });
+
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.28, 1.2), steelMat);
+            const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.3), steelMat);
+            barrel.rotateX(Math.PI / 2); barrel.position.set(0, 0.04, -0.9);
+
+            const bipodL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55), darkMat);
+            bipodL.position.set(-0.18, -0.25, -1.1); bipodL.rotation.z = -0.3;
+
+            const bipodR = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55), darkMat);
+            bipodR.position.set(0.18, -0.25, -1.1); bipodR.rotation.z = 0.3;
+
+            const ammoBox = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.25, 0.28), darkMat);
+            ammoBox.position.set(-0.2, -0.25, -0.1);
+
+            weaponGroup.add(body); weaponGroup.add(barrel); weaponGroup.add(bipodL); weaponGroup.add(bipodR); weaponGroup.add(ammoBox);
         } else {
             const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1e272e, metalness: 0.9 });
             const glowMat = new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 0.8 });

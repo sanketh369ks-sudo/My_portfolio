@@ -17,7 +17,7 @@ class InventoryManager {
     }
 
     selectSlot(slotIndex) {
-        const slots = ['ak47', 'awm', 'mp40', 'm1887', 'plasma', 'deagle'];
+        const slots = ['ak47', 'awm', 'mp40', 'm1887', 'plasma', 'deagle', 'm60'];
         if (slots[slotIndex]) {
             this.weaponSys.switchWeapon(slots[slotIndex]);
         }

@@ -292,6 +292,87 @@ class PlayerController {
 
             weaponGroup.add(body);
             weaponGroup.add(barrel);
+        } else if (weaponId === 'm60') {
+            // Iconic M60 Heavy LMG (Matching User's Reference Image)
+            const steelMat = new THREE.MeshStandardMaterial({ color: 0x636e72, metalness: 0.85, roughness: 0.25 });
+            const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e272e, metalness: 0.9, roughness: 0.4 });
+            const brassMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f, metalness: 0.95, roughness: 0.1 });
+            const redMat = new THREE.MeshStandardMaterial({ color: 0xd63031, metalness: 0.6 });
+
+            // 1. Heavy Receiver & Barrel with Heat Shield Rings
+            const mainReceiver = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.32, 1.2), steelMat);
+            const longBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 1.4), steelMat);
+            longBarrel.rotateX(Math.PI / 2);
+            longBarrel.position.set(0, 0.04, -1.0);
+
+            // Heat-Shield Rings on Barrel
+            for (let r = 0; r < 4; r++) {
+                const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.12), darkMat);
+                ring.rotateX(Math.PI / 2);
+                ring.position.set(0, 0.04, -0.5 - (r * 0.2));
+                weaponGroup.add(ring);
+            }
+
+            // Muzzle Brake & Front Sight
+            const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.2), darkMat);
+            muzzle.position.set(0, 0.04, -1.75);
+
+            const sight = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.06), darkMat);
+            sight.position.set(0, 0.14, -1.65);
+
+            // 2. Front Dual Bipod Attachment (Matching Reference Image)
+            const bipodLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.65), darkMat);
+            bipodLeft.position.set(-0.22, -0.3, -1.3);
+            bipodLeft.rotation.z = -0.35;
+
+            const bipodRight = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.65), darkMat);
+            bipodRight.position.set(0.22, -0.3, -1.3);
+            bipodRight.rotation.z = 0.35;
+
+            // 3. Top Carrying Handle (Matching Reference Image)
+            const handleMount = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.22, 0.08), darkMat);
+            handleMount.position.set(0, 0.26, -0.35);
+            handleMount.rotation.x = -0.35;
+
+            const handleGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.35), darkMat);
+            handleGrip.rotateX(Math.PI / 2);
+            handleGrip.position.set(0, 0.35, -0.42);
+
+            // 4. Ammo Box & Hanging Brass Bullet Belt (Matching Reference Image)
+            const ammoBox = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.28, 0.32), darkMat);
+            ammoBox.position.set(-0.25, -0.32, -0.1);
+
+            // Curve of Brass Bullet Cartridges feeding into tray
+            for (let b = 0; b < 7; b++) {
+                const bullet = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.18), brassMat);
+                bullet.rotateZ(Math.PI / 2);
+                bullet.position.set(-0.16 + (b * 0.02), -0.05 - (b * 0.04), -0.08);
+                weaponGroup.add(bullet);
+            }
+
+            // 5. Stock, Pistol Grip & Red Trigger
+            const stock = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.35, 0.6), steelMat);
+            stock.position.set(0, -0.05, 0.6);
+
+            const grip = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.4, 0.22), darkMat);
+            grip.position.set(0, -0.32, 0.25);
+            grip.rotation.x = -0.3;
+
+            const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.1, 0.08), redMat);
+            trigger.position.set(0, -0.18, 0.12);
+
+            weaponGroup.add(mainReceiver);
+            weaponGroup.add(longBarrel);
+            weaponGroup.add(muzzle);
+            weaponGroup.add(sight);
+            weaponGroup.add(bipodLeft);
+            weaponGroup.add(bipodRight);
+            weaponGroup.add(handleMount);
+            weaponGroup.add(handleGrip);
+            weaponGroup.add(ammoBox);
+            weaponGroup.add(stock);
+            weaponGroup.add(grip);
+            weaponGroup.add(trigger);
         }
 
         this.weaponSocket.add(weaponGroup);

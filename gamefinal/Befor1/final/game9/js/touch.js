@@ -169,7 +169,7 @@ class TouchController {
 
         // Switch Weapon Button
         bindBtn('touch-btn-switch', () => {
-            const keys = ['ak47', 'awm', 'mp40', 'm1887', 'plasma', 'deagle'];
+            const keys = ['ak47', 'awm', 'mp40', 'm1887', 'plasma', 'deagle', 'm60'];
             const idx = keys.indexOf(this.weaponSys.equippedKey);
             const nextKey = keys[(idx + 1) % keys.length];
             this.weaponSys.switchWeapon(nextKey);
