@@ -62,12 +62,12 @@ class AIBot {
 
         this.position = spawnPos.clone();
         this.velocity = new THREE.Vector3();
-        this.speed = 4.8;
+        this.speed = 9.0;
         this.rotationY = Math.random() * Math.PI * 2;
 
         this.target = null;
         this.lastFireTime = 0;
-        this.fireInterval = 0.85 + Math.random() * 0.5;
+        this.fireInterval = 0.4 + Math.random() * 0.4;
         this.patrolTarget = this.getRandomPatrolPoint();
 
         // Tactical Strafe Timer & Direction

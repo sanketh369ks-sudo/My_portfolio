@@ -130,9 +130,26 @@ class BattleRoyaleGame {
             }
         });
 
-        // Menu Buttons
-        document.getElementById('start-btn').addEventListener('click', () => this.startMatch());
-        document.getElementById('restart-btn').addEventListener('click', () => this.startMatch());
+        // Menu Buttons with Direct Fullscreen User Gesture Triggers
+        const triggerFullscreen = () => {
+            try {
+                const doc = document.documentElement;
+                if (doc.requestFullscreen) {
+                    doc.requestFullscreen().catch(() => {});
+                } else if (doc.webkitRequestFullscreen) {
+                    doc.webkitRequestFullscreen();
+                }
+            } catch (e) {}
+        };
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            triggerFullscreen();
+            this.startMatch();
+        });
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            triggerFullscreen();
+            this.startMatch();
+        });
     }
 
     startMatch() {
