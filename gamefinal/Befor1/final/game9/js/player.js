@@ -391,7 +391,10 @@ class PlayerController {
     }
 
     setupControls() {
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth < 900);
+
         document.addEventListener('click', (e) => {
+            if (isTouch) return;
             if (this.isAlive && !this.isLocked && e.target.tagName === 'CANVAS') {
                 this.domElement.requestPointerLock();
             }
@@ -401,7 +404,7 @@ class PlayerController {
             this.isLocked = (document.pointerLockElement === this.domElement);
             const lockPrompt = document.getElementById('lock-prompt');
             if (lockPrompt) {
-                if (!this.isLocked && this.isAlive && window.gameInstance && window.gameInstance.state === 'PLAYING') {
+                if (!isTouch && !this.isLocked && this.isAlive && window.gameInstance && window.gameInstance.state === 'PLAYING') {
                     lockPrompt.classList.remove('hidden');
                 } else {
                     lockPrompt.classList.add('hidden');

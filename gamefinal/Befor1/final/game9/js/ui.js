@@ -312,13 +312,14 @@ class UIManager {
         const invOverlay = document.getElementById('inventory-overlay');
         if (!invOverlay) return;
 
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth < 900);
         if (show) {
             this.populateInventoryModal(player, weaponSys);
             invOverlay.classList.remove('hidden');
             if (document.pointerLockElement) document.exitPointerLock();
         } else {
             invOverlay.classList.add('hidden');
-            if (window.gameInstance && window.gameInstance.player && window.gameInstance.player.isAlive && !window.gameInstance.touchController.isTouchDevice) {
+            if (!isTouch && window.gameInstance && window.gameInstance.player && window.gameInstance.player.isAlive) {
                 document.getElementById('webgl-canvas').requestPointerLock();
             }
         }
@@ -359,12 +360,13 @@ class UIManager {
         const emoteOverlay = document.getElementById('emote-wheel-overlay');
         if (!emoteOverlay) return;
 
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth < 900);
         if (show) {
             emoteOverlay.classList.remove('hidden');
             if (document.pointerLockElement) document.exitPointerLock();
         } else {
             emoteOverlay.classList.add('hidden');
-            if (window.gameInstance && window.gameInstance.player && window.gameInstance.player.isAlive && !window.gameInstance.touchController.isTouchDevice) {
+            if (!isTouch && window.gameInstance && window.gameInstance.player && window.gameInstance.player.isAlive) {
                 document.getElementById('webgl-canvas').requestPointerLock();
             }
         }

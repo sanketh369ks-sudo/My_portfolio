@@ -792,6 +792,9 @@
     .weapon-hud-container {
         width: auto !important;
     }
+    #lock-prompt {
+        display: none !important;
+    }
 }
 body.is-touch .tactical-actions-row {
     display: none !important;
@@ -799,4 +802,7 @@ body.is-touch .tactical-actions-row {
 body.is-touch .vitals-container {
     width: 220px !important;
     padding: 10px 14px !important;
+}
+body.is-touch #lock-prompt {
+    display: none !important;
 }
