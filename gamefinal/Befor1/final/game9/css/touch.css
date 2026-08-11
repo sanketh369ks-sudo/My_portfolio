@@ -55,6 +55,7 @@
 }
 
 .touch-btn {
+    position: relative;
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -69,6 +70,22 @@
     touch-action: none;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     transition: transform 0.05s ease, background 0.15s ease;
+}
+
+.touch-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid #ffaa00;
+    color: #ffaa00;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    line-height: 1;
 }
 
 .touch-btn:active, .touch-btn.pressed {

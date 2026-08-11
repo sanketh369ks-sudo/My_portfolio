@@ -61,19 +61,33 @@ class UIManager {
         if (this.medkitCount) this.medkitCount.textContent = `x${player.medkits}`;
         if (this.glooCount) this.glooCount.textContent = `x${player.glooWalls}`;
 
-        // Skill Cooldown Badge
+        const touchMedkit = document.getElementById('touch-medkit-count');
+        if (touchMedkit) touchMedkit.textContent = `x${player.medkits}`;
+
+        const touchGloo = document.getElementById('touch-gloo-count');
+        if (touchGloo) touchGloo.textContent = `x${player.glooWalls}`;
+
+        // Skill Cooldown Badge (Desktop & Mobile)
         const skillCd = document.getElementById('skill-cd');
+        const touchSkillCd = document.getElementById('touch-skill-cd');
+
+        let cdText = 'READY';
+        let cdColor = '#20e2a3';
+        if (player.abilityActive) {
+            cdText = `${Math.ceil(player.abilityTimer)}s`;
+            cdColor = '#2ed573';
+        } else if (player.abilityCooldown > 0) {
+            cdText = `${Math.ceil(player.abilityCooldown)}s`;
+            cdColor = '#ffaa00';
+        }
+
         if (skillCd) {
-            if (player.abilityActive) {
-                skillCd.textContent = `ACTIVE (${Math.ceil(player.abilityTimer)}s)`;
-                skillCd.style.color = '#2ed573';
-            } else if (player.abilityCooldown > 0) {
-                skillCd.textContent = `${Math.ceil(player.abilityCooldown)}s`;
-                skillCd.style.color = '#ffaa00';
-            } else {
-                skillCd.textContent = 'READY';
-                skillCd.style.color = '#20e2a3';
-            }
+            skillCd.textContent = player.abilityActive ? `ACTIVE (${cdText})` : cdText;
+            skillCd.style.color = cdColor;
+        }
+        if (touchSkillCd) {
+            touchSkillCd.textContent = cdText;
+            touchSkillCd.style.color = cdColor;
         }
 
         // Active Weapon & Ammo
