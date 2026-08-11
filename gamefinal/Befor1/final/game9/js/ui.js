@@ -80,16 +80,28 @@ class UIManager {
         const w = weaponSys.currentWeapon;
         this.weaponName.textContent = w.name;
         this.ammoCount.textContent = weaponSys.isReloading ? 'RELOADING...' : w.currentAmmo;
-        this.ammoReserve.textContent = `/ ${w.reserveAmmo}`;
+        this.ammoReserve.textContent = (w.reserveAmmo === Infinity || w.reserveAmmo > 999) ? '/ ∞' : `/ ${w.reserveAmmo}`;
 
-        // Weapon Slot active highlight
-        document.querySelectorAll('.weapon-slot').forEach(slot => {
-            if (slot.dataset.weapon === weaponSys.equippedKey) {
-                slot.classList.add('active');
-            } else {
-                slot.classList.remove('active');
-            }
-        });
+        // Render 2 Carried Weapon Slots on HUD
+        const slotsContainer = document.querySelector('.weapon-slots');
+        if (slotsContainer && weaponSys.carriedWeapons) {
+            slotsContainer.innerHTML = '';
+            weaponSys.carriedWeapons.forEach((gunKey, idx) => {
+                const gunDef = weaponSys.weapons[gunKey];
+                if (!gunDef) return;
+                const isEquipped = (weaponSys.equippedKey === gunKey);
+                const slotEl = document.createElement('div');
+                slotEl.className = `weapon-slot ${isEquipped ? 'active' : ''}`;
+                slotEl.style.width = 'auto';
+                slotEl.style.padding = '0 12px';
+                slotEl.style.minWidth = '75px';
+                slotEl.innerHTML = `<span style="color:#ffaa00; font-weight:900; margin-right:4px;">${idx + 1}.</span> ${gunDef.name}`;
+                slotEl.onclick = () => {
+                    weaponSys.switchSlot(idx);
+                };
+                slotsContainer.appendChild(slotEl);
+            });
+        }
 
         // Top Status Bar
         const mins = Math.floor(Math.max(0, zone.timer) / 60);

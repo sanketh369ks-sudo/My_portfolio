@@ -248,10 +248,34 @@ class LootManager {
 
         const data = loot.data;
         if (data.category === 'weapon') {
-            weaponSys.switchWeapon(data.id);
+            const newGunId = data.id;
+            const droppedGunId = weaponSys.equipOrSwapWeapon(newGunId);
+
+            if (droppedGunId && weaponSys.weapons[droppedGunId]) {
+                const oldDef = weaponSys.weapons[droppedGunId];
+                const pos = player.position.clone();
+                const groundY = this.world.getTerrainHeight(pos.x, pos.z);
+
+                this.createLootItem(pos.x + (Math.random() - 0.5) * 1.5, groundY, pos.z + (Math.random() - 0.5) * 1.5, {
+                    id: droppedGunId,
+                    name: oldDef.name,
+                    category: 'weapon',
+                    color: oldDef.color,
+                    count: 1
+                });
+
+                if (window.gameInstance && window.gameInstance.ui) {
+                    window.gameInstance.ui.showHealText(`SWAPPED FOR ${weaponSys.weapons[newGunId].name}`);
+                }
+            } else {
+                if (window.gameInstance && window.gameInstance.ui) {
+                    window.gameInstance.ui.showHealText(`EQUIPPED ${data.name}`);
+                }
+            }
         } else if (data.category === 'ammo') {
-            if (weaponSys.weapons[data.weaponId]) {
-                weaponSys.weapons[data.weaponId].reserveAmmo += data.amount;
+            weaponSys.makeAmmoUnlimited();
+            if (window.gameInstance && window.gameInstance.ui) {
+                window.gameInstance.ui.showHealText('⚡ UNLIMITED BULLETS!');
             }
         } else if (data.category === 'armor') {
             player.armor = Math.min(player.maxArmor, player.armor + data.amount);
@@ -262,8 +286,25 @@ class LootManager {
         }
     }
 
-    update() {
+    update(player, weaponSys) {
         const time = performance.now() * 0.003;
+
+        // Automatic Auto-Pickup for bullets/ammo, medkits, armor, gloo walls, and guns when carrying < 2 guns
+        if (player && player.isAlive && weaponSys) {
+            for (let i = 0; i < this.lootItems.length; i++) {
+                const loot = this.lootItems[i];
+                if (loot.isPickedUp) continue;
+                const dist = loot.group.position.distanceTo(player.position);
+                if (dist < 3.2) {
+                    const category = loot.data.category;
+                    if (category === 'ammo' || category === 'medkit' || category === 'armor' || category === 'gloo') {
+                        this.pickupLoot(loot, player, weaponSys);
+                    } else if (category === 'weapon' && weaponSys.carriedWeapons.length < 2) {
+                        this.pickupLoot(loot, player, weaponSys);
+                    }
+                }
+            }
+        }
 
         // Slow subtle rotation for ground loot items
         this.lootItems.forEach(loot => {

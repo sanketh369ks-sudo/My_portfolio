@@ -238,12 +238,10 @@ class TouchController {
             this.weaponSys.reload();
         });
 
-        // Switch Weapon Button
+        // Switch Weapon Button (Toggles between Slot 1 and Slot 2)
         bindBtn('touch-btn-switch', () => {
-            const keys = ['ak47', 'awm', 'mp40', 'm1887', 'plasma', 'deagle', 'm60'];
-            const idx = keys.indexOf(this.weaponSys.equippedKey);
-            const nextKey = keys[(idx + 1) % keys.length];
-            this.weaponSys.switchWeapon(nextKey);
+            const nextSlot = (this.weaponSys.activeSlot === 0) ? 1 : 0;
+            this.weaponSys.switchSlot(nextSlot);
         });
     }
 }

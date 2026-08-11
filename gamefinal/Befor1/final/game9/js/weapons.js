@@ -110,22 +110,71 @@ class WeaponSystem {
             }
         };
 
-        this.equippedKey = 'ak47';
+        // Player starts carrying 2 guns maximum (Primary & Secondary loadout)
+        this.carriedWeapons = ['ak47', 'deagle'];
+        this.activeSlot = 0;
+        this.equippedKey = this.carriedWeapons[0];
         this.isReloading = false;
         this.lastFireTime = 0;
 
         this.tracers = [];
         this.sparks = [];
         this.flashes = [];
+
+        // All weapons come with Unlimited / Infinite ammo!
+        this.makeAmmoUnlimited();
     }
 
     get currentWeapon() {
         return this.weapons[this.equippedKey];
     }
 
+    makeAmmoUnlimited() {
+        Object.keys(this.weapons).forEach(k => {
+            this.weapons[k].reserveAmmo = Infinity;
+        });
+    }
+
+    switchSlot(slotIdx) {
+        if (this.carriedWeapons[slotIdx] && !this.isReloading) {
+            this.activeSlot = slotIdx;
+            this.switchWeapon(this.carriedWeapons[slotIdx]);
+        }
+    }
+
+    equipOrSwapWeapon(newGunId) {
+        // If gun is already carried, switch to its slot
+        const existingIdx = this.carriedWeapons.indexOf(newGunId);
+        if (existingIdx !== -1) {
+            this.activeSlot = existingIdx;
+            this.switchWeapon(newGunId);
+            return null;
+        }
+
+        let droppedGunId = null;
+        if (this.carriedWeapons.length < 2) {
+            // Free slot available
+            this.carriedWeapons.push(newGunId);
+            this.activeSlot = this.carriedWeapons.length - 1;
+        } else {
+            // Swap out current active slot gun and drop it!
+            droppedGunId = this.carriedWeapons[this.activeSlot];
+            this.carriedWeapons[this.activeSlot] = newGunId;
+        }
+
+        if (this.weapons[newGunId]) {
+            this.weapons[newGunId].reserveAmmo = Infinity;
+        }
+
+        this.switchWeapon(newGunId);
+        return droppedGunId;
+    }
+
     switchWeapon(key) {
         if (this.weapons[key] && !this.isReloading) {
             this.equippedKey = key;
+            const idx = this.carriedWeapons.indexOf(key);
+            if (idx !== -1) this.activeSlot = idx;
             audioManager.playReload();
             if (window.gameInstance && window.gameInstance.player) {
                 window.gameInstance.player.attachWeapon3D(key);
@@ -135,16 +184,14 @@ class WeaponSystem {
 
     reload() {
         const w = this.currentWeapon;
-        if (this.isReloading || w.currentAmmo >= w.magSize || w.reserveAmmo <= 0) return;
+        if (this.isReloading || w.currentAmmo >= w.magSize) return;
 
         this.isReloading = true;
         audioManager.playReload();
 
         setTimeout(() => {
-            const needed = w.magSize - w.currentAmmo;
-            const reloaded = Math.min(needed, w.reserveAmmo);
-            w.currentAmmo += reloaded;
-            w.reserveAmmo -= reloaded;
+            w.currentAmmo = w.magSize;
+            w.reserveAmmo = Infinity;
             this.isReloading = false;
         }, w.reloadTime * 1000);
     }

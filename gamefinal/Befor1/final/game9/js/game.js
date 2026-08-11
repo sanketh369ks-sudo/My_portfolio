@@ -95,13 +95,8 @@ class BattleRoyaleGame {
         window.addEventListener('keydown', (e) => {
             if (this.state !== 'PLAYING') return;
 
-            if (e.code === 'Digit1') this.weaponSys.switchWeapon('ak47');
-            if (e.code === 'Digit2') this.weaponSys.switchWeapon('awm');
-            if (e.code === 'Digit3') this.weaponSys.switchWeapon('mp40');
-            if (e.code === 'Digit4') this.weaponSys.switchWeapon('m1887');
-            if (e.code === 'Digit5') this.weaponSys.switchWeapon('plasma');
-            if (e.code === 'Digit6') this.weaponSys.switchWeapon('deagle');
-            if (e.code === 'Digit7') this.weaponSys.switchWeapon('m60');
+            if (e.code === 'Digit1') this.weaponSys.switchSlot(0);
+            if (e.code === 'Digit2') this.weaponSys.switchSlot(1);
             if (e.code === 'KeyR') this.weaponSys.reload();
             if (e.code === 'KeyF') {
                 const loot = this.lootManager.checkPlayerProximity(this.player.position);
@@ -259,7 +254,7 @@ class BattleRoyaleGame {
             this.player.update(delta);
             this.weaponSys.update();
             this.botManager.update(delta, this.player, this.zoneManager);
-            this.lootManager.update();
+            this.lootManager.update(this.player, this.weaponSys);
             this.zoneManager.update(delta, this.player, this.botManager.bots);
 
             const nearbyLoot = this.lootManager.checkPlayerProximity(this.player.position);
