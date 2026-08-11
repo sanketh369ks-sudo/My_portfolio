@@ -109,6 +109,9 @@ class BattleRoyaleGame {
             if (e.code === 'KeyG') {
                 this.player.deployGlooWall();
             }
+            if (e.code === 'KeyQ') {
+                this.player.activateBubbleShield();
+            }
             if (e.code === 'KeyH') {
                 this.player.useMedkit();
             }

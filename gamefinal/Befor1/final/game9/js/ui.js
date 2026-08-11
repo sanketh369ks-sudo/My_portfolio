@@ -67,6 +67,36 @@ class UIManager {
         const touchGloo = document.getElementById('touch-gloo-count');
         if (touchGloo) touchGloo.textContent = `x${player.glooWalls}`;
 
+        // ─── Bubble Shield Cooldown Badge ───────────────────────────────────
+        const shieldCdEl   = document.getElementById('bubble-shield-cd');
+        const touchShieldCd = document.getElementById('touch-bubble-cd');
+        const shieldBtn    = document.getElementById('touch-btn-bubble');
+        const shieldBtnDsk = document.querySelector('.tactical-btn.bubble-btn');
+        const vignetteEl   = document.getElementById('bubble-shield-vignette');
+
+        if (player.bubbleShieldActive) {
+            const sText = `${Math.ceil(player.bubbleShieldTimer)}s`;
+            if (shieldCdEl)    { shieldCdEl.textContent = sText; shieldCdEl.style.color = '#44ddff'; }
+            if (touchShieldCd) { touchShieldCd.textContent = sText; touchShieldCd.style.color = '#44ddff'; }
+            if (shieldBtn)     shieldBtn.classList.remove('on-cooldown');
+            if (shieldBtnDsk)  shieldBtnDsk.classList.remove('on-cooldown');
+            if (vignetteEl)    vignetteEl.classList.add('active');
+        } else if (player.bubbleShieldCooldown > 0) {
+            const cdText = `${Math.ceil(player.bubbleShieldCooldown)}s`;
+            if (shieldCdEl)    { shieldCdEl.textContent = cdText; shieldCdEl.style.color = '#ffaa00'; }
+            if (touchShieldCd) { touchShieldCd.textContent = cdText; touchShieldCd.style.color = '#ffaa00'; }
+            if (shieldBtn)     shieldBtn.classList.add('on-cooldown');
+            if (shieldBtnDsk)  shieldBtnDsk.classList.add('on-cooldown');
+            if (vignetteEl)    vignetteEl.classList.remove('active');
+        } else {
+            if (shieldCdEl)    { shieldCdEl.textContent = 'READY'; shieldCdEl.style.color = '#44ddff'; }
+            if (touchShieldCd) { touchShieldCd.textContent = 'READY'; touchShieldCd.style.color = '#44ddff'; }
+            if (shieldBtn)     shieldBtn.classList.remove('on-cooldown');
+            if (shieldBtnDsk)  shieldBtnDsk.classList.remove('on-cooldown');
+            if (vignetteEl)    vignetteEl.classList.remove('active');
+        }
+        // ───────────────────────────────────────────────────────────────────
+
         // Skill Cooldown Badge (Desktop & Mobile)
         const skillCd = document.getElementById('skill-cd');
         const touchSkillCd = document.getElementById('touch-skill-cd');
@@ -121,7 +151,28 @@ class UIManager {
         if (this.zoneTimer) {
             const mins = Math.floor(Math.max(0, zone.timer) / 60);
             const secs = Math.floor(Math.max(0, zone.timer) % 60);
-            this.zoneTimer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            this.zoneTimer.textContent = timeStr;
+
+            // Color: red when shrinking, orange when waiting, green when plenty of time
+            if (zone.state === 'SHRINKING') {
+                this.zoneTimer.style.color = '#ff4757';
+                this.zoneTimer.style.textShadow = '0 0 14px rgba(255,71,87,0.8)';
+            } else if (zone.timer < 10) {
+                this.zoneTimer.style.color = '#ffaa00';
+                this.zoneTimer.style.textShadow = '0 0 12px rgba(255,170,0,0.7)';
+            } else {
+                this.zoneTimer.style.color = '#20e2a3';
+                this.zoneTimer.style.textShadow = '0 0 10px rgba(32,226,163,0.5)';
+            }
+
+            // Update ⏱ TIME label to show phase number
+            const timerLabel = this.zoneTimer.previousElementSibling;
+            if (timerLabel) {
+                const phaseNum = (zone.currentPhaseIndex || 0) + 1;
+                const stateStr = zone.state === 'SHRINKING' ? '🔴 ZONE ' : '⏱ ZONE ';
+                timerLabel.textContent = `${stateStr}${phaseNum}`;
+            }
         }
 
         this.aliveCount.textContent = aliveCountTotal;

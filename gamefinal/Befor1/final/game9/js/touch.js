@@ -207,6 +207,11 @@ class TouchController {
             this.player.deployGlooWall();
         });
 
+        // Bubble Shield Button
+        bindBtn('touch-btn-bubble', () => {
+            this.player.activateBubbleShield();
+        });
+
         // Medkit Healing Button
         bindBtn('touch-btn-medkit', () => {
             this.player.useMedkit();

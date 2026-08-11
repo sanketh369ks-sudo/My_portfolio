@@ -60,6 +60,16 @@ class PlayerController {
         this.abilityTimer = 0;
         this.abilityRingMesh = null;
 
+        // ─── Bubble Shield System ───────────────────────────────────────────
+        this.bubbleShieldActive = false;
+        this.bubbleShieldTimer = 0;
+        this.bubbleShieldDuration = 5;   // seconds of protection
+        this.bubbleShieldCooldown = 0;
+        this.bubbleShieldMaxCooldown = 25; // seconds
+        this.bubbleShieldMesh = null;
+        this.bubbleShieldInnerMesh = null;
+        // ───────────────────────────────────────────────────────────────────
+
         // Free Fire Emotes System
         this.isEmoting = false;
         this.currentEmote = null;
@@ -454,6 +464,9 @@ class PlayerController {
             if (code === 'KeyG' || key === 'g') {
                 this.deployGlooWall();
             }
+            if (code === 'KeyQ' || key === 'q') {
+                this.activateBubbleShield();
+            }
             if (code === 'KeyH' || key === 'h') {
                 this.useMedkit();
             }
@@ -461,6 +474,100 @@ class PlayerController {
             if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') this.keys.sprint = false;
         }
     }
+
+    // ─── Bubble Shield ─────────────────────────────────────────────────────
+    activateBubbleShield() {
+        if (!this.isAlive || this.bubbleShieldCooldown > 0 || this.bubbleShieldActive) return;
+
+        this.bubbleShieldActive = true;
+        this.bubbleShieldTimer = this.bubbleShieldDuration;
+        this.bubbleShieldCooldown = this.bubbleShieldMaxCooldown;
+
+        // Play shield activation sound (reuse gloo wall sound)
+        if (typeof audioManager !== 'undefined') audioManager.playGlooWall();
+
+        // Outer bubble sphere
+        if (!this.bubbleShieldMesh) {
+            const outerGeo = new THREE.SphereGeometry(2.0, 32, 32);
+            const outerMat = new THREE.MeshStandardMaterial({
+                color: 0x00c8ff,
+                emissive: 0x0088ff,
+                emissiveIntensity: 0.7,
+                transparent: true,
+                opacity: 0.22,
+                side: THREE.FrontSide,
+                depthWrite: false
+            });
+            this.bubbleShieldMesh = new THREE.Mesh(outerGeo, outerMat);
+            this.scene.add(this.bubbleShieldMesh);
+
+            // Inner hexagonal shimmer shell
+            const innerGeo = new THREE.IcosahedronGeometry(1.75, 2);
+            const innerMat = new THREE.MeshStandardMaterial({
+                color: 0x44ddff,
+                emissive: 0x00aaff,
+                emissiveIntensity: 1.2,
+                transparent: true,
+                opacity: 0.12,
+                wireframe: true,
+                depthWrite: false
+            });
+            this.bubbleShieldInnerMesh = new THREE.Mesh(innerGeo, innerMat);
+            this.scene.add(this.bubbleShieldInnerMesh);
+        }
+
+        this.bubbleShieldMesh.visible = true;
+        this.bubbleShieldInnerMesh.visible = true;
+        this.bubbleShieldMesh.scale.set(0.1, 0.1, 0.1);
+        this.bubbleShieldInnerMesh.scale.set(0.1, 0.1, 0.1);
+
+        // Pop-in scale animation
+        let popT = 0;
+        const popAnim = setInterval(() => {
+            popT += 0.08;
+            const s = Math.min(1.0, popT * 2);
+            if (this.bubbleShieldMesh) this.bubbleShieldMesh.scale.set(s, s, s);
+            if (this.bubbleShieldInnerMesh) this.bubbleShieldInnerMesh.scale.set(s, s, s);
+            if (popT >= 0.6) clearInterval(popAnim);
+        }, 16);
+
+        // HUD notification
+        if (window.gameInstance && window.gameInstance.ui) {
+            window.gameInstance.ui.showHealText('🛡️ BUBBLE SHIELD ACTIVE!');
+        }
+    }
+
+    deactivateBubbleShield(burst = false) {
+        this.bubbleShieldActive = false;
+        if (this.bubbleShieldMesh) {
+            if (burst) {
+                // Burst-out effect
+                let bT = 0;
+                const burstAnim = setInterval(() => {
+                    bT += 0.07;
+                    const s = 1.0 + bT * 2.5;
+                    const op = Math.max(0, 0.22 - bT * 0.8);
+                    if (this.bubbleShieldMesh) {
+                        this.bubbleShieldMesh.scale.set(s, s, s);
+                        this.bubbleShieldMesh.material.opacity = op;
+                    }
+                    if (this.bubbleShieldInnerMesh) {
+                        this.bubbleShieldInnerMesh.scale.set(s, s, s);
+                        this.bubbleShieldInnerMesh.material.opacity = Math.max(0, 0.12 - bT * 0.5);
+                    }
+                    if (bT >= 0.35) {
+                        clearInterval(burstAnim);
+                        if (this.bubbleShieldMesh) this.bubbleShieldMesh.visible = false;
+                        if (this.bubbleShieldInnerMesh) this.bubbleShieldInnerMesh.visible = false;
+                    }
+                }, 16);
+            } else {
+                this.bubbleShieldMesh.visible = false;
+                if (this.bubbleShieldInnerMesh) this.bubbleShieldInnerMesh.visible = false;
+            }
+        }
+    }
+    // ───────────────────────────────────────────────────────────────────────
 
     activateAbility() {
         if (!this.isAlive || this.abilityCooldown > 0 || this.abilityActive) return;
@@ -560,11 +667,32 @@ class PlayerController {
         this.velocity.set(0, 0, 0);
         this.isCrouching = false;
         this.isProne = false;
+        this.bubbleShieldActive = false;
+        this.bubbleShieldCooldown = 0;
+        if (this.bubbleShieldMesh) this.bubbleShieldMesh.visible = false;
+        if (this.bubbleShieldInnerMesh) this.bubbleShieldInnerMesh.visible = false;
         this.stopEmote();
     }
 
     takeDamage(amount, attacker) {
         if (!this.isAlive) return;
+
+        // ── Bubble Shield blocks ALL incoming damage ────────────────────────
+        if (this.bubbleShieldActive) {
+            // Ripple flash on shield hit
+            if (this.bubbleShieldMesh) {
+                const mat = this.bubbleShieldMesh.material;
+                const origOp = mat.opacity;
+                mat.opacity = 0.7;
+                setTimeout(() => { if (mat) mat.opacity = origOp; }, 120);
+            }
+            if (window.gameInstance && window.gameInstance.ui) {
+                window.gameInstance.ui.showHealText('🛡️ SHIELD BLOCKED!');
+            }
+            return; // damage fully absorbed
+        }
+        // ──────────────────────────────────────────────────────────────────
+
         this.stopEmote();
 
         let remaining = amount;
@@ -838,6 +966,40 @@ class PlayerController {
                 if (this.abilityRingMesh) this.abilityRingMesh.visible = false;
             }
         }
+
+        // ─── Bubble Shield Timer & Animation ────────────────────────────────
+        if (this.bubbleShieldCooldown > 0) {
+            this.bubbleShieldCooldown = Math.max(0, this.bubbleShieldCooldown - delta);
+        }
+
+        if (this.bubbleShieldActive) {
+            this.bubbleShieldTimer -= delta;
+
+            const t = performance.now() * 0.002;
+            const pulse = 0.18 + Math.sin(t * 3.5) * 0.07;
+            const innerPulse = 0.10 + Math.sin(t * 5.0 + 1.2) * 0.04;
+
+            if (this.bubbleShieldMesh) {
+                this.bubbleShieldMesh.position.copy(this.position).add(new THREE.Vector3(0, 0.6, 0));
+                this.bubbleShieldMesh.material.opacity = pulse;
+                this.bubbleShieldMesh.material.emissiveIntensity = 0.5 + Math.sin(t * 4) * 0.3;
+                this.bubbleShieldMesh.rotation.y += delta * 0.8;
+            }
+            if (this.bubbleShieldInnerMesh) {
+                this.bubbleShieldInnerMesh.position.copy(this.position).add(new THREE.Vector3(0, 0.6, 0));
+                this.bubbleShieldInnerMesh.material.opacity = innerPulse;
+                this.bubbleShieldInnerMesh.rotation.x += delta * 0.5;
+                this.bubbleShieldInnerMesh.rotation.z += delta * 0.3;
+            }
+
+            if (this.bubbleShieldTimer <= 0) {
+                this.deactivateBubbleShield(true);
+                if (window.gameInstance && window.gameInstance.ui) {
+                    window.gameInstance.ui.showHealText('🛡️ SHIELD EXPIRED');
+                }
+            }
+        }
+        // ────────────────────────────────────────────────────────────────────
 
         let currentSpeed = this.speed;
         if (this.abilityActive) {
