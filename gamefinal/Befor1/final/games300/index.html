@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Party Clash 🎮 – 1–4 Player Mini Games</title>
+  <meta name="description"
+    content="Party Clash – A collection of 1–4 player mini-games you can play on one device. Includes Tic-Tac-Toe, Whack-a-Mole, Memory, Snakes and more!" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ===================== PARTICLE CANVAS ===================== -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- ===================== SCREENS ===================== -->
+  <div id="app">
+
+    <!-- ===== MAIN MENU ===== -->
+    <div id="screen-menu" class="screen active">
+      <div class="menu-wrap">
+        <div class="logo-block">
+          <div class="logo-icon">🎮</div>
+          <h1 class="logo-title">PARTY<span>CLASH</span></h1>
+          <p class="logo-sub">The Ultimate 1–4 Player Party Game!</p>
+        </div>
+
+        <div class="player-count-grid">
+          <button class="pc-btn" id="pc1" onclick="selectPlayerCount(1)">
+            <span class="pc-num">1</span>
+            <span class="pc-label">PLAYER</span>
+            <span class="pc-icon">🎯</span>
+          </button>
+          <button class="pc-btn" id="pc2" onclick="selectPlayerCount(2)">
+            <span class="pc-num">2</span>
+            <span class="pc-label">PLAYERS</span>
+            <span class="pc-icon">⚔️</span>
+          </button>
+          <button class="pc-btn" id="pc3" onclick="selectPlayerCount(3)">
+            <span class="pc-num">3</span>
+            <span class="pc-label">PLAYERS</span>
+            <span class="pc-icon">🏆</span>
+          </button>
+          <button class="pc-btn" id="pc4" onclick="selectPlayerCount(4)">
+            <span class="pc-num">4</span>
+            <span class="pc-label">PLAYERS</span>
+            <span class="pc-icon">🎉</span>
+          </button>
+        </div>
+
+        <button class="btn-primary pulse-glow" id="btn-play" onclick="goToPlayerSelect()" disabled>
+          <span>▶ PLAY</span>
+        </button>
+
+        <div class="menu-footer-btns">
+          <button class="btn-secondary" onclick="goToGameSelect()">🎮 Browse All 300 Games</button>
+          <button class="btn-secondary" onclick="showScreen('screen-settings')">⚙️ Settings</button>
+          <button class="btn-secondary" onclick="showScreen('screen-tournament')">🏆 Tournament</button>
+        </div>
+
+        <div class="version-tag">v1.0 – Party Clash</div>
+      </div>
+    </div>
+
+    <!-- ===== PLAYER SELECTION ===== -->
+    <div id="screen-players" class="screen">
+      <div class="screen-inner">
+        <button class="back-btn" onclick="showScreen('screen-menu')">← Back</button>
+        <h2 class="screen-title">SELECT PLAYERS</h2>
+
+        <div id="player-cards-container" class="player-cards"></div>
+
+        <button class="btn-primary" onclick="goToGameSelect()">▶ SELECT GAME</button>
+      </div>
+    </div>
+
+    <!-- ===== GAME SELECTION ===== -->
+    <div id="screen-games" class="screen">
+      <div class="screen-inner games-screen-inner">
+        <div class="games-header">
+          <button class="back-btn" onclick="showScreen('screen-players')">← Back</button>
+          <h1 class="main-games-heading">🚩 START FROM GAME #1 (Tic-Tac-Toe) TO #300 🏆</h1>
+          <p class="screen-sub">(START #1 TO END #300 – ALL 300 MINI-GAMES AVAILABLE)</p>
+        </div>
+
+        <div class="search-and-filter">
+          <div style="width:100%;margin-top:10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <input type="text" id="game-search" placeholder="🔍 Search among 300 mini-games..." oninput="filterGames()" style="width:100%;max-width:500px;padding:12px 20px;border-radius:25px;border:2px solid var(--accent);background:var(--surface);color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;outline:none;box-shadow:0 4px 15px rgba(0,0,0,0.3);" />
+            <div class="btn-start-one" onclick="resetToGameOne()"
+              style="background:linear-gradient(135deg, var(--gold), #ff914d);color:#000;font-family:'Fredoka One',cursive;font-size:1.15rem;padding:14px 24px;border-radius:30px;border:none;box-shadow:0 6px 20px rgba(255,215,0,0.4);cursor:pointer;transition:transform 0.2s;width:100%;max-width:500px;margin:0 auto;">
+              🚩 START FROM GAME #1 (Tic-Tac-Toe) TO END #300
+            </div>
+          </div>
+
+          <div class="filter-group" style="width:100%;margin-top:12px;">
+            <div class="filter-label"
+              style="font-size:0.75rem;font-weight:900;color:var(--gold);margin-bottom:4px;letter-spacing:1px;">🔢 GAME
+              RANGE (#1 TO #300):</div>
+            <div class="category-pills" id="range-pills">
+              <button class="cat-pill active" onclick="selectRange('all', this)">All (1-300)</button>
+              <button class="cat-pill" onclick="selectRange('1-50', this)">#1–50</button>
+              <button class="cat-pill" onclick="selectRange('51-100', this)">#51–100</button>
+              <button class="cat-pill" onclick="selectRange('101-150', this)">#101–150</button>
+              <button class="cat-pill" onclick="selectRange('151-200', this)">#151–200</button>
+              <button class="cat-pill" onclick="selectRange('201-250', this)">#201–250</button>
+              <button class="cat-pill" onclick="selectRange('251-300', this)">#251–300</button>
+            </div>
+          </div>
+
+          <div class="filter-group" style="width:100%;margin-top:8px;">
+            <div class="filter-label"
+              style="font-size:0.75rem;font-weight:900;color:var(--accent);margin-bottom:4px;letter-spacing:1px;">🏷️
+              CATEGORY FILTER:</div>
+            <div class="category-pills" id="category-pills">
+              <button class="cat-pill active" onclick="selectCategory('all', this)">All Categories</button>
+              <button class="cat-pill" onclick="selectCategory('strategy', this)">🧠 Strategy</button>
+              <button class="cat-pill" onclick="selectCategory('puzzle', this)">🧩 Puzzle</button>
+              <button class="cat-pill" onclick="selectCategory('retro', this)">👾 Retro</button>
+              <button class="cat-pill" onclick="selectCategory('action', this)">⚡ Action</button>
+              <button class="cat-pill" onclick="selectCategory('party', this)">🎉 Party</button>
+              <button class="cat-pill" onclick="selectCategory('sports', this)">⚽ Sports</button>
+              <button class="cat-pill" onclick="selectCategory('cards', this)">🃏 Cards</button>
+              <button class="cat-pill" onclick="selectCategory('arcade', this)">🕹️ Arcade</button>
+              <button class="cat-pill" onclick="selectCategory('words', this)">🔤 Words</button>
+              <button class="cat-pill" onclick="selectCategory('music', this)">🎵 Music</button>
+              <button class="cat-pill" onclick="selectCategory('board', this)">🪜 Board</button>
+              <button class="cat-pill" onclick="selectCategory('misc', this)">🎲 Misc</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-grid-container" id="game-grid-container"></div>
+
+        <button class="btn-primary btn-random" onclick="pickRandomGame()">🎲 RANDOM GAME</button>
+        <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTopGames()">⬆ Back to Top (#1)</button>
+      </div>
+    </div>
+
+    <!-- ===== TIC-TAC-TOE ===== -->
+    <div id="screen-ttt" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title" id="ttt-title">❌⭕ TIC-TAC-TOE</h2>
+
+        <div class="ttt-info-bar">
+          <div class="turn-badge" id="ttt-turn-badge">
+            <span id="ttt-turn-icon"></span>
+            <span id="ttt-turn-label">Player 1's Turn</span>
+          </div>
+        </div>
+
+        <div class="ttt-board" id="ttt-board">
+          <div class="ttt-cell" id="c0" onclick="tttClick(0)"></div>
+          <div class="ttt-cell" id="c1" onclick="tttClick(1)"></div>
+          <div class="ttt-cell" id="c2" onclick="tttClick(2)"></div>
+          <div class="ttt-cell" id="c3" onclick="tttClick(3)"></div>
+          <div class="ttt-cell" id="c4" onclick="tttClick(4)"></div>
+          <div class="ttt-cell" id="c5" onclick="tttClick(5)"></div>
+          <div class="ttt-cell" id="c6" onclick="tttClick(6)"></div>
+          <div class="ttt-cell" id="c7" onclick="tttClick(7)"></div>
+          <div class="ttt-cell" id="c8" onclick="tttClick(8)"></div>
+        </div>
+
+        <div class="score-strip" id="ttt-scores"></div>
+
+        <button class="btn-secondary mt-sm" onclick="tttRestart()">🔄 Restart Round</button>
+      </div>
+    </div>
+
+    <!-- ===== WHACK-A-MOLE ===== -->
+    <div id="screen-wam" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title">🐹 WHACK-A-MOLE</h2>
+
+        <div class="wam-hud">
+          <div class="hud-item">
+            <span class="hud-label">TIME</span>
+            <span class="hud-val" id="wam-timer">30</span>
+          </div>
+          <div id="wam-scores-hud" class="wam-scores-hud"></div>
+        </div>
+
+        <div class="wam-instructions" id="wam-instructions">
+          <p id="wam-player-instruction">Player 1 – Get ready! You have 30 seconds.</p>
+          <button class="btn-primary" onclick="wamStart()">▶ START</button>
+        </div>
+
+        <div class="wam-grid" id="wam-grid"></div>
+      </div>
+    </div>
+
+    <!-- ===== MEMORY GAME ===== -->
+    <div id="screen-mem" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title">🧠 MEMORY</h2>
+
+        <div class="mem-hud">
+          <div class="hud-item">
+            <span class="hud-label">TURN</span>
+            <span class="hud-val" id="mem-turn-label">Player 1</span>
+          </div>
+          <div id="mem-scores-hud" class="mem-scores-hud"></div>
+        </div>
+
+        <div class="mem-board" id="mem-board"></div>
+      </div>
+    </div>
+
+    <!-- ===== SNAKES GAME ===== -->
+    <div id="screen-snake" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title">🐍 SNAKES</h2>
+
+        <div class="snake-hud" id="snake-scores-hud"></div>
+
+        <canvas id="snakeCanvas" width="400" height="400"></canvas>
+
+        <div id="snake-controls" class="snake-controls"
+          style="width:100%;display:flex;flex-direction:column;align-items:center;">
+          <p class="ctrl-note" id="snake-ctrl-note">Use keyboard arrows / WASD or touch buttons to play</p>
+          <button class="btn-primary" onclick="snakeStart()" id="snake-start-btn">▶ START</button>
+          <div id="snake-touch-pad" style="width:100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ARCHERY ===== -->
+    <div id="screen-archery" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title">🏹 ARCHERY</h2>
+
+        <div class="score-strip" id="archery-scores-hud"></div>
+
+        <div class="archery-info" id="archery-info">Loading…</div>
+
+        <canvas id="archeryCanvas" width="340" height="260"></canvas>
+
+        <button class="btn-primary" onclick="archeryShoot()" id="archery-shoot-btn">
+          🏹 SHOOT &nbsp;<kbd>SPACE</kbd>
+        </button>
+        <p class="ctrl-note">Press <b>SPACE</b>, tap canvas, or button above to shoot</p>
+      </div>
+    </div>
+
+    <!-- ===== MATHS ===== -->
+    <div id="screen-math" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title">➗ MATHS</h2>
+
+        <div class="math-round-label" id="math-round">Round 1 / 8</div>
+
+        <div class="math-board" id="math-board">
+          <div class="math-question" id="math-question">…</div>
+          <div class="math-timer-track">
+            <div class="math-timer-bar" id="math-timer-bar"></div>
+          </div>
+          <div class="math-input-display" id="math-input-display" style="display:none">?</div>
+        </div>
+
+        <div class="math-sub" id="math-sub">Buzz in to answer!</div>
+
+        <div class="score-strip" id="math-scores"></div>
+
+        <div id="math-touch-buzzers" style="width:100%;"></div>
+
+        <p class="ctrl-note">Buzz keys: <b>Z · M · Q · P</b> or Tap your Player Buzzer above</p>
+      </div>
+    </div>
+
+    <!-- ===== TUG OF WAR ===== -->
+    <div id="screen-tug" class="screen">
+      <div class="screen-inner game-screen">
+        <button class="back-btn" onclick="quitGame()">← Quit</button>
+        <h2 class="screen-title">🤼 TUG OF WAR</h2>
+
+        <div class="tug-players-row">
+          <div class="tug-team" id="tug-left-zone">
+            <span id="tug-p1-name">P1</span>
+            <div class="tug-tap-count" id="tug-p1-count">0</div>
+          </div>
+          <div class="tug-team" id="tug-right-zone">
+            <span id="tug-p2-name">P2</span>
+            <div class="tug-tap-count" id="tug-p2-count">0</div>
+          </div>
+        </div>
+
+        <div class="tug-rope-container">
+          <div class="tug-rope">
+            <div class="tug-bar-fill" id="tug-bar-fill"></div>
+            <div class="tug-knot" id="tug-knot">🪢</div>
+          </div>
+          <div class="tug-flags">
+            <span id="tug-flag-left">🚩</span>
+            <span id="tug-flag-right">🚩</span>
+          </div>
+        </div>
+
+        <div class="tug-info" id="tug-info"></div>
+
+        <button class="btn-primary" onclick="tugBegin()" id="tug-start-btn">▶ START</button>
+        <div id="tug-touch-bar" style="width:100%;"></div>
+      </div>
+    </div>
+
+    <!-- ===== WINNER / RESULT SCREEN ===== -->
+    <div id="screen-result" class="screen">
+      <div class="screen-inner result-screen">
+        <div class="confetti-container" id="confetti-container"></div>
+        <div class="result-card">
+          <div class="result-trophy" id="result-trophy">🏆</div>
+          <h2 class="result-title" id="result-title">WINNER!</h2>
+          <p class="result-name" id="result-name">Player 1</p>
+          <div class="result-scores" id="result-scores"></div>
+
+          <div class="result-btns">
+            <button class="btn-primary" onclick="playAgainSameGame()">🔄 Play Again</button>
+            <button class="btn-secondary" onclick="goToGameSelect()">🎮 Other Game</button>
+            <button class="btn-secondary" onclick="showScreen('screen-menu')">🏠 Main Menu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div id="screen-settings" class="screen">
+      <div class="screen-inner">
+        <button class="back-btn" onclick="showScreen('screen-menu')">← Back</button>
+        <h2 class="screen-title">⚙️ SETTINGS</h2>
+
+        <div class="settings-list">
+          <div class="setting-row">
+            <span>🔊 Sound Effects</span>
+            <label class="toggle-sw">
+              <input type="checkbox" id="sfx-toggle" checked onchange="toggleSetting('sfx')" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <span>🎵 Background Music</span>
+            <label class="toggle-sw">
+              <input type="checkbox" id="music-toggle" onchange="toggleSetting('music')" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <span>✨ Animations</span>
+            <label class="toggle-sw">
+              <input type="checkbox" id="anim-toggle" checked onchange="toggleSetting('anim')" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <span>🌙 Dark Theme</span>
+            <label class="toggle-sw">
+              <input type="checkbox" id="theme-toggle" checked onchange="toggleSetting('theme')" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOURNAMENT ===== -->
+    <div id="screen-tournament" class="screen">
+      <div class="screen-inner">
+        <button class="back-btn" onclick="showScreen('screen-menu')">← Back</button>
+        <h2 class="screen-title">🏆 TOURNAMENT</h2>
+        <p class="screen-sub">Play all games – highest total score wins!</p>
+
+        <div id="tournament-body">
+          <div class="tourn-empty">
+            <div class="tourn-empty-icon">🎮</div>
+            <p>Start a game from the main menu to begin building your tournament score!</p>
+            <button class="btn-primary" onclick="showScreen('screen-menu')">▶ Start Playing</button>
+          </div>
+        </div>
+
+        <div id="tournament-scores" class="tourn-scores" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ===== UNIVERSAL SHELL (shared by 43 new games) ===== -->
+    <div id="screen-shell" class="screen">
+      <div class="screen-inner game-screen">
+        <div class="shell-header">
+          <button class="back-btn" onclick="quitGame()">← Quit</button>
+          <h2 class="screen-title" id="shell-title">Game</h2>
+        </div>
+        <div class="score-strip" id="shell-scores"></div>
+        <div id="shell-status" class="shell-status"></div>
+        <div id="shell-main" class="shell-main"></div>
+        <canvas id="shell-canvas" style="display:none"></canvas>
+        <div id="shell-footer" class="shell-footer"></div>
+      </div>
+    </div>
+
+  </div><!-- end #app -->
+
+  <script src="script.js"></script>
+  <script src="tic-tac-toe.js"></script>
+  <script src="whack-a-mole.js"></script>
+  <script src="memory.js"></script>
+  <script src="snakes.js"></script>
+  <script src="archery.js"></script>
+  <script src="maths.js"></script>
+  <script src="tug-of-war.js"></script>
+  <script src="reaction-games.js"></script>
+  <script src="card-games.js"></script>
+  <script src="sports-games.js"></script>
+  <script src="arcade-games.js"></script>
+  <script src="word-games.js"></script>
+  <script src="music-games.js"></script>
+  <script src="board-games.js"></script>
+  <script src="battle-games.js"></script>
+  <script src="party-games.js"></script>
+  <script src="misc-games.js"></script>
+  <script src="puzzle-games.js"></script>
+  <script src="retro-games.js"></script>
+  <script src="action-games.js"></script>
+  <script src="party-more.js"></script>
+  <script src="strategy-games.js"></script>
+  <script src="arcade-more.js"></script>
+  <script src="sports-more.js"></script>
+  <script src="party-ultimate.js"></script>
+  <script src="brain-300.js"></script>
+  <script src="arcade-300.js"></script>
+  <script src="sports-300.js"></script>
+  <script src="party-300.js"></script>
+</body>
+
+</html>
