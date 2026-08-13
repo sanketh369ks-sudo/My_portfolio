@@ -36,15 +36,48 @@
 				</div>
 
 				<div class="hint-card">
-					<span class="hint-title">🔑 DEMO CREDENTIALS:</span>
-					<span>Email: <code>sankethmlr@gmail.com</code></span>
-					<span>Pass: <code>password@369</code></span>
+					<span class="hint-title">🔑 ANY GMAIL LOGIN ENABLED:</span>
+					<span>Log in with any <code>@gmail.com</code> account (e.g. <code>player@gmail.com</code>)</span>
+					<span>Or use Demo: <code>sankethmlr@gmail.com</code> | <code>password@369</code></span>
 				</div>
 
-				<button type="submit" id="submit" class="submit-btn">LOGIN NOW 🚀</button>
+				<button type="submit" id="submit" class="submit-btn">LOGIN & VERIFY GMAIL 🚀</button>
 			</form>
 		</div>
 	</section>
+
+	<!-- Gmail Account Verification Modal -->
+	<div id="verifyModal" class="modal-overlay hidden">
+		<div class="modal-card">
+			<div class="modal-icon">📧</div>
+			<h3 class="modal-title">Verify Gmail Account</h3>
+			<p class="modal-sub">We've sent a 6-digit security code to <br><strong id="userEmailTarget" class="email-highlight">user@gmail.com</strong></p>
+
+			<div class="otp-container">
+				<input type="text" maxlength="1" class="otp-input" autofocus>
+				<input type="text" maxlength="1" class="otp-input">
+				<input type="text" maxlength="1" class="otp-input">
+				<input type="text" maxlength="1" class="otp-input">
+				<input type="text" maxlength="1" class="otp-input">
+				<input type="text" maxlength="1" class="otp-input">
+			</div>
+
+			<div class="quick-demo-code">
+				<span>Demo Code: <strong id="demoCodeText">123456</strong></span>
+				<button type="button" id="autoFillBtn" class="autofill-btn">⚡ Auto-fill Code</button>
+			</div>
+
+			<div id="verifyError" class="verify-error hidden">Invalid code! Please try again.</div>
+			<div id="verifySuccess" class="verify-success hidden">✅ Gmail Account Verified! Logging in...</div>
+
+			<button type="button" id="confirmVerifyBtn" class="submit-btn modal-btn">VERIFY & CONTINUE 🎮</button>
+			
+			<div class="modal-footer">
+				<button type="button" id="resendCodeBtn" class="link-btn">Resend Code</button>
+				<button type="button" id="cancelVerifyBtn" class="link-btn cancel">Cancel</button>
+			</div>
+		</div>
+	</div>
 
 	<script src="login.js"></script>
 </body>
