@@ -9,40 +9,94 @@
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link
-		href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap"
-		rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="login.css">
 </head>
 
 <body>
 	<section class="login-wrapper">
-		<div class="login-box">
+		<!-- Step 1: Gmail Account Form -->
+		<div id="stepEmailBox" class="login-box">
 			<a href="../final.html" class="back-link" title="Return to Arcade Hub Store">← BACK TO STORE</a>
 
 			<div class="brand-header">
 				<div class="logo-icon">🎮</div>
 				<h2 class="arcade-title">ARCADE HUB</h2>
-				<p class="login-sub">Sign in to access your player profile</p>
+				<p class="login-sub">Sign in with your Gmail account</p>
 			</div>
 
-			<form id="loginForm">
-				<div class="input-box">
-					<input type="email" required id="username" autocomplete="off" placeholder=" ">
-					<label for="username">Email Address</label>
+<form id="loginForm">
+    <div class="input-box">
+        <input type="text" required id="fullName" autocomplete="off" placeholder=" ">
+        <label for="fullName">Full Name</label>
+    </div>
+
+    <div class="input-box">
+        <input type="email" required id="username" autocomplete="off" placeholder=" ">
+        <label for="username">Gmail Address</label>
+        <div id="emailVerifyBadge" class="verify-badge hidden"></div>
+    </div>
+
+    <div class="input-box">
+        <input type="password" required id="password" autocomplete="off" placeholder=" ">
+        <label for="password">Password</label>
+    </div>
+
+    <div class="input-box">
+        <input type="password" required id="confirmPassword" autocomplete="off" placeholder=" ">
+        <label for="confirmPassword">Confirm Password</label>
+    </div>
+
+    <button type="submit" id="submit" class="submit-btn">SEND OTP TO GMAIL 📩</button>
+</form>
+		</div>
+
+		<!-- Step 2: Email OTP Entry Box -->
+		<div id="stepOtpBox" class="login-box hidden">
+			<button type="button" id="backToEmailBtn" class="back-link" style="background:none;border:none;cursor:pointer;">← CHANGE GMAIL</button>
+
+			<div class="brand-header">
+				<div class="logo-icon">📧</div>
+				<h2 class="arcade-title">ENTER EMAIL OTP</h2>
+				<p class="login-sub">Security code sent to <br><strong id="otpEmailTarget" class="email-highlight">user@gmail.com</strong></p>
+			</div>
+
+			<form id="otpForm">
+				<div class="otp-container">
+					<input type="text" maxlength="1" class="otp-input" autofocus autocomplete="off">
+					<input type="text" maxlength="1" class="otp-input" autocomplete="off">
+					<input type="text" maxlength="1" class="otp-input" autocomplete="off">
+					<input type="text" maxlength="1" class="otp-input" autocomplete="off">
+					<input type="text" maxlength="1" class="otp-input" autocomplete="off">
+					<input type="text" maxlength="1" class="otp-input" autocomplete="off">
 				</div>
 
-				<div class="input-box">
-					<input type="password" required id="password" autocomplete="off" placeholder=" ">
-					<label for="password">Password</label>
+				<div id="otpStatusMessage" class="verify-badge hidden" style="margin-bottom: 20px; justify-content: center;"></div>
+
+				<button type="submit" id="verifyOtpSubmit" class="submit-btn">VERIFY OTP & LOGIN 🚀</button>
+
+				<div class="resend-wrapper">
+					<button type="button" id="resendOtpBtn" class="link-btn" disabled>Resend OTP (<span id="countdownTimer">30</span>s)</button>
 				</div>
-
-
-
-				<button type="submit" id="submit" class="submit-btn">LOGIN NOW 🚀</button>
 			</form>
 		</div>
 	</section>
+
+	<!-- Live Email Notification Toast Simulator -->
+	<div id="emailToastNotification" class="email-toast hidden">
+		<div class="toast-header">
+			<span class="toast-badge">📩 NEW GMAIL INBOX MESSAGE</span>
+			<button type="button" id="closeToastBtn" class="toast-close">✕</button>
+		</div>
+		<div class="toast-body">
+			<div class="toast-sender">From: <strong>security@arcadehub.com</strong></div>
+			<div class="toast-recipient">To: <strong id="toastEmailRecipient">user@gmail.com</strong></div>
+			<div class="toast-subject">Subject: 🔑 Your Arcade Hub OTP Verification Code</div>
+			<div class="toast-content">
+				Your 6-digit Email OTP security code is: <strong id="toastOtpCode" class="otp-code-highlight">849204</strong>
+			</div>
+		</div>
+	</div>
 
 	<script src="login.js"></script>
 </body>

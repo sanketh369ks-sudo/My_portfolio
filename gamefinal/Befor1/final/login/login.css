@@ -33,6 +33,10 @@ body {
     overflow-x: hidden;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .login-wrapper {
     width: 100%;
     max-width: 440px;
@@ -51,6 +55,12 @@ body {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     position: relative;
     transition: all 0.3s ease;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .login-box:hover {
@@ -75,7 +85,7 @@ body {
 
 .brand-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 }
 
 .logo-icon {
@@ -93,7 +103,7 @@ body {
 
 .arcade-title {
     font-family: var(--font-heading);
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 900;
     letter-spacing: 1px;
     background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
@@ -103,14 +113,20 @@ body {
 }
 
 .login-sub {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.email-highlight {
+    color: var(--accent-cyan);
+    word-break: break-all;
 }
 
 /* Floating Input Box */
 .input-box {
     position: relative;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .input-box input {
@@ -156,34 +172,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Hint Card */
-.hint-card {
-    background: rgba(0, 255, 204, 0.06);
-    border: 1px dashed rgba(0, 255, 204, 0.3);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.hint-title {
-    font-weight: 700;
-    color: var(--accent-cyan);
-    margin-bottom: 2px;
-}
-
-.hint-card code {
-    color: #ffffff;
-    font-family: monospace;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
 /* Submit Button */
 .submit-btn {
     width: 100%;
@@ -192,7 +180,7 @@ body {
     color: #000000;
     font-family: var(--font-heading);
     font-weight: 800;
-    font-size: 1rem;
+    font-size: 0.95rem;
     border: none;
     border-radius: 14px;
     cursor: pointer;
@@ -206,193 +194,186 @@ body {
     box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
 }
 
-@media(max-width: 480px) {
-    .login-box {
-        padding: 30px 20px;
-    }
-}
-
-/* Modal Overlay & Card */
-.hidden {
-    display: none !important;
-}
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(4, 7, 13, 0.85);
-    backdrop-filter: blur(12px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.modal-card {
-    background: #0f172a;
-    border: 1px solid rgba(0, 255, 204, 0.3);
-    border-radius: 24px;
-    padding: 36px 28px;
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    box-shadow: 0 25px 60px rgba(0, 255, 204, 0.2);
-    position: relative;
-}
-
-.modal-icon {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-    display: inline-block;
-    animation: pulse 2s infinite ease-in-out;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.modal-title {
-    font-family: var(--font-heading);
-    font-size: 1.4rem;
-    color: #ffffff;
-    margin-bottom: 8px;
-}
-
-.modal-sub {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 24px;
-    line-height: 1.4;
-}
-
-.email-highlight {
-    color: var(--accent-cyan);
-    word-break: break-all;
-}
-
-/* OTP Container */
+/* OTP Input Row */
 .otp-container {
     display: flex;
     gap: 8px;
     justify-content: center;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
 }
 
 .otp-input {
-    width: 46px;
-    height: 52px;
-    background: rgba(30, 41, 59, 0.8);
+    width: 48px;
+    height: 56px;
+    background: rgba(15, 23, 42, 0.9);
     border: 2px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 14px;
     text-align: center;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--accent-cyan);
     font-family: var(--font-heading);
     outline: none;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
 }
 
 .otp-input:focus {
     border-color: var(--accent-cyan);
-    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
-    background: rgba(15, 23, 42, 0.95);
-    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(0, 255, 204, 0.45);
+    background: rgba(22, 30, 46, 0.95);
+    transform: translateY(-3px);
 }
 
-.quick-demo-code {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(0, 255, 204, 0.08);
-    border: 1px dashed rgba(0, 255, 204, 0.25);
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-}
-
-.quick-demo-code strong {
-    color: var(--accent-cyan);
-    letter-spacing: 2px;
-}
-
-.autofill-btn {
-    background: linear-gradient(135deg, var(--accent-cyan), #3b82f6);
-    color: #000;
-    border: none;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.autofill-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
-}
-
-.verify-error {
-    color: #ff4949;
-    background: rgba(255, 73, 73, 0.15);
-    border: 1px solid rgba(255, 73, 73, 0.3);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    margin-bottom: 16px;
-}
-
-.verify-success {
-    color: #00ffcc;
-    background: rgba(0, 255, 204, 0.15);
-    border: 1px solid rgba(0, 255, 204, 0.3);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    margin-bottom: 16px;
-    font-weight: 700;
-}
-
-.modal-btn {
-    margin-top: 4px;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
+.resend-wrapper {
+    text-align: center;
+    margin-top: 18px;
 }
 
 .link-btn {
     background: none;
     border: none;
     color: var(--accent-cyan);
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: opacity 0.2s ease;
 }
 
-.link-btn:hover {
-    opacity: 0.8;
-    text-decoration: underline;
+.link-btn:disabled {
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
-.link-btn.cancel {
+/* Verification Badge */
+.verify-badge {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.verify-badge.checking {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+}
+
+.verify-badge.valid {
+    background: rgba(0, 255, 204, 0.15);
+    border: 1px solid rgba(0, 255, 204, 0.4);
+    color: #00ffcc;
+}
+
+.verify-badge.invalid {
+    background: rgba(255, 73, 73, 0.15);
+    border: 1px solid rgba(255, 73, 73, 0.4);
+    color: #ff4949;
+}
+
+/* Email Toast Notification Simulator */
+.email-toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    width: 90%;
+    max-width: 380px;
+    background: #0d1527;
+    border: 2px solid var(--accent-cyan);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 15px 40px rgba(0, 255, 204, 0.3);
+    z-index: 9999;
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #000;
+    background: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.toast-close {
+    background: none;
+    border: none;
     color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.toast-close:hover {
+    color: #ffffff;
+}
+
+.toast-body {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.toast-sender, .toast-recipient, .toast-subject {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toast-sender strong, .toast-recipient strong {
+    color: #ffffff;
+}
+
+.toast-content {
+    margin-top: 8px;
+    background: rgba(0, 255, 204, 0.08);
+    border: 1px dashed rgba(0, 255, 204, 0.3);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.otp-code-highlight {
+    display: inline-block;
+    color: var(--accent-cyan);
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin-left: 6px;
+}
+
+@media(max-width: 480px) {
+    .login-box {
+        padding: 30px 20px;
+    }
+    .email-toast {
+        top: 10px;
+        right: 5%;
+        width: 90%;
+    }
 }
