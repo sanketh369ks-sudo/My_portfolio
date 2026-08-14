@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    
 
     /* =====================================================
        VIDEO PROGRESS
@@ -163,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "index.html";
 
         }, 500);
-        
+
 
     });
 
