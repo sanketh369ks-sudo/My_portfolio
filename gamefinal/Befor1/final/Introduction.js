@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
 
-            window.location.href = "index.html";
+            window.location.href = "./Login/login.html";
 
         }, 500);
 
