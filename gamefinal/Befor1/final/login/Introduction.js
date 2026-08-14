@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.style.display = 'inline-block';
     // Navigate to login page on click
     submitBtn.addEventListener('click', () => {
-      window.location.href = 'file:///D:/My_portfolio/gamefinal/Befor1/final/login/login.html';
+      window.location.href = "login2/login.html";
     });
   });
 });
