@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome</title>
+    <meta name="description" content="Welcome page with a video that plays after clicking the button.">
+
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <main class="container">
+        <h1 class="welcome-msg">Welcome to Our Site!</h1>
+        <button id="playBtn" class="play-btn">Play Video</button>
+        <div class="video-wrapper" id="videoWrapper" style="display:none;">
+            <video id="welcomeVideo" class="welcome-video" controls>
+                <source src="imp.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <button id="submitBtn" class="submit-btn" style="display:none;">Submit</button>
+    </main>
+    <script src="script.js"></script>
+</body>
+
+</html>
