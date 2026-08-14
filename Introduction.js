@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const submitSection = document.getElementById("submitSection");
 
+
+
+    
+
     const submitBtn = document.getElementById("submitBtn");
 
 
@@ -88,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    
+
 
     /* =====================================================
        VIDEO PROGRESS
