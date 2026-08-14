@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Introduction</title>
+    <meta name="description" content="Welcome to my interactive 3D introduction">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="Introduction.css">
+</head>
+
+<body>
+
+    <!-- Animated background -->
+    <div class="background">
+
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+
+        <div class="grid"></div>
+
+        <!-- 3D floating objects -->
+        <div class="cube cube-1">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+        </div>
+
+        <div class="cube cube-2">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+        </div>
+
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+
+    </div>
+
+
+    <!-- Main content -->
+    <main class="container">
+
+        <section class="glass-card" id="card">
+
+            <!-- Top badge -->
+            <div class="badge">
+                <span class="status-dot"></span>
+                Welcome
+            </div>
+
+
+            <!-- Heading -->
+            <div class="heading-section">
+
+                <span class="small-title">NICE TO MEET YOU</span>
+
+                <h1 class="welcome-msg">
+                    Welcome to
+                    <span>My Introduction</span>
+                </h1>
+
+                <p class="description">
+                    Get to know me through a short introduction.
+                    Click below to begin the journey.
+                </p>
+
+            </div>
+
+
+            <!-- Play section -->
+            <div class="play-section" id="playSection">
+
+                <button id="playBtn" class="play-btn">
+
+                    <span class="play-icon">
+                        ▶
+                    </span>
+
+                    <span>Play Introduction</span>
+
+                    <span class="button-glow"></span>
+
+                </button>
+
+                <p class="hint">
+                    Click to start the video
+                </p>
+
+            </div>
+
+
+            <!-- Video -->
+            <div class="video-wrapper" id="videoWrapper">
+
+                <div class="video-container">
+
+                    <video
+                        id="welcomeVideo"
+                        class="welcome-video"
+                        controls
+                        playsinline
+                        preload="metadata"
+                    >
+
+                        <source src="imp.mp4" type="video/mp4">
+
+                        Your browser does not support the video tag.
+
+                    </video>
+
+                    <div class="video-glow"></div>
+
+                </div>
+
+
+                <!-- Progress -->
+                <div class="progress-container">
+
+                    <div class="progress-bar">
+
+                        <div
+                            class="progress-fill"
+                            id="progressFill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Submit -->
+            <div class="submit-section" id="submitSection">
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+                <h2>Introduction Complete</h2>
+
+                <p>
+                    Thanks for watching. Continue to the next page.
+                </p>
+
+                <button id="submitBtn" class="submit-btn">
+
+                    Continue
+
+                    <span>→</span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="Introduction.js"></script>
+
+</body>
+
+</html>
